@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Diagnostics;
@@ -13,12 +14,17 @@ namespace Tower_Unite_Piano_Bot
         [DllImport("User32.dll")]
         static extern int SetForegroundWindow(IntPtr point);
 
+        #region Main
         public string song = "{123456789QWERTYUIOPASDFGHJLZXCVBNM}";
-
         public int normalDelay = 200;
         public int fastDelay = 100;
-
         public bool stop = true;
+        #endregion
+
+        #region Save and load
+        OpenFileDialog loadFileDialog = new OpenFileDialog();
+        SaveFileDialog saveFileDialog = new SaveFileDialog();
+        #endregion
 
         public Form1()
         {
@@ -26,6 +32,7 @@ namespace Tower_Unite_Piano_Bot
             SongTextBox.Text = song;
             NormalDelayBox.Value = normalDelay;
             FastDelayBox.Value = fastDelay;
+            saveFileDialog.Filter = "Text File | *.txt";
         }
 
         private void PlayButton_Click(object sender, EventArgs e)
@@ -123,6 +130,57 @@ namespace Tower_Unite_Piano_Bot
             }
             Text = "Tower Unite Piano Bot - Stopped";
             stop = true;
+        }
+
+        private void LoadButton_Click(object sender, EventArgs e)
+        {
+            if (loadFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                StreamReader sr = new StreamReader(loadFileDialog.FileName);
+                if (sr.ReadLine() == "NORMAL DELAY")
+                {
+                    if (int.TryParse(sr.ReadLine(), out normalDelay))
+                    {
+                        NormalDelayBox.Value = normalDelay;
+                        if (sr.ReadLine() == "FAST DELAY")
+                        {
+                            if (int.TryParse(sr.ReadLine(), out fastDelay))
+                            {
+                                FastDelayBox.Value = fastDelay;
+                                if (sr.ReadLine() == "NOTES")
+                                {
+                                    string tempReadNotes = sr.ReadToEnd();
+                                    if (!string.IsNullOrWhiteSpace(tempReadNotes))
+                                    {
+                                        SongTextBox.Text = tempReadNotes;
+                                        sr.Close();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                MessageBox.Show("Load Failed");
+                sr.Close();
+            }
+        }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                StreamWriter sw = new StreamWriter(saveFileDialog.FileName);
+
+                sw.WriteLine("NORMAL DELAY");
+                sw.WriteLine(normalDelay.ToString());
+                sw.WriteLine("FAST DELAY");
+                sw.WriteLine(fastDelay.ToString());
+                sw.WriteLine("NOTES");
+                sw.WriteLine(SongTextBox.Text);
+                sw.Dispose();
+                sw.Close();
+            }
         }
     }
 }

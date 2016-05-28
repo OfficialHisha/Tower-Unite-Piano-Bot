@@ -15,11 +15,12 @@ An example of a working input is as such:
 A B C ABC [ABC] {ABC}
 
 An example of invalid input is as such:
-[(7] % {A/C}
+[(7] % {A/C} (x2)
 as described in Known issues.
 
 # Planned features
-Saving and loading songs
+Saving and loading songs - Implemented as of version 1.1.
+Suggestions?
 
 # Known issues
 Some characters are not supported as notes, yet (Mostly special characters).
