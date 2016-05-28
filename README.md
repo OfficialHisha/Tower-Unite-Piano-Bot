@@ -8,8 +8,9 @@ Redistributed versions of the software must contain appropriate creadits to the 
 1. Read Known issues and Important
 2. Paste the song you want to play in the text box
 3. Make sure the song is a appropriate format and does not contain special characters
-4. Click play
-5. If the game window does not become the active window on its own, do so now
+4. Make sure your in-game character is sitting by the piano 
+5. Click play
+6. If the game window does not become the active window on its own, do so now
 
 An example of a working input is as such:
 A B C ABC [ABC] {ABC}
