@@ -14,3 +14,4 @@ C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\ob
 C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Release\Tower_Unite_Piano_Bot.Form1.resources
 C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Release\Tower_Unite_Piano_Bot.Properties.Resources.resources
 C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Release\Tower Unite Piano Bot.csproj.GenerateResource.Cache
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Release\Tower Unite Piano Bot.csprojResolveAssemblyReference.cache

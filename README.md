@@ -28,7 +28,7 @@ Saving and loading songs - Implemented as of version 1.1.
 Suggestions?
 
 # Known issues
-Some characters are not supported as notes, yet (Mostly special characters).
+Some characters are not supported as notes, yet (Mostly special characters). - Fixed as of version 1.1.1.
 
 Does not support (x2) etc. tags. The workaround is to paste it for each iteration.
 

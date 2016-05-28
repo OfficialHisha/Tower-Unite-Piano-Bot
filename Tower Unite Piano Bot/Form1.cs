@@ -77,7 +77,10 @@ namespace Tower_Unite_Piano_Bot
                         else
                         {
                             isMultiPress = false;
-                            SendKeys.SendWait(multiPressNotes);
+                            foreach (char currentNote in multiPressNotes)
+                            {
+                                SendKeys.SendWait("{" + currentNote.ToString() + "}");
+                            }
                             multiPressNotes = "";
                             Thread.Sleep(delay);
                             continue;
@@ -109,7 +112,7 @@ namespace Tower_Unite_Piano_Bot
                         continue;
                     }
 
-                    SendKeys.SendWait(note.ToString());
+                    SendKeys.SendWait("{" + note.ToString() + "}");
                     Thread.Sleep(delay);
                 }
                 Thread.Sleep(1000);

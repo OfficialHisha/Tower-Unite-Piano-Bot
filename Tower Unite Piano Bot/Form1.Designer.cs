@@ -38,10 +38,10 @@
             this.FastDelayBox = new System.Windows.Forms.NumericUpDown();
             this.StopButton = new System.Windows.Forms.Button();
             this.MainGroup = new System.Windows.Forms.GroupBox();
+            this.VersionLabel = new System.Windows.Forms.Label();
             this.SaveButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
             this.DelaySettingsGroup = new System.Windows.Forms.GroupBox();
-            this.VersionLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.NormalDelayBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.FastDelayBox)).BeginInit();
             this.MainGroup.SuspendLayout();
@@ -172,6 +172,15 @@
             this.MainGroup.TabStop = false;
             this.MainGroup.Text = "Notes:";
             // 
+            // VersionLabel
+            // 
+            this.VersionLabel.AutoSize = true;
+            this.VersionLabel.Location = new System.Drawing.Point(335, 397);
+            this.VersionLabel.Name = "VersionLabel";
+            this.VersionLabel.Size = new System.Drawing.Size(72, 13);
+            this.VersionLabel.TabIndex = 14;
+            this.VersionLabel.Text = "Version: 1.1.1";
+            // 
             // SaveButton
             // 
             this.SaveButton.Location = new System.Drawing.Point(336, 199);
@@ -206,15 +215,6 @@
             this.DelaySettingsGroup.TabIndex = 13;
             this.DelaySettingsGroup.TabStop = false;
             this.DelaySettingsGroup.Text = "Delay Settings";
-            // 
-            // VersionLabel
-            // 
-            this.VersionLabel.AutoSize = true;
-            this.VersionLabel.Location = new System.Drawing.Point(335, 397);
-            this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Size = new System.Drawing.Size(63, 13);
-            this.VersionLabel.TabIndex = 14;
-            this.VersionLabel.Text = "Version: 1.1";
             // 
             // Form1
             // 

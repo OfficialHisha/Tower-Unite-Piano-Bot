@@ -4,3 +4,6 @@ Initial Release.
 1.1
 GUI Redesign.
 Added save and load features.
+
+1.1.1
+Fixed a bug where special characters would make your in-game character leave the piano.
