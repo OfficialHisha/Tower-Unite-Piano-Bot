@@ -2,8 +2,17 @@
 Initial Release.
 
 1.1
-GUI Redesign.
+GUI: Redesign.
 Added save and load features.
 
 1.1.1
 Fixed a bug where special characters would make your in-game character leave the piano.
+
+1.2
+Added looping.
+Possibly added GMT support.
+
+1.2.1 (Unreleased)
+Added character (½) to act as a spacebar (for drum set support).
+Added keybindings (Change bindings in the new settings tab).
+GUI: Moved delay settings to settings tab.

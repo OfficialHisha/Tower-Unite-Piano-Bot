@@ -1,0 +1,8 @@
+NORMAL DELAY
+175
+FAST DELAY
+50
+NOTES
+D [½D] D [DF] 
+[½D] D [½D] [DF] 
+

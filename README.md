@@ -18,17 +18,19 @@ A B C ABC [ABC] {ABC}
 
 An example of invalid input is as such:
 
-[(7] % {A/C} (x2)
+(x2) (x3) etc.
 
 as described in Known issues.
 
 # Planned features
-Saving and loading songs - Implemented as of version 1.1.
 
 Suggestions?
 
 # Known issues
-Some characters are not supported as notes, yet (Mostly special characters). - Fixed as of version 1.1.1.
+Cannot play black keys.
+(I have tried to overcome this issue with everything I could think of, no luck so far.
+I've tried to send capital letters and I've tried emulating holding the shift key. But it looks straight through my trixes.
+If anyone has any idea how to solve this issue, please tell me :> )
 
 Does not support (x2) etc. tags. The workaround is to paste it for each iteration.
 

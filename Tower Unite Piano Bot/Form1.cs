@@ -5,12 +5,13 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Tower_Unite_Piano_Bot.Exceptions;
+using Utilities;
 
 namespace Tower_Unite_Piano_Bot
 {
     public partial class Form1 : Form
     {
+        //This imports a method used in the PlayButton_Click method to choose active window.
         [DllImport("User32.dll")]
         static extern int SetForegroundWindow(IntPtr point);
 
@@ -20,6 +21,8 @@ namespace Tower_Unite_Piano_Bot
         public int fastDelay = 100;
         public bool stop = true;
         public bool loop = false;
+        Keys startKey;
+        Keys stopKey;
         #endregion
 
         #region Save and load
@@ -27,17 +30,34 @@ namespace Tower_Unite_Piano_Bot
         SaveFileDialog saveFileDialog = new SaveFileDialog();
         #endregion
 
+        GlobalKeyboardHook gkh = new GlobalKeyboardHook();
+
         public Form1()
         {
             InitializeComponent();
             SongTextBox.Text = song;
             NormalDelayBox.Value = normalDelay;
             FastDelayBox.Value = fastDelay;
+
+            //This sets the save dialog to filter on .txt files.
             saveFileDialog.Filter = "Text File | *.txt";
 
+            //This adds options for the ProcessChooserBox.
             ProcessChooserBox.Items.Add("TU");
             ProcessChooserBox.Items.Add("GMT");
             ProcessChooserBox.SelectedItem = "TU";
+
+            //Subscribe the method "GKS_KeyDown" to the KeyDown event of the GlobalKeyboardHook.
+            gkh.KeyDown += new KeyEventHandler(GKS_KeyDown);
+
+            //This converts the text from the keybind settings window to actual keys.
+            //Then we add them to the global hook (This is done so the keypresses will be detected when the application is not in focus)
+            KeysConverter keysConverter = new KeysConverter();
+            startKey = (Keys)keysConverter.ConvertFromString(StartKeyTextBox.Text.ToString());
+            stopKey = (Keys)keysConverter.ConvertFromString(StopKeyTextBox.Text.ToString());
+            gkh.HookedKeys.Add(startKey);
+            gkh.HookedKeys.Add(stopKey);
+            
         }
 
         private void PlayButton_Click(object sender, EventArgs e)
@@ -68,9 +88,9 @@ namespace Tower_Unite_Piano_Bot
                 {
                     while (loop)
                     {
-                        PlayFromTheStart();
                         if (stop)
                             return;
+                        PlayFromTheStart();
                     }
                 }
                 else
@@ -172,6 +192,46 @@ namespace Tower_Unite_Piano_Bot
             }
         }
 
+        private void StartKey_TextChanged(object sender, EventArgs e)
+        {
+            //Using a try catch here in case the user inputs wrong key binds.
+            KeysConverter keysConverter = new KeysConverter();
+            try
+            {
+                //Remember to reset the hooked key to the new one.
+                gkh.HookedKeys.Remove(startKey);
+                startKey = (Keys)keysConverter.ConvertFromString(StartKeyTextBox.Text.ToString());
+                if (startKey == stopKey)
+                    MessageBox.Show("This key is already bound to another action!");
+                gkh.HookedKeys.Add(startKey);
+                PlayButton.Text = $"Start ({StartKeyTextBox.Text.ToString()})";
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show($"ERROR: Invalid key {StartKeyTextBox.Text.ToString()}");
+            }
+        }
+
+        private void StopKey_TextChanged(object sender, EventArgs e)
+        {
+            //Using a try catch here in case the user inputs wrong key binds.
+            KeysConverter keysConverter = new KeysConverter();
+            try
+            {
+                //Remember to reset the hooked key to the new one.
+                gkh.HookedKeys.Remove(stopKey);
+                stopKey = (Keys)keysConverter.ConvertFromString(StopKeyTextBox.Text.ToString());
+                if (stopKey == startKey)
+                    MessageBox.Show("This key is already bound to another action!");
+                gkh.HookedKeys.Add(stopKey);
+                StopButton.Text = $"Stop ({StopKeyTextBox.Text.ToString()})";
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show($"ERROR: Invalid key {StopKeyTextBox.Text.ToString()}");
+            }
+        }
+
         private void PlayFromTheStart()
         {
             bool isMultiPress = false;
@@ -187,18 +247,31 @@ namespace Tower_Unite_Piano_Bot
                     continue;
 
                 #region Multiple notes
-                    if (isMultiPress)
+                if (isMultiPress)
                 {
                     if (note != ']')
                     {
-                        multiPressNotes += note;
-                        continue;
+                        if (note == '½')
+                        {
+                            multiPressNotes += ' ';
+                            continue;
+                        }
+                        else
+                        {
+                            multiPressNotes += note;
+                            continue;
+                        }
                     }
                     else
                     {
                         isMultiPress = false;
                         foreach (char currentNote in multiPressNotes)
                         {
+                            if(currentNote == '½')
+                            {
+                                SendKeys.SendWait(" ");
+                                continue;
+                            }
                             SendKeys.SendWait("{" + currentNote.ToString() + "}");
                         }
                         multiPressNotes = "";
@@ -225,16 +298,34 @@ namespace Tower_Unite_Piano_Bot
                 }
                 #endregion
 
-                //Normal pause
-                if (note == ' ')
+                if (note == '½')
+                {
+                    SendKeys.SendWait(" ");
+                    continue;
+                }
+
+                    //Normal pause
+                    if (note == ' ')
                 {
                     Thread.Sleep(normalDelay);
                     continue;
                 }
-
                 SendKeys.SendWait("{" + note.ToString() + "}");
                 Thread.Sleep(delay);
             }
+        }
+
+        private void GKS_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == startKey)
+            {
+                PlayButton.PerformClick();
+            }
+            else if (e.KeyCode == stopKey)
+            {
+                StopButton.PerformClick();
+            }
+            e.Handled = true;
         }
     }
 }

@@ -1,5 +1,5 @@
 NORMAL DELAY
-200
+225
 FAST DELAY
 100
 NOTES
@@ -27,3 +27,4 @@ NOTES
 
 [4sfl]f[etf]f[qf][qd][etd]q
 [48qpsh][psf][et][psf]
+

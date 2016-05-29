@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+    Program developed by Matias Jensen. Licenced under the GNU General Public License V3.
+    Git repository: https://github.com/Sejemus/Tower-Unite-Piano-Bot
+*/
+using System;
 using System.Windows.Forms;
 using Tower_Unite_Piano_Bot.Exceptions;
 
