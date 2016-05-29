@@ -45,6 +45,9 @@
             this.SaveButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
             this.DelaySettingsGroup = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.LongPauseDelayBox = new System.Windows.Forms.NumericUpDown();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.FirstTab = new System.Windows.Forms.TabPage();
             this.SecondTab = new System.Windows.Forms.TabPage();
@@ -57,6 +60,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.FastDelayBox)).BeginInit();
             this.MainGroup.SuspendLayout();
             this.DelaySettingsGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.LongPauseDelayBox)).BeginInit();
             this.Tabs.SuspendLayout();
             this.FirstTab.SuspendLayout();
             this.SecondTab.SuspendLayout();
@@ -85,25 +89,25 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 26);
+            this.label1.Location = new System.Drawing.Point(3, 26);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(86, 13);
+            this.label1.Size = new System.Drawing.Size(118, 13);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Delay for normal:";
+            this.label1.Text = "Delay for normal speed:";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 51);
+            this.label2.Location = new System.Drawing.Point(3, 52);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(72, 13);
+            this.label2.Size = new System.Drawing.Size(104, 13);
             this.label2.TabIndex = 6;
-            this.label2.Text = "Delay for fast:";
+            this.label2.Text = "Delay for fast speed:";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(153, 26);
+            this.label3.Location = new System.Drawing.Point(182, 26);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(64, 13);
             this.label3.TabIndex = 7;
@@ -112,7 +116,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(152, 51);
+            this.label4.Location = new System.Drawing.Point(182, 52);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(64, 13);
             this.label4.TabIndex = 8;
@@ -120,7 +124,7 @@
             // 
             // NormalDelayBox
             // 
-            this.NormalDelayBox.Location = new System.Drawing.Point(98, 24);
+            this.NormalDelayBox.Location = new System.Drawing.Point(128, 24);
             this.NormalDelayBox.Maximum = new decimal(new int[] {
             2500,
             0,
@@ -135,14 +139,14 @@
             this.NormalDelayBox.Size = new System.Drawing.Size(49, 20);
             this.NormalDelayBox.TabIndex = 9;
             this.NormalDelayBox.Value = new decimal(new int[] {
-            500,
+            200,
             0,
             0,
             0});
             // 
             // FastDelayBox
             // 
-            this.FastDelayBox.Location = new System.Drawing.Point(98, 49);
+            this.FastDelayBox.Location = new System.Drawing.Point(128, 50);
             this.FastDelayBox.Maximum = new decimal(new int[] {
             2000,
             0,
@@ -157,7 +161,7 @@
             this.FastDelayBox.Size = new System.Drawing.Size(49, 20);
             this.FastDelayBox.TabIndex = 10;
             this.FastDelayBox.Value = new decimal(new int[] {
-            250,
+            100,
             0,
             0,
             0});
@@ -227,7 +231,7 @@
             this.VersionLabel.Name = "VersionLabel";
             this.VersionLabel.Size = new System.Drawing.Size(72, 13);
             this.VersionLabel.TabIndex = 14;
-            this.VersionLabel.Text = "Version: 1.2.1";
+            this.VersionLabel.Text = "Version: 1.2.2";
             // 
             // SaveButton
             // 
@@ -251,6 +255,9 @@
             // 
             // DelaySettingsGroup
             // 
+            this.DelaySettingsGroup.Controls.Add(this.label6);
+            this.DelaySettingsGroup.Controls.Add(this.label7);
+            this.DelaySettingsGroup.Controls.Add(this.LongPauseDelayBox);
             this.DelaySettingsGroup.Controls.Add(this.label3);
             this.DelaySettingsGroup.Controls.Add(this.label4);
             this.DelaySettingsGroup.Controls.Add(this.label2);
@@ -259,10 +266,50 @@
             this.DelaySettingsGroup.Controls.Add(this.NormalDelayBox);
             this.DelaySettingsGroup.Location = new System.Drawing.Point(0, 116);
             this.DelaySettingsGroup.Name = "DelaySettingsGroup";
-            this.DelaySettingsGroup.Size = new System.Drawing.Size(225, 79);
+            this.DelaySettingsGroup.Size = new System.Drawing.Size(268, 110);
             this.DelaySettingsGroup.TabIndex = 13;
             this.DelaySettingsGroup.TabStop = false;
             this.DelaySettingsGroup.Text = "Delay Settings";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(182, 77);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(64, 13);
+            this.label6.TabIndex = 12;
+            this.label6.Text = "Milliseconds";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(3, 77);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(123, 13);
+            this.label7.TabIndex = 11;
+            this.label7.Text = "Delay for long pause (\'.\'):";
+            // 
+            // LongPauseDelayBox
+            // 
+            this.LongPauseDelayBox.Location = new System.Drawing.Point(128, 75);
+            this.LongPauseDelayBox.Maximum = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
+            this.LongPauseDelayBox.Minimum = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.LongPauseDelayBox.Name = "LongPauseDelayBox";
+            this.LongPauseDelayBox.Size = new System.Drawing.Size(49, 20);
+            this.LongPauseDelayBox.TabIndex = 13;
+            this.LongPauseDelayBox.Value = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
             // 
             // Tabs
             // 
@@ -305,14 +352,14 @@
             this.KeybindingBox.Controls.Add(this.StartKeyLabel);
             this.KeybindingBox.Location = new System.Drawing.Point(0, 0);
             this.KeybindingBox.Name = "KeybindingBox";
-            this.KeybindingBox.Size = new System.Drawing.Size(225, 110);
+            this.KeybindingBox.Size = new System.Drawing.Size(268, 110);
             this.KeybindingBox.TabIndex = 0;
             this.KeybindingBox.TabStop = false;
             this.KeybindingBox.Text = "Key bindings";
             // 
             // StopKeyTextBox
             // 
-            this.StopKeyTextBox.Location = new System.Drawing.Point(42, 71);
+            this.StopKeyTextBox.Location = new System.Drawing.Point(41, 66);
             this.StopKeyTextBox.Name = "StopKeyTextBox";
             this.StopKeyTextBox.Size = new System.Drawing.Size(100, 20);
             this.StopKeyTextBox.TabIndex = 3;
@@ -321,7 +368,7 @@
             // 
             // StartKeyTextBox
             // 
-            this.StartKeyTextBox.Location = new System.Drawing.Point(42, 43);
+            this.StartKeyTextBox.Location = new System.Drawing.Point(41, 40);
             this.StartKeyTextBox.Name = "StartKeyTextBox";
             this.StartKeyTextBox.Size = new System.Drawing.Size(100, 20);
             this.StartKeyTextBox.TabIndex = 2;
@@ -331,7 +378,7 @@
             // StopKeyLabel
             // 
             this.StopKeyLabel.AutoSize = true;
-            this.StopKeyLabel.Location = new System.Drawing.Point(6, 71);
+            this.StopKeyLabel.Location = new System.Drawing.Point(6, 69);
             this.StopKeyLabel.Name = "StopKeyLabel";
             this.StopKeyLabel.Size = new System.Drawing.Size(29, 13);
             this.StopKeyLabel.TabIndex = 1;
@@ -360,6 +407,7 @@
             this.MainGroup.PerformLayout();
             this.DelaySettingsGroup.ResumeLayout(false);
             this.DelaySettingsGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.LongPauseDelayBox)).EndInit();
             this.Tabs.ResumeLayout(false);
             this.FirstTab.ResumeLayout(false);
             this.SecondTab.ResumeLayout(false);
@@ -396,6 +444,9 @@
         private System.Windows.Forms.TextBox StartKeyTextBox;
         private System.Windows.Forms.Label StopKeyLabel;
         private System.Windows.Forms.Label StartKeyLabel;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown LongPauseDelayBox;
     }
 }
 

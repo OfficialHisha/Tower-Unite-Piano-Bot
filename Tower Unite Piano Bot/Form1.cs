@@ -19,6 +19,7 @@ namespace Tower_Unite_Piano_Bot
         public string song = "{123456789QWERTYUIOPASDFGHJLZXCVBNM}";
         public int normalDelay = 200;
         public int fastDelay = 100;
+        public int longDelay = 200;
         public bool stop = true;
         public bool loop = false;
         Keys startKey;
@@ -72,6 +73,7 @@ namespace Tower_Unite_Piano_Bot
             song = SongTextBox.Text;
             normalDelay = (int)NormalDelayBox.Value;
             fastDelay = (int)FastDelayBox.Value;
+            longDelay = (int)LongPauseDelayBox.Value;
 
             Process p;
             if ((string)ProcessChooserBox.SelectedItem == "GMT")
@@ -246,6 +248,22 @@ namespace Tower_Unite_Piano_Bot
                 if (note == '\n' || note == '\r')
                     continue;
 
+                #region Pauses
+                //Long pause
+                if (note == '.')
+                {
+                    Thread.Sleep(longDelay);
+                    continue;
+                }
+                
+                //Normal pause
+                if (note == ' ')
+                {
+                    Thread.Sleep(normalDelay);
+                    continue;
+                }
+                #endregion
+
                 #region Multiple notes
                 if (isMultiPress)
                 {
@@ -267,12 +285,16 @@ namespace Tower_Unite_Piano_Bot
                         isMultiPress = false;
                         foreach (char currentNote in multiPressNotes)
                         {
-                            if(currentNote == '½')
+                            if(currentNote == ' ')
                             {
-                                SendKeys.SendWait(" ");
+                                 SendKeys.SendWait(" ");
                                 continue;
                             }
-                            SendKeys.SendWait("{" + currentNote.ToString() + "}");
+                            else
+                            {
+                                SendKeys.SendWait("{" + currentNote.ToString() + "}");
+                                continue;
+                            }
                         }
                         multiPressNotes = "";
                         Thread.Sleep(delay);
@@ -304,12 +326,6 @@ namespace Tower_Unite_Piano_Bot
                     continue;
                 }
 
-                    //Normal pause
-                    if (note == ' ')
-                {
-                    Thread.Sleep(normalDelay);
-                    continue;
-                }
                 SendKeys.SendWait("{" + note.ToString() + "}");
                 Thread.Sleep(delay);
             }
