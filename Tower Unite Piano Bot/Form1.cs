@@ -19,6 +19,7 @@ namespace Tower_Unite_Piano_Bot
         public int normalDelay = 200;
         public int fastDelay = 100;
         public bool stop = true;
+        public bool loop = false;
         #endregion
 
         #region Save and load
@@ -33,6 +34,10 @@ namespace Tower_Unite_Piano_Bot
             NormalDelayBox.Value = normalDelay;
             FastDelayBox.Value = fastDelay;
             saveFileDialog.Filter = "Text File | *.txt";
+
+            ProcessChooserBox.Items.Add("TU");
+            ProcessChooserBox.Items.Add("GMT");
+            ProcessChooserBox.SelectedItem = "TU";
         }
 
         private void PlayButton_Click(object sender, EventArgs e)
@@ -48,80 +53,39 @@ namespace Tower_Unite_Piano_Bot
             normalDelay = (int)NormalDelayBox.Value;
             fastDelay = (int)FastDelayBox.Value;
 
-            Process p = Process.GetProcessesByName("Tower").FirstOrDefault();
+            Process p;
+            if ((string)ProcessChooserBox.SelectedItem == "GMT")
+                p = Process.GetProcessesByName("hl2").FirstOrDefault();
+            else
+                p = Process.GetProcessesByName("Tower").FirstOrDefault();
+
             if (p != null)
             {
                 IntPtr h = p.MainWindowHandle;
                 SetForegroundWindow(h);
 
-                bool isMultiPress = false;
-                string multiPressNotes = "";
-
-                int delay = normalDelay;
-
-                foreach (char note in song)
+                if (loop)
                 {
-                    if (stop)
-                        return;
-                    if (note == '\n' || note == '\r')
-                        continue;
-
-                    #region Multiple notes
-                        if (isMultiPress)
+                    while (loop)
                     {
-                        if (note != ']')
-                        {
-                            multiPressNotes += note;
-                            continue;
-                        }
-                        else
-                        {
-                            isMultiPress = false;
-                            foreach (char currentNote in multiPressNotes)
-                            {
-                                SendKeys.SendWait("{" + currentNote.ToString() + "}");
-                            }
-                            multiPressNotes = "";
-                            Thread.Sleep(delay);
-                            continue;
-                        }
+                        PlayFromTheStart();
+                        if (stop)
+                            return;
                     }
-                    else if (note == '[')
-                    {
-                        isMultiPress = true;
-                        continue;
-                    }
-                    #endregion
-                    #region Really fast
-                    if (note == '{')
-                    {
-                        delay = fastDelay;
-                        continue;
-                    }
-                    else if (note == '}')
-                    {
-                        delay = normalDelay;
-                        continue;
-                    }
-                    #endregion
-
-                    //Normal pause
-                    if (note == ' ')
-                    {
-                        Thread.Sleep(normalDelay);
-                        continue;
-                    }
-
-                    SendKeys.SendWait("{" + note.ToString() + "}");
-                    Thread.Sleep(delay);
                 }
+                else
+                {
+                    PlayFromTheStart();
+                }
+
+
                 Thread.Sleep(1000);
                 Text = "Tower Unite Piano Bot";
                 stop = true;
             }
             else
             {
-                throw new ProcessNotFoundException("The process could not be found!");
+                MessageBox.Show("ERROR: The targeted game could not be found! Please ensure that the game you are trying to target is running");
             }
         }
 
@@ -183,6 +147,93 @@ namespace Tower_Unite_Piano_Bot
                 sw.WriteLine(SongTextBox.Text);
                 sw.Dispose();
                 sw.Close();
+            }
+        }
+
+        private void LoopCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            // The CheckBox control's Text property is changed each time the 
+            // control is clicked, indicating a checked or unchecked state.
+            if (LoopCheckBox.Checked)
+            {
+                loop = true;
+            }
+            else
+            {
+                loop = false;
+            }
+        }
+
+        private void ProcessChooserBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if ((string)ProcessChooserBox.SelectedItem == "GMT")
+            {
+                MessageBox.Show("WARNING! Choosing GMT will set the software to target Garry's Mod. This is completely untested and potentially dangerous!");
+            }
+        }
+
+        private void PlayFromTheStart()
+        {
+            bool isMultiPress = false;
+            string multiPressNotes = "";
+
+            int delay = normalDelay;
+
+            foreach (char note in song)
+            {
+                if (stop)
+                    return;
+                if (note == '\n' || note == '\r')
+                    continue;
+
+                #region Multiple notes
+                    if (isMultiPress)
+                {
+                    if (note != ']')
+                    {
+                        multiPressNotes += note;
+                        continue;
+                    }
+                    else
+                    {
+                        isMultiPress = false;
+                        foreach (char currentNote in multiPressNotes)
+                        {
+                            SendKeys.SendWait("{" + currentNote.ToString() + "}");
+                        }
+                        multiPressNotes = "";
+                        Thread.Sleep(delay);
+                        continue;
+                    }
+                }
+                else if (note == '[')
+                {
+                    isMultiPress = true;
+                    continue;
+                }
+                #endregion
+                #region Really fast
+                if (note == '{')
+                {
+                    delay = fastDelay;
+                    continue;
+                }
+                else if (note == '}')
+                {
+                    delay = normalDelay;
+                    continue;
+                }
+                #endregion
+
+                //Normal pause
+                if (note == ' ')
+                {
+                    Thread.Sleep(normalDelay);
+                    continue;
+                }
+
+                SendKeys.SendWait("{" + note.ToString() + "}");
+                Thread.Sleep(delay);
             }
         }
     }

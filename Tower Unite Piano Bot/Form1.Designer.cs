@@ -38,6 +38,9 @@
             this.FastDelayBox = new System.Windows.Forms.NumericUpDown();
             this.StopButton = new System.Windows.Forms.Button();
             this.MainGroup = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.ProcessChooserBox = new System.Windows.Forms.ComboBox();
+            this.LoopCheckBox = new System.Windows.Forms.CheckBox();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.SaveButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
@@ -159,6 +162,9 @@
             // 
             // MainGroup
             // 
+            this.MainGroup.Controls.Add(this.label5);
+            this.MainGroup.Controls.Add(this.ProcessChooserBox);
+            this.MainGroup.Controls.Add(this.LoopCheckBox);
             this.MainGroup.Controls.Add(this.VersionLabel);
             this.MainGroup.Controls.Add(this.SaveButton);
             this.MainGroup.Controls.Add(this.LoadButton);
@@ -172,14 +178,44 @@
             this.MainGroup.TabStop = false;
             this.MainGroup.Text = "Notes:";
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(335, 284);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(41, 13);
+            this.label5.TabIndex = 17;
+            this.label5.Text = "Target:";
+            // 
+            // ProcessChooserBox
+            // 
+            this.ProcessChooserBox.FormattingEnabled = true;
+            this.ProcessChooserBox.Location = new System.Drawing.Point(338, 300);
+            this.ProcessChooserBox.Name = "ProcessChooserBox";
+            this.ProcessChooserBox.Size = new System.Drawing.Size(89, 21);
+            this.ProcessChooserBox.TabIndex = 16;
+            this.ProcessChooserBox.Text = "TU";
+            this.ProcessChooserBox.SelectedIndexChanged += new System.EventHandler(this.ProcessChooserBox_SelectedIndexChanged);
+            // 
+            // LoopCheckBox
+            // 
+            this.LoopCheckBox.AutoSize = true;
+            this.LoopCheckBox.Location = new System.Drawing.Point(338, 259);
+            this.LoopCheckBox.Name = "LoopCheckBox";
+            this.LoopCheckBox.Size = new System.Drawing.Size(50, 17);
+            this.LoopCheckBox.TabIndex = 15;
+            this.LoopCheckBox.Text = "Loop";
+            this.LoopCheckBox.UseVisualStyleBackColor = true;
+            this.LoopCheckBox.CheckedChanged += new System.EventHandler(this.LoopCheckBox_CheckedChanged);
+            // 
             // VersionLabel
             // 
             this.VersionLabel.AutoSize = true;
             this.VersionLabel.Location = new System.Drawing.Point(335, 397);
             this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Size = new System.Drawing.Size(72, 13);
+            this.VersionLabel.Size = new System.Drawing.Size(63, 13);
             this.VersionLabel.TabIndex = 14;
-            this.VersionLabel.Text = "Version: 1.1.1";
+            this.VersionLabel.Text = "Version: 1.2";
             // 
             // SaveButton
             // 
@@ -251,6 +287,9 @@
         private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.Button LoadButton;
         private System.Windows.Forms.Label VersionLabel;
+        private System.Windows.Forms.CheckBox LoopCheckBox;
+        private System.Windows.Forms.ComboBox ProcessChooserBox;
+        private System.Windows.Forms.Label label5;
     }
 }
 
