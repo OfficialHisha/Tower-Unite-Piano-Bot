@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomDelay.cs" />
     <Compile Include="Exceptions\BotException.cs" />
     <Compile Include="Exceptions\ProcessNotFoundException.cs" />
     <Compile Include="Form1.cs">

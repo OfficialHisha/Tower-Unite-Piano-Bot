@@ -16,3 +16,12 @@ C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\ob
 C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower_Unite_Piano_Bot.Form1.resources
 C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower_Unite_Piano_Bot.Properties.Resources.resources
 C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower Unite Piano Bot.csproj.GenerateResource.Cache
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\bin\Debug\Tower Unite Piano Bot.exe.config
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\bin\Debug\Tower Unite Piano Bot.exe
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\bin\Debug\Tower Unite Piano Bot.pdb
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower Unite Piano Bot.csprojResolveAssemblyReference.cache
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower_Unite_Piano_Bot.Form1.resources
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower_Unite_Piano_Bot.Properties.Resources.resources
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower Unite Piano Bot.csproj.GenerateResource.Cache
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower Unite Piano Bot.exe
+C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower Unite Piano Bot.pdb
