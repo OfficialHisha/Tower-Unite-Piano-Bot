@@ -20,3 +20,4 @@ GUI: Moved delay settings to settings tab.
 1.2.2
 Fixed playback for drums (Whoops)
 Added custom delay options. For ultimate costumization!
+New save format, backwards compatible.
