@@ -1,4 +1,4 @@
-1.0
+﻿1.0
 Initial Release.
 
 1.1
@@ -12,7 +12,11 @@ Fixed a bug where special characters would make your in-game character leave the
 Added looping.
 Possibly added GMT support.
 
-1.2.1 (Unreleased)
+1.2.1
 Added character (½) to act as a spacebar (for drum set support).
 Added keybindings (Change bindings in the new settings tab).
 GUI: Moved delay settings to settings tab.
+
+1.2.2
+Fixed playback for drums (Whoops)
+Added custom delay options. For ultimate costumization!
