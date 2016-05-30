@@ -1,3 +1,5 @@
+CUSTOM DELAYS
+0
 NORMAL DELAY
 225
 FAST DELAY
@@ -27,4 +29,3 @@ NOTES
 
 [4sfl]f[etf]f[qf][qd][etd]q
 [48qpsh][psf][et][psf]
-

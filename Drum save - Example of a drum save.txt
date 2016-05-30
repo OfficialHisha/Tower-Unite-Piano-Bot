@@ -1,3 +1,5 @@
+CUSTOM DELAYS
+0
 NORMAL DELAY
 175
 FAST DELAY
@@ -5,4 +7,3 @@ FAST DELAY
 NOTES
 D [½D] D [DF] 
 [½D] D [½D] [DF] 
-

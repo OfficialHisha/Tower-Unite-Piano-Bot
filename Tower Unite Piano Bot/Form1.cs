@@ -30,7 +30,8 @@ namespace Tower_Unite_Piano_Bot
         OpenFileDialog loadFileDialog = new OpenFileDialog();
         SaveFileDialog saveFileDialog = new SaveFileDialog();
         #endregion
-        
+
+        List<CustomDelay> customDelayOptions = new List<CustomDelay>();
         List<CustomDelay> activeCustomDelays = new List<CustomDelay>();
 
         GlobalKeyboardHook gkh = new GlobalKeyboardHook();
@@ -60,6 +61,25 @@ namespace Tower_Unite_Piano_Bot
             stopKey = (Keys)keysConverter.ConvertFromString(StopKeyTextBox.Text.ToString());
             gkh.HookedKeys.Add(startKey);
             gkh.HookedKeys.Add(stopKey);
+
+            #region Initialize custom delay options
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox0, DelayCharacter0, DelayTime0, 0));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox1, DelayCharacter1, DelayTime1, 1));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox2, DelayCharacter2, DelayTime2, 2));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox3, DelayCharacter3, DelayTime3, 3));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox4, DelayCharacter4, DelayTime4, 4));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox5, DelayCharacter5, DelayTime5, 5));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox6, DelayCharacter6, DelayTime6, 6));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox7, DelayCharacter7, DelayTime7, 7));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox8, DelayCharacter8, DelayTime8, 8));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox9, DelayCharacter9, DelayTime9, 9));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox10, DelayCharacter10, DelayTime10, 10));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox11, DelayCharacter11, DelayTime11, 11));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox12, DelayCharacter12, DelayTime12, 12));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox13, DelayCharacter13, DelayTime13, 13));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox14, DelayCharacter14, DelayTime14, 14));
+            customDelayOptions.Add(new CustomDelay(DelayCheckBox15, DelayCharacter15, DelayTime15, 15));
+            #endregion
         }
 
         private void PlayButton_Click(object sender, EventArgs e)
@@ -127,7 +147,81 @@ namespace Tower_Unite_Piano_Bot
             if (loadFileDialog.ShowDialog() == DialogResult.OK)
             {
                 StreamReader sr = new StreamReader(loadFileDialog.FileName);
-                if (sr.ReadLine() == "NORMAL DELAY")
+
+                string firstLine = sr.ReadLine();
+
+                if (firstLine == "CUSTOM DELAYS")
+                {
+                    int customDelayAmount = 0;
+                    if (int.TryParse(sr.ReadLine(), out customDelayAmount))
+                    {
+                        if (sr.ReadLine() == "NORMAL DELAY")
+                        {
+                            if (int.TryParse(sr.ReadLine(), out normalDelay))
+                            {
+                                NormalDelayBox.Value = normalDelay;
+                                if (sr.ReadLine() == "FAST DELAY")
+                                {
+                                    if (int.TryParse(sr.ReadLine(), out fastDelay))
+                                    {
+                                        FastDelayBox.Value = fastDelay;
+                                        if (customDelayAmount != 0)
+                                        {
+                                            for (int i = 0; i < customDelayAmount; i++)
+                                            {
+                                                int customDelayIndex = 0;
+                                                int customDelayTime = 0;
+                                                char customDelayChar;
+
+                                                if (sr.ReadLine() == "CUSTOM DELAY INDEX")
+                                                {
+                                                    if (int.TryParse(sr.ReadLine(), out customDelayIndex))
+                                                    {
+                                                        if (sr.ReadLine() == "CUSTOM DELAY CHARACTER")
+                                                        {
+                                                            if (char.TryParse(sr.ReadLine(), out customDelayChar))
+                                                            {
+                                                                if (sr.ReadLine() == "CUSTOM DELAY TIME")
+                                                                {
+                                                                    if (int.TryParse(sr.ReadLine(), out customDelayTime))
+                                                                    {
+                                                                        CustomDelay customDelay = customDelayOptions.Find(x => x.Index == customDelayIndex);
+                                                                        if(customDelay != null)
+                                                                        {
+                                                                            customDelay.EnabledBox.Checked = true;
+                                                                            customDelay.CharacterBox.Text.ToCharArray()[0] = customDelayChar;
+                                                                            customDelay.DelayBox.Value = customDelayTime;
+                                                                            activeCustomDelays.Add(customDelay);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if (sr.ReadLine() == "NOTES")
+                                        {
+                                            string tempReadNotes = sr.ReadToEnd();
+                                            if (!string.IsNullOrWhiteSpace(tempReadNotes))
+                                            {
+                                                SongTextBox.Text = tempReadNotes;
+                                                sr.Close();
+                                                return;
+                                            }
+                                        }
+                                        MessageBox.Show("Load Failed");
+                                        sr.Close();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //Legacy load (Saved for backwards combatibility)
+                else if (firstLine == "NORMAL DELAY")
                 {
                     if (int.TryParse(sr.ReadLine(), out normalDelay))
                     {
@@ -161,11 +255,24 @@ namespace Tower_Unite_Piano_Bot
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 StreamWriter sw = new StreamWriter(saveFileDialog.FileName);
-
+                sw.WriteLine("CUSTOM DELAYS");
+                sw.WriteLine(activeCustomDelays.Count);
                 sw.WriteLine("NORMAL DELAY");
                 sw.WriteLine(normalDelay.ToString());
                 sw.WriteLine("FAST DELAY");
                 sw.WriteLine(fastDelay.ToString());
+                if (activeCustomDelays.Count != 0)
+                {
+                    foreach (CustomDelay delay in activeCustomDelays)
+                    {
+                        sw.WriteLine("CUSTOM DELAY INDEX");
+                        sw.WriteLine(delay.Index);
+                        sw.WriteLine("CUSTOM DELAY CHARACTER");
+                        sw.WriteLine(delay.CharacterBox.Text);
+                        sw.WriteLine("CUSTOM DELAY TIME");
+                        sw.WriteLine(delay.DelayBox.Value);
+                    }
+                }
                 sw.WriteLine("NOTES");
                 sw.WriteLine(SongTextBox.Text);
                 sw.Dispose();
@@ -357,7 +464,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter0.Enabled = false;
                 CustomDelayDelayLabel0.Enabled = false;
                 DelayTime0.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter0));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 0));
             }
             else
             {
@@ -365,7 +472,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter0.Enabled = true;
                 CustomDelayDelayLabel0.Enabled = true;
                 DelayTime0.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox0, DelayCharacter0, DelayTime0));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 0));
             }
         }
         private void DelayCheckBox1_CheckedChanged(object sender, EventArgs e)
@@ -376,7 +483,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter1.Enabled = false;
                 CustomDelayDelayLabel1.Enabled = false;
                 DelayTime1.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter1));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 1));
             }
             else
             {
@@ -384,7 +491,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter1.Enabled = true;
                 CustomDelayDelayLabel1.Enabled = true;
                 DelayTime1.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox1, DelayCharacter1, DelayTime1));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 1));
             }
         }
         private void DelayCheckBox2_CheckedChanged(object sender, EventArgs e)
@@ -395,7 +502,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter2.Enabled = false;
                 CustomDelayDelayLabel2.Enabled = false;
                 DelayTime2.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter2));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 2));
             }
             else
             {
@@ -403,7 +510,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter2.Enabled = true;
                 CustomDelayDelayLabel2.Enabled = true;
                 DelayTime2.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox2, DelayCharacter2, DelayTime2));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 2));
             }
         }
         private void DelayCheckBox3_CheckedChanged(object sender, EventArgs e)
@@ -414,7 +521,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter3.Enabled = false;
                 CustomDelayDelayLabel3.Enabled = false;
                 DelayTime3.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter3));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 3));
             }
             else
             {
@@ -422,7 +529,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter3.Enabled = true;
                 CustomDelayDelayLabel3.Enabled = true;
                 DelayTime3.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox3, DelayCharacter3, DelayTime3));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 3));
             }
         }
         private void DelayCheckBox4_CheckedChanged(object sender, EventArgs e)
@@ -433,7 +540,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter4.Enabled = false;
                 CustomDelayDelayLabel4.Enabled = false;
                 DelayTime4.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter4));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 4));
             }
             else
             {
@@ -441,7 +548,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter4.Enabled = true;
                 CustomDelayDelayLabel4.Enabled = true;
                 DelayTime4.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox4, DelayCharacter4, DelayTime4));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 4));
             }
         }
         private void DelayCheckBox5_CheckedChanged(object sender, EventArgs e)
@@ -452,7 +559,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter5.Enabled = false;
                 CustomDelayDelayLabel5.Enabled = false;
                 DelayTime5.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter5));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 5));
             }
             else
             {
@@ -460,7 +567,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter5.Enabled = true;
                 CustomDelayDelayLabel5.Enabled = true;
                 DelayTime5.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox5, DelayCharacter5, DelayTime5));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 5));
             }
         }
         private void DelayCheckBox6_CheckedChanged(object sender, EventArgs e)
@@ -471,7 +578,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter6.Enabled = false;
                 CustomDelayDelayLabel6.Enabled = false;
                 DelayTime6.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter6));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 6));
             }
             else
             {
@@ -479,7 +586,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter6.Enabled = true;
                 CustomDelayDelayLabel6.Enabled = true;
                 DelayTime6.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox6, DelayCharacter6, DelayTime6));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 6));
             }
         }
         private void DelayCheckBox7_CheckedChanged(object sender, EventArgs e)
@@ -490,7 +597,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter7.Enabled = false;
                 CustomDelayDelayLabel7.Enabled = false;
                 DelayTime7.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter7));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 7));
             }
             else
             {
@@ -498,7 +605,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter7.Enabled = true;
                 CustomDelayDelayLabel7.Enabled = true;
                 DelayTime7.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox7, DelayCharacter7, DelayTime7));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 7));
             }
         }
         private void DelayCheckBox8_CheckedChanged(object sender, EventArgs e)
@@ -509,7 +616,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter8.Enabled = false;
                 CustomDelayDelayLabel8.Enabled = false;
                 DelayTime8.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter8));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 8));
             }
             else
             {
@@ -517,7 +624,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter8.Enabled = true;
                 CustomDelayDelayLabel8.Enabled = true;
                 DelayTime8.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox8, DelayCharacter8, DelayTime8));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 8));
             }
         }
         private void DelayCheckBox9_CheckedChanged(object sender, EventArgs e)
@@ -528,7 +635,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter9.Enabled = false;
                 CustomDelayDelayLabel9.Enabled = false;
                 DelayTime9.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter9));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 9));
             }
             else
             {
@@ -536,7 +643,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter9.Enabled = true;
                 CustomDelayDelayLabel9.Enabled = true;
                 DelayTime9.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox9, DelayCharacter9, DelayTime9));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 9));
             }
         }
         private void DelayCheckBox10_CheckedChanged(object sender, EventArgs e)
@@ -547,7 +654,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter10.Enabled = false;
                 CustomDelayDelayLabel10.Enabled = false;
                 DelayTime10.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter10));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 10));
             }
             else
             {
@@ -555,7 +662,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter10.Enabled = true;
                 CustomDelayDelayLabel10.Enabled = true;
                 DelayTime10.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox10, DelayCharacter10, DelayTime10));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 10));
             }
         }
         private void DelayCheckBox11_CheckedChanged(object sender, EventArgs e)
@@ -566,7 +673,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter11.Enabled = false;
                 CustomDelayDelayLabel11.Enabled = false;
                 DelayTime11.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter11));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 11));
             }
             else
             {
@@ -574,7 +681,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter11.Enabled = true;
                 CustomDelayDelayLabel11.Enabled = true;
                 DelayTime11.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox11, DelayCharacter11, DelayTime11));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 11));
             }
         }
         private void DelayCheckBox12_CheckedChanged(object sender, EventArgs e)
@@ -585,7 +692,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter12.Enabled = false;
                 CustomDelayDelayLabel12.Enabled = false;
                 DelayTime12.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter12));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 12));
             }
             else
             {
@@ -593,7 +700,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter12.Enabled = true;
                 CustomDelayDelayLabel12.Enabled = true;
                 DelayTime12.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox12, DelayCharacter12, DelayTime12));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 12));
             }
         }
         private void DelayCheckBox13_CheckedChanged(object sender, EventArgs e)
@@ -604,7 +711,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter13.Enabled = false;
                 CustomDelayDelayLabel13.Enabled = false;
                 DelayTime13.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter13));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 13));
             }
             else
             {
@@ -612,7 +719,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter13.Enabled = true;
                 CustomDelayDelayLabel13.Enabled = true;
                 DelayTime13.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox13, DelayCharacter13, DelayTime13));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 13));
             }
         }
         private void DelayCheckBox14_CheckedChanged(object sender, EventArgs e)
@@ -623,7 +730,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter14.Enabled = false;
                 CustomDelayDelayLabel14.Enabled = false;
                 DelayTime14.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter14));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 14));
             }
             else
             {
@@ -631,7 +738,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter14.Enabled = true;
                 CustomDelayDelayLabel14.Enabled = true;
                 DelayTime14.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox14, DelayCharacter14, DelayTime14));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 14));
             }
         }
         private void DelayCheckBox15_CheckedChanged(object sender, EventArgs e)
@@ -642,7 +749,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter15.Enabled = false;
                 CustomDelayDelayLabel15.Enabled = false;
                 DelayTime15.Enabled = false;
-                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.CharacterBox == DelayCharacter15));
+                activeCustomDelays.Remove(activeCustomDelays.Find(x => x.Index == 15));
             }
             else
             {
@@ -650,7 +757,7 @@ namespace Tower_Unite_Piano_Bot
                 DelayCharacter15.Enabled = true;
                 CustomDelayDelayLabel15.Enabled = true;
                 DelayTime15.Enabled = true;
-                activeCustomDelays.Add(new CustomDelay(DelayCheckBox15, DelayCharacter15, DelayTime15));
+                activeCustomDelays.Add(customDelayOptions.Find(x => x.Index == 15));
             }
         }
         #endregion
