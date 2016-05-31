@@ -8,9 +8,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     class AutoplayerLoadFailedException : AutoplayerException
     {
         public AutoplayerLoadFailedException(){}
-
         public AutoplayerLoadFailedException(string message) : base(message){}
-
         public AutoplayerLoadFailedException(string message, Exception innerException) : base(message, innerException){}
     }
 }

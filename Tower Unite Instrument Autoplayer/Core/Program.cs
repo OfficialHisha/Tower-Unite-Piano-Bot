@@ -7,19 +7,31 @@ using Tower_Unite_Instrument_Autoplayer.GUI;
 
 namespace Tower_Unite_Instrument_Autoplayer.Core
 {
+    public delegate void AutoplayerEvent();
     static class Program
     {
+        #region Events
+        public static event AutoplayerEvent AddingNoteFinished;
+        public static event AutoplayerEvent AddingNotesFailed;
+        public static event AutoplayerEvent NotesCleared;
+        public static event AutoplayerEvent LoadCompleted;
+        public static event AutoplayerEvent LoadFailed;
+        public static event AutoplayerEvent SaveCompleted;
+        public static event AutoplayerEvent SongFinishedPlaying;
+        public static event AutoplayerEvent SongWasStopped;
+        #endregion
+
         #region Field and property declarations
         //This can be accessed to get the version text
-        public static string Version { get; private set; } = "Version 2.0";
+        public static string Version { get; private set; } = "Version: 2.0";
 
         //This property tells the program if we should play the next note in the song
         public static bool Stop { get; set; } = true;
 
         //The note we generate will go in here to form the song
-        static List<INote> song = new List<INote>();
+        public static List<INote> Song { get; private set; } = new List<INote>();
         //The delays we generate will go in this list
-        static List<Delay> delays = new List<Delay>();
+        public static List<Delay> Delays { get; private set; } = new List<Delay>();
         //This buffer is used when we generate multinotes based on input
         static List<Note> multiNoteBuffer = new List<Note>();
 
@@ -48,34 +60,46 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         /// <summary>
         /// This method will clear the song from all notes
         /// </summary>
-        static void ClearAllNotes()
+        public static void ClearAllNotes()
         {
-            song.Clear();
+            Song.Clear();
+            if (NotesCleared != null)
+            {
+                NotesCleared();
+            }
         }
         /// <summary>
         /// This method will take a string of notes and break it down into single notes
         /// and send them to the AddNoteFromChar method to process them
         /// </summary>
-        static void AddNotesFromString(string rawNotes)
+        public static void AddNotesFromString(string rawNotes)
         {
             foreach (char note in rawNotes)
             {
                 AddNoteFromChar(note);
             }
+            if (AddingNoteFinished != null)
+            {
+                AddingNoteFinished();
+            }
         }
         /// <summary>
         /// This method will process a given character and add a corrosponding note to the song
         /// </summary>
-        static void AddNoteFromChar(char note)
+        public static void AddNoteFromChar(char note)
         {
-            Delay delay = delays.Find(x => x.Character == note);
+            Delay delay = Delays.Find(x => x.Character == note);
 
             //Start multinote building if the input is a [
             if(note == '[')
             {
                 if (buildingMultiNote)
                 {
-                    //TODO: Give an error!
+                    if (AddingNotesFailed != null)
+                    {
+                        AddingNotesFailed();
+                    }
+                    throw new AutoplayerInvalidMultiNoteException("A multi note cannot be defined whithin a multinote definition!");
                 }
                 buildingMultiNote = true;
             }
@@ -84,10 +108,14 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             {
                 if (!buildingMultiNote)
                 {
-                    //TODO: Give an error!
+                    if (AddingNotesFailed != null)
+                    {
+                        AddingNotesFailed();
+                    }
+                    throw new AutoplayerMultiNoteNotDefinedException("A multi note must be have a start before the end!");
                 }
                 buildingMultiNote = false;
-                song.Add(new MultiNote(multiNoteBuffer.ToArray()));
+                Song.Add(new MultiNote(multiNoteBuffer.ToArray()));
                 multiNoteBuffer.Clear();
             }
             //Start fast speed if the input is a {
@@ -97,11 +125,15 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 //Otherwise add it as a single note
                 if(buildingMultiNote)
                 {
-                    //TODO: Give an error
+                    if (AddingNotesFailed != null)
+                    {
+                        AddingNotesFailed();
+                    }
+                    throw new AutoplayerInvalidMultiNoteException("A speed change note cannot be defined whithin a multinote definition!");
                 }
                 else
                 {
-                    song.Add(new SpeedChangeNote(true));
+                    Song.Add(new SpeedChangeNote(true));
                 }
             }
             //Stop fast speed if the input is a }
@@ -109,11 +141,15 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             {
                 if (buildingMultiNote)
                 {
-                    //TODO: Give an error
+                    if (AddingNotesFailed != null)
+                    {
+                        AddingNotesFailed();
+                    }
+                    throw new AutoplayerInvalidMultiNoteException("A speed change note cannot be defined whithin a multinote definition!");
                 }
                 else
                 {
-                    song.Add(new SpeedChangeNote(false));
+                    Song.Add(new SpeedChangeNote(false));
                 }
             }
             //Interpret % as spacebar
@@ -125,7 +161,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 }
                 else
                 {
-                    song.Add(new Note(' '));
+                    Song.Add(new Note(' '));
                 }
             }
             //If the input is registered as a delay, add a delay note
@@ -133,12 +169,21 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             {
                 if(buildingMultiNote)
                 {
-                    //TODO: Give an error
+                    if (AddingNotesFailed != null)
+                    {
+                        AddingNotesFailed();
+                    }
+                    throw new AutoplayerInvalidMultiNoteException("A delay note cannot be defined whithin a multinote definition!");
                 }
                 else
                 {
-                    song.Add(new DelayNote(delay.Character, delay.Time));
+                    Song.Add(new DelayNote(delay.Character, delay.Time));
                 }
+            }
+            //If we reach a newline, we just ignore it
+            else if (note == '\n' || note == '\r')
+            {
+                return;
             }
             //If the input is not a special character, add it as a normal note
             else
@@ -149,19 +194,64 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 }
                 else
                 {
-                    song.Add(new Note(note));
+                    Song.Add(new Note(note));
                 }
             }
         }
         #endregion
 
         /// <summary>
+        /// This method will check if a delay exists in the list of delays
+        /// If it does, it returns true, otherwise it returns false
+        /// </summary>
+        public static bool CheckDelayExists(char character)
+        {
+            return (Delays.Find(x => x.Character == character) != null);
+        }
+        /// <summary>
         /// This method will add a delay to the list of delays
         /// </summary>
-        static void AddDelay(char character, int time)
+        public static void AddDelay(char character, int time)
         {
-            delays.Add(new Delay(character, time));
+            if (!CheckDelayExists(character))
+            {
+                Delays.Add(new Delay(character, time));
+            }
+            else
+            {
+                throw new AutoplayerCustomDelayException("Trying to add already existing delay");
+            }
+            
         }
+        /// <summary>
+        /// This method will remove a delay from the list of delays
+        /// </summary>
+        public static void RemoveDelay(char character)
+        {
+            if (CheckDelayExists(character))
+            {
+                Delays.Remove(Delays.Find(x => x.Character == character));
+            }
+            else
+            {
+                throw new AutoplayerCustomDelayException("Trying to remove non-existent delay");
+            }
+        }
+        /// <summary>
+        /// This method will set a new time to a specified delay from the list of delays
+        /// </summary>
+        public static void ChangeDelay(char character, int newTime)
+        {
+            if (CheckDelayExists(character))
+            {
+                Delays.Find(x => x.Character == character).Time = newTime;
+            }
+            else
+            {
+                throw new AutoplayerCustomDelayException("Trying to modify non-existent delay");
+            }
+        }
+
 
         /// <summary>
         /// This method will change the speed according to the changeToFast boolean
@@ -181,10 +271,10 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         /// <summary>
         /// This method will play the notes in the song in sequence
         /// </summary>
-        static void PlaySong()
+        public static void PlaySong()
         {
             Stop = false;
-            foreach (INote note in song)
+            foreach (INote note in Song)
             {
                 if (!Stop)
                 {
@@ -198,13 +288,25 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                         Thread.Sleep(delayAtNormalSpeed);
                     }
                 }
+                else
+                {
+                    if (SongWasStopped != null)
+                    {
+                        SongWasStopped();
+                    }
+                    
+                }
+            }
+            if(SongFinishedPlaying != null)
+            {
+                SongFinishedPlaying();
             }
         }
 
         /// <summary>
         /// This method sets the Stop property which will (hopefully) stop the song from playing any further
         /// </summary>
-        static void StopSong()
+        public static void StopSong()
         {
             Stop = true;
         }
@@ -213,24 +315,24 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         /// <summary>
         /// This method will save the song and its settings to a file at the "path" variable's destination
         /// </summary>
-        static void SaveSong(string path)
+        public static void SaveSong(string path)
         {
             StreamWriter sw = new StreamWriter(path);
             sw.WriteLine("DELAYS");
-            sw.WriteLine(delays.Count);
-            if (delays.Count != 0)
+            sw.WriteLine(Delays.Count);
+            if (Delays.Count != 0)
             {
-                foreach (Delay delay in delays)
+                foreach (Delay delay in Delays)
                 {
                     sw.WriteLine(delay.Character);
                     sw.WriteLine(delay.Time);
                 }
             }
             sw.WriteLine("NOTES");
-            sw.WriteLine(song.Count);
-            if (song.Count != 0)
+            sw.WriteLine(Song.Count);
+            if (Song.Count != 0)
             {
-                foreach (INote note in song)
+                foreach (INote note in Song)
                 {
                     if(note is DelayNote)
                     {
@@ -264,12 +366,16 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             }
             sw.Dispose();
             sw.Close();
+            if (SaveCompleted != null)
+            {
+                SaveCompleted();
+            }
         }
         /// <summary>
         /// This method will load a song and its settings from a file at the "path" variable's destination
         /// This loading method handles all previous save formats for backwards compatibility
         /// </summary>
-        static void LoadSong(string path)
+        public static void LoadSong(string path)
         {
             bool errorWhileLoading = true;
             StreamReader sr = new StreamReader(path);
@@ -289,7 +395,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                         {
                             if (int.TryParse(sr.ReadLine(), out delayTime))
                             {
-                                delays.Add(new Delay(delayChar, delayTime));
+                                Delays.Add(new Delay(delayChar, delayTime));
                             }
                         }
                     }
@@ -309,13 +415,13 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             else if (firstLine == "CUSTOM DELAYS")
             {
                 int delayCount = 0;
-                if (int.TryParse(sr.ReadLine(), out delayCount) && delayCount > 0)
+                if (int.TryParse(sr.ReadLine(), out delayCount))
                 {
                     if (sr.ReadLine() == "NORMAL DELAY")
                     {
                         if (int.TryParse(sr.ReadLine(), out delayAtNormalSpeed))
                         {
-                            delays.Add(new Delay(' ', delayAtNormalSpeed));
+                            Delays.Add(new Delay(' ', delayAtNormalSpeed));
                             if (sr.ReadLine() == "FAST DELAY")
                             {
                                 if (int.TryParse(sr.ReadLine(), out delayAtFastSpeed))
@@ -340,7 +446,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                                                             {
                                                                 if (int.TryParse(sr.ReadLine(), out customDelayTime))
                                                                 {
-                                                                    delays.Add(new Delay(customDelayChar, customDelayTime));
+                                                                    Delays.Add(new Delay(customDelayChar, customDelayTime));
                                                                 }
                                                             }
                                                         }
@@ -383,7 +489,15 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             sr.Close();
             if (errorWhileLoading)
             {
-                //TODO: Give error
+                if (LoadFailed != null)
+                {
+                    LoadFailed();
+                }
+                throw new AutoplayerLoadFailedException("No compatible save format was found!");
+            }
+            if (LoadCompleted != null)
+            {
+                LoadCompleted();
             }
         }
         #endregion

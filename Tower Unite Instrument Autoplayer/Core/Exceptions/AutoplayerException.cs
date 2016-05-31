@@ -9,9 +9,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     class AutoplayerException : Exception
     {
         public AutoplayerException(){}
-
         public AutoplayerException(string message) : base(message){}
-
         public AutoplayerException(string message, Exception innerException) : base(message, innerException){}
     }
 }
