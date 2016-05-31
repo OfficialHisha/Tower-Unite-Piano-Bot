@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Delay.cs" />
+    <Compile Include="Core\Exceptions\AutoplayerException.cs" />
+    <Compile Include="Core\Exceptions\AutoplayerLoadFailedException.cs" />
     <Compile Include="Core\Interfaces\INote.cs" />
     <Compile Include="Core\Notes\DelayNote.cs" />
     <Compile Include="Core\Notes\SpeedChangeNote.cs" />

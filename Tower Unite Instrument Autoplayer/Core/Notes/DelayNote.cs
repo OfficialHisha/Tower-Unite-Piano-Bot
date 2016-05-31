@@ -11,10 +11,12 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     /// </summary>
     class DelayNote : INote
     {
+        public char Character { get; private set; }
         public int Time { get; private set; }
 
-        public DelayNote(int delayTime)
+        public DelayNote(char character, int delayTime)
         {
+            Character = character;
             Time = delayTime;
         }
 

@@ -7,16 +7,16 @@
     /// </summary>
     class MultiNote : INote
     {
-        public INote[] Notes { get; set; }
+        public Note[] Notes { get; set; }
 
-        public MultiNote(INote[] notes)
+        public MultiNote(Note[] notes)
         {
             Notes = notes;
         }
 
         public void Play()
         {
-            foreach (INote note in Notes)
+            foreach (Note note in Notes)
             {
                 note.Play();
             }
