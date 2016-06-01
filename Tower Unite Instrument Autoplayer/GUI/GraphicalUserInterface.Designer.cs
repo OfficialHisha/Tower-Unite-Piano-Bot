@@ -31,6 +31,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.MainTabPage = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.LoopCheckBox = new System.Windows.Forms.CheckBox();
             this.ClearNotesButton = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.SaveButton = new System.Windows.Forms.Button();
@@ -39,6 +40,18 @@
             this.PlayButton = new System.Windows.Forms.Button();
             this.NoteTextBox = new System.Windows.Forms.TextBox();
             this.SettingsTabPage = new System.Windows.Forms.TabPage();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.FastDelayBox = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.NormalDelayBox = new System.Windows.Forms.NumericUpDown();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.StopKeyTextBox = new System.Windows.Forms.TextBox();
+            this.StartKeyTextBox = new System.Windows.Forms.TextBox();
+            this.StopKeyLabel = new System.Windows.Forms.Label();
+            this.StartKeyLabel = new System.Windows.Forms.Label();
             this.CustomizeTabButton = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -49,30 +62,17 @@
             this.CustomDelayCharacterBox = new System.Windows.Forms.TextBox();
             this.AddDelayButton = new System.Windows.Forms.Button();
             this.DelayListBox = new System.Windows.Forms.TextBox();
-            this.LoopCheckBox = new System.Windows.Forms.CheckBox();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.StopKeyTextBox = new System.Windows.Forms.TextBox();
-            this.StartKeyTextBox = new System.Windows.Forms.TextBox();
-            this.StopKeyLabel = new System.Windows.Forms.Label();
-            this.StartKeyLabel = new System.Windows.Forms.Label();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.FastDelayBox = new System.Windows.Forms.NumericUpDown();
-            this.label6 = new System.Windows.Forms.Label();
-            this.NormalDelayBox = new System.Windows.Forms.NumericUpDown();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SettingsTabPage.SuspendLayout();
-            this.CustomizeTabButton.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).BeginInit();
-            this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FastDelayBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NormalDelayBox)).BeginInit();
+            this.groupBox4.SuspendLayout();
+            this.CustomizeTabButton.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -113,6 +113,17 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Notes";
+            // 
+            // LoopCheckBox
+            // 
+            this.LoopCheckBox.AutoSize = true;
+            this.LoopCheckBox.Location = new System.Drawing.Point(548, 277);
+            this.LoopCheckBox.Name = "LoopCheckBox";
+            this.LoopCheckBox.Size = new System.Drawing.Size(50, 17);
+            this.LoopCheckBox.TabIndex = 7;
+            this.LoopCheckBox.Text = "Loop";
+            this.LoopCheckBox.UseVisualStyleBackColor = true;
+            this.LoopCheckBox.CheckedChanged += new System.EventHandler(this.LoopCheckBox_CheckedChanged);
             // 
             // ClearNotesButton
             // 
@@ -182,6 +193,7 @@
             this.NoteTextBox.Size = new System.Drawing.Size(541, 355);
             this.NoteTextBox.TabIndex = 0;
             this.NoteTextBox.Text = "Nothing to see here yet..";
+            this.NoteTextBox.TextChanged += new System.EventHandler(this.NoteTextBox_TextChanged);
             // 
             // SettingsTabPage
             // 
@@ -194,6 +206,152 @@
             this.SettingsTabPage.TabIndex = 1;
             this.SettingsTabPage.Text = "Settings";
             this.SettingsTabPage.UseVisualStyleBackColor = true;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.label3);
+            this.groupBox5.Controls.Add(this.label4);
+            this.groupBox5.Controls.Add(this.label5);
+            this.groupBox5.Controls.Add(this.FastDelayBox);
+            this.groupBox5.Controls.Add(this.label6);
+            this.groupBox5.Controls.Add(this.NormalDelayBox);
+            this.groupBox5.Location = new System.Drawing.Point(0, 108);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(263, 91);
+            this.groupBox5.TabIndex = 1;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Default delays";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(185, 30);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(64, 13);
+            this.label3.TabIndex = 13;
+            this.label3.Text = "Milliseconds";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(185, 56);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(64, 13);
+            this.label4.TabIndex = 14;
+            this.label4.Text = "Milliseconds";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 56);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(104, 13);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "Delay for fast speed:";
+            // 
+            // FastDelayBox
+            // 
+            this.FastDelayBox.Location = new System.Drawing.Point(131, 54);
+            this.FastDelayBox.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.FastDelayBox.Minimum = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.FastDelayBox.Name = "FastDelayBox";
+            this.FastDelayBox.Size = new System.Drawing.Size(49, 20);
+            this.FastDelayBox.TabIndex = 16;
+            this.FastDelayBox.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.FastDelayBox.ValueChanged += new System.EventHandler(this.FastDelayBox_ValueChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 30);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(118, 13);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "Delay for normal speed:";
+            // 
+            // NormalDelayBox
+            // 
+            this.NormalDelayBox.Location = new System.Drawing.Point(131, 28);
+            this.NormalDelayBox.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.NormalDelayBox.Minimum = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.NormalDelayBox.Name = "NormalDelayBox";
+            this.NormalDelayBox.Size = new System.Drawing.Size(49, 20);
+            this.NormalDelayBox.TabIndex = 15;
+            this.NormalDelayBox.Value = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.NormalDelayBox.ValueChanged += new System.EventHandler(this.NormalDelayBox_ValueChanged);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.StopKeyTextBox);
+            this.groupBox4.Controls.Add(this.StartKeyTextBox);
+            this.groupBox4.Controls.Add(this.StopKeyLabel);
+            this.groupBox4.Controls.Add(this.StartKeyLabel);
+            this.groupBox4.Location = new System.Drawing.Point(0, 0);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(187, 102);
+            this.groupBox4.TabIndex = 0;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Key bindings";
+            // 
+            // StopKeyTextBox
+            // 
+            this.StopKeyTextBox.Location = new System.Drawing.Point(41, 58);
+            this.StopKeyTextBox.Name = "StopKeyTextBox";
+            this.StopKeyTextBox.Size = new System.Drawing.Size(100, 20);
+            this.StopKeyTextBox.TabIndex = 7;
+            this.StopKeyTextBox.Text = "F3";
+            this.StopKeyTextBox.TextChanged += new System.EventHandler(this.StopKeyTextBox_TextChanged);
+            // 
+            // StartKeyTextBox
+            // 
+            this.StartKeyTextBox.Location = new System.Drawing.Point(41, 32);
+            this.StartKeyTextBox.Name = "StartKeyTextBox";
+            this.StartKeyTextBox.Size = new System.Drawing.Size(100, 20);
+            this.StartKeyTextBox.TabIndex = 6;
+            this.StartKeyTextBox.Text = "F2";
+            this.StartKeyTextBox.TextChanged += new System.EventHandler(this.StartKeyTextBox_TextChanged);
+            // 
+            // StopKeyLabel
+            // 
+            this.StopKeyLabel.AutoSize = true;
+            this.StopKeyLabel.Location = new System.Drawing.Point(6, 61);
+            this.StopKeyLabel.Name = "StopKeyLabel";
+            this.StopKeyLabel.Size = new System.Drawing.Size(29, 13);
+            this.StopKeyLabel.TabIndex = 5;
+            this.StopKeyLabel.Text = "Stop";
+            // 
+            // StartKeyLabel
+            // 
+            this.StartKeyLabel.AutoSize = true;
+            this.StartKeyLabel.Location = new System.Drawing.Point(6, 35);
+            this.StartKeyLabel.Name = "StartKeyLabel";
+            this.StartKeyLabel.Size = new System.Drawing.Size(29, 13);
+            this.StartKeyLabel.TabIndex = 4;
+            this.StartKeyLabel.Text = "Start";
             // 
             // CustomizeTabButton
             // 
@@ -310,163 +468,6 @@
             this.DelayListBox.Size = new System.Drawing.Size(164, 349);
             this.DelayListBox.TabIndex = 0;
             // 
-            // LoopCheckBox
-            // 
-            this.LoopCheckBox.AutoSize = true;
-            this.LoopCheckBox.Location = new System.Drawing.Point(548, 277);
-            this.LoopCheckBox.Name = "LoopCheckBox";
-            this.LoopCheckBox.Size = new System.Drawing.Size(50, 17);
-            this.LoopCheckBox.TabIndex = 7;
-            this.LoopCheckBox.Text = "Loop";
-            this.LoopCheckBox.UseVisualStyleBackColor = true;
-            this.LoopCheckBox.CheckedChanged += new System.EventHandler(this.LoopCheckBox_CheckedChanged);
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.StopKeyTextBox);
-            this.groupBox4.Controls.Add(this.StartKeyTextBox);
-            this.groupBox4.Controls.Add(this.StopKeyLabel);
-            this.groupBox4.Controls.Add(this.StartKeyLabel);
-            this.groupBox4.Location = new System.Drawing.Point(0, 0);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(187, 102);
-            this.groupBox4.TabIndex = 0;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Key bindings";
-            // 
-            // StopKeyTextBox
-            // 
-            this.StopKeyTextBox.Location = new System.Drawing.Point(41, 58);
-            this.StopKeyTextBox.Name = "StopKeyTextBox";
-            this.StopKeyTextBox.Size = new System.Drawing.Size(100, 20);
-            this.StopKeyTextBox.TabIndex = 7;
-            this.StopKeyTextBox.Text = "F3";
-            this.StopKeyTextBox.TextChanged += new System.EventHandler(this.StopKeyTextBox_TextChanged);
-            // 
-            // StartKeyTextBox
-            // 
-            this.StartKeyTextBox.Location = new System.Drawing.Point(41, 32);
-            this.StartKeyTextBox.Name = "StartKeyTextBox";
-            this.StartKeyTextBox.Size = new System.Drawing.Size(100, 20);
-            this.StartKeyTextBox.TabIndex = 6;
-            this.StartKeyTextBox.Text = "F2";
-            this.StartKeyTextBox.TextChanged += new System.EventHandler(this.StartKeyTextBox_TextChanged);
-            // 
-            // StopKeyLabel
-            // 
-            this.StopKeyLabel.AutoSize = true;
-            this.StopKeyLabel.Location = new System.Drawing.Point(6, 61);
-            this.StopKeyLabel.Name = "StopKeyLabel";
-            this.StopKeyLabel.Size = new System.Drawing.Size(29, 13);
-            this.StopKeyLabel.TabIndex = 5;
-            this.StopKeyLabel.Text = "Stop";
-            // 
-            // StartKeyLabel
-            // 
-            this.StartKeyLabel.AutoSize = true;
-            this.StartKeyLabel.Location = new System.Drawing.Point(6, 35);
-            this.StartKeyLabel.Name = "StartKeyLabel";
-            this.StartKeyLabel.Size = new System.Drawing.Size(29, 13);
-            this.StartKeyLabel.TabIndex = 4;
-            this.StartKeyLabel.Text = "Start";
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.label3);
-            this.groupBox5.Controls.Add(this.label4);
-            this.groupBox5.Controls.Add(this.label5);
-            this.groupBox5.Controls.Add(this.FastDelayBox);
-            this.groupBox5.Controls.Add(this.label6);
-            this.groupBox5.Controls.Add(this.NormalDelayBox);
-            this.groupBox5.Location = new System.Drawing.Point(0, 108);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(263, 91);
-            this.groupBox5.TabIndex = 1;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Default delays";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(185, 30);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(64, 13);
-            this.label3.TabIndex = 13;
-            this.label3.Text = "Milliseconds";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(185, 56);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(64, 13);
-            this.label4.TabIndex = 14;
-            this.label4.Text = "Milliseconds";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 56);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(104, 13);
-            this.label5.TabIndex = 12;
-            this.label5.Text = "Delay for fast speed:";
-            // 
-            // FastDelayBox
-            // 
-            this.FastDelayBox.Location = new System.Drawing.Point(131, 54);
-            this.FastDelayBox.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.FastDelayBox.Minimum = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.FastDelayBox.Name = "FastDelayBox";
-            this.FastDelayBox.Size = new System.Drawing.Size(49, 20);
-            this.FastDelayBox.TabIndex = 16;
-            this.FastDelayBox.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.FastDelayBox.ValueChanged += new System.EventHandler(this.FastDelayBox_ValueChanged);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 30);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(118, 13);
-            this.label6.TabIndex = 11;
-            this.label6.Text = "Delay for normal speed:";
-            // 
-            // NormalDelayBox
-            // 
-            this.NormalDelayBox.Location = new System.Drawing.Point(131, 28);
-            this.NormalDelayBox.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.NormalDelayBox.Minimum = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.NormalDelayBox.Name = "NormalDelayBox";
-            this.NormalDelayBox.Size = new System.Drawing.Size(49, 20);
-            this.NormalDelayBox.TabIndex = 15;
-            this.NormalDelayBox.Value = new decimal(new int[] {
-            200,
-            0,
-            0,
-            0});
-            this.NormalDelayBox.ValueChanged += new System.EventHandler(this.NormalDelayBox_ValueChanged);
-            // 
             // GraphicalUserInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -480,16 +481,16 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.SettingsTabPage.ResumeLayout(false);
-            this.CustomizeTabButton.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).EndInit();
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FastDelayBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NormalDelayBox)).EndInit();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
+            this.CustomizeTabButton.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).EndInit();
             this.ResumeLayout(false);
 
         }

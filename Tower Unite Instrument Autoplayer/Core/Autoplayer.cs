@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using System.Windows.Forms;
+using Interceptor;
 
 namespace Tower_Unite_Instrument_Autoplayer.Core
 {
@@ -27,6 +27,10 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         //This can be accessed to get the version text
         public static string Version { get; private set; } = "Version: 2.0";
 
+        public static string TargetApplication { get; private set; } = "Tower Unite";
+
+        public static Input InterceptorInput { get; private set; } = new Input();
+
         //This property tells the program if we should play the next note in the song
         public static bool Stop { get; set; } = true;
         //This property tells the program to replay the song until a stop event happens
@@ -44,9 +48,11 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         //This boolean informs the program if it should use the fast delay or not when playing notes
         static bool isFastSpeed = false;
         //This is the delay (in milliseconds) at normal speed
-        public static int DelayAtNormalSpeed { get; set; } = 200;
+        private static int delayAtNormalSpeed = 200;
+        public static int DelayAtNormalSpeed { get { return delayAtNormalSpeed; } set { delayAtNormalSpeed = value; } }
         //This is the delay (in milliseconds) at fast speed
-        public static int DelayAtFastSpeed { get; set; } = 100;
+        private static int delayAtFastSpeed = 100;
+        public static int DelayAtFastSpeed { get { return delayAtFastSpeed; } set { delayAtFastSpeed = value; } }
         #endregion
 
         #region Note handling
@@ -392,12 +398,12 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 {
                     if (sr.ReadLine() == "NORMAL DELAY")
                     {
-                        if (int.TryParse(sr.ReadLine(), out DelayAtNormalSpeed))
+                        if (int.TryParse(sr.ReadLine(), out delayAtNormalSpeed))
                         {
                             Delays.Add(new Delay(' ', DelayAtNormalSpeed));
                             if (sr.ReadLine() == "FAST DELAY")
                             {
-                                if (int.TryParse(sr.ReadLine(), out DelayAtFastSpeed))
+                                if (int.TryParse(sr.ReadLine(), out delayAtFastSpeed))
                                 {
                                     if (delayCount != 0)
                                     {
@@ -443,11 +449,11 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             #region Old save format (For backwards compatibility)
             else if (firstLine == "NORMAL DELAY")
             {
-                if (int.TryParse(sr.ReadLine(), out DelayAtNormalSpeed))
+                if (int.TryParse(sr.ReadLine(), out delayAtNormalSpeed))
                 {
                     if (sr.ReadLine() == "FAST DELAY")
                     {
-                        if (int.TryParse(sr.ReadLine(), out DelayAtFastSpeed))
+                        if (int.TryParse(sr.ReadLine(), out delayAtFastSpeed))
                         {
                             if (sr.ReadLine() == "NOTES")
                             {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using WindowsInput;
-using WindowsInput.Native;
+﻿using Interceptor;
 
 namespace Tower_Unite_Instrument_Autoplayer.Core
 {
@@ -13,13 +10,6 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     /// </summary>
     class Note : INote
     {
-        //These constants are used with the SendMessage and PostMessage methods
-        private const int WM_SETTEXT = 0x000c;
-        private const int WM_KEYDOWN = 0x0100;
-
-        //This instantiates the InputSimulator we'll be using for HighNotes
-        InputSimulator inputSimulator = new InputSimulator();
-
         public char Character { get; private set; }
         public bool IsHighNote { get; private set; }
         private Keys key;
@@ -33,27 +23,15 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
 
         public void Play()
         {
-            IntPtr hWndNotepad = NativeMethods.FindWindow("Notepad", null);
-            if(hWndNotepad != IntPtr.Zero)
+            if(IsHighNote)
             {
-                IntPtr hWndEdit = NativeMethods.FindWindowEx(hWndNotepad, IntPtr.Zero, "Edit", null);
-
-                NativeMethods.SendMessage(hWndEdit, WM_SETTEXT, 0, string.Empty);
-
-                if(IsHighNote)
-                {
-                    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
-                    NativeMethods.PostMessage(hWndEdit, WM_KEYDOWN, key, IntPtr.Zero);
-                    inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
-                }
-                else
-                {
-                    NativeMethods.PostMessage(hWndEdit, WM_KEYDOWN, key, IntPtr.Zero);
-                }
+                Autoplayer.InterceptorInput.SendKey(Keys.LeftShift, KeyState.Down);
+                Autoplayer.InterceptorInput.SendKey(key);
+                Autoplayer.InterceptorInput.SendKey(Keys.LeftShift, KeyState.Up);
             }
             else
             {
-                throw new AutoplayerTargetNotFoundException("The targeted application could not be found! Ensure that the application is running");
+                Autoplayer.InterceptorInput.SendKey(key);
             }
         }
     }

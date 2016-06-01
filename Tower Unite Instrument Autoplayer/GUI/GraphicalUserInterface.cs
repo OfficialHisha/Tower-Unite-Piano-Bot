@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
 //This is how to tell the form application to use the core
@@ -31,23 +32,25 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         {
             InitializeComponent();
             VersionLabel.Text = Autoplayer.Version;
-            NoteTextBox.Leave += DisablePlayButton;
-            NoteTextBox.Leave += MakeSong;
             Autoplayer.AddingNoteFinished += EnablePlayButton;
             Autoplayer.SongFinishedPlaying += EnableClearButton;
             Autoplayer.SongWasStopped += EnableClearButton;
             Autoplayer.SongWasInteruptedByException += ExceptionHandler;
 
-            //Subscribe the method "GKS_KeyDown" to the KeyDown event of the GlobalKeyboardHook.
+            //Subscribe the method "GKS_KeyDown" to the KeyDown event of the GlobalKeyboardHook
             gkh.KeyDown += new KeyEventHandler(GKS_KeyDown);
 
-            //This converts the text from the keybind settings window to actual keys.
+            //This converts the text from the keybind settings window to actual keys
             //Then we add them to the global hook (This is done so the keypresses will be detected when the application is not in focus)
             KeysConverter keysConverter = new KeysConverter();
             startKey = (Keys)keysConverter.ConvertFromString(StartKeyTextBox.Text.ToString());
             stopKey = (Keys)keysConverter.ConvertFromString(StopKeyTextBox.Text.ToString());
             gkh.HookedKeys.Add(startKey);
             gkh.HookedKeys.Add(stopKey);
+
+            //Activate the input interceptor that will send the keys
+            Autoplayer.InterceptorInput.KeyboardFilterMode = Interceptor.KeyboardFilterMode.All;
+            Autoplayer.InterceptorInput.Load();
         }
 
         /// <summary>
@@ -127,8 +130,6 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         /// <summary>
         /// TODO: Add comment
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MakeSong(object sender, EventArgs e)
         {
             Autoplayer.AddNotesFromString(NoteTextBox.Text);
@@ -137,7 +138,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         /// <summary>
         /// TODO: Add comment
         /// </summary>
-        private void DisablePlayButton(object sender, EventArgs e)
+        private void DisablePlayButton()
         {
             PlayButton.Enabled = false;
         }
@@ -360,6 +361,12 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         private void FastDelayBox_ValueChanged(object sender, EventArgs e)
         {
             Autoplayer.DelayAtFastSpeed = (int)FastDelayBox.Value;
+        }
+
+        private void NoteTextBox_TextChanged(object sender, EventArgs e)
+        {
+            DisablePlayButton();
+            Autoplayer.AddNotesFromString(NoteTextBox.Text);
         }
     }
 }
