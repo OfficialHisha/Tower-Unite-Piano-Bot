@@ -1,28 +1,69 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 //This is how to tell the form application to use the core
 //You will need to use this if you want to make your own GUI
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 using Tower_Unite_Instrument_Autoplayer.Core;
+using Utilities;
 
 namespace Tower_Unite_Instrument_Autoplayer.GUI
 {
     public partial class GraphicalUserInterface : Form
     {
+        //Here we create a thread that will be used to play the song
+        //This way the program will not freeze while playing
+        Thread songThread;
+
+        //This is the hook for the key bindings, until I find a better solution
+        GlobalKeyboardHook gkh = new GlobalKeyboardHook();
+
+        //The key bind to start playing
+        Keys startKey;
+        //The key bind to stop playing
+        Keys stopKey;
+
+        /// <summary>
+        /// This is the constructor for the GUI
+        /// It is called when the GUI starts
+        /// </summary>
         public GraphicalUserInterface()
         {
             InitializeComponent();
-            VersionLabel.Text = Program.Version;
+            VersionLabel.Text = Autoplayer.Version;
             NoteTextBox.Leave += DisablePlayButton;
             NoteTextBox.Leave += MakeSong;
-            Program.AddingNoteFinished += EnablePlayButton;
+            Autoplayer.AddingNoteFinished += EnablePlayButton;
+            Autoplayer.SongFinishedPlaying += EnableClearButton;
+            Autoplayer.SongWasStopped += EnableClearButton;
+            Autoplayer.SongWasInteruptedByException += ExceptionHandler;
+
+            //Subscribe the method "GKS_KeyDown" to the KeyDown event of the GlobalKeyboardHook.
+            gkh.KeyDown += new KeyEventHandler(GKS_KeyDown);
+
+            //This converts the text from the keybind settings window to actual keys.
+            //Then we add them to the global hook (This is done so the keypresses will be detected when the application is not in focus)
+            KeysConverter keysConverter = new KeysConverter();
+            startKey = (Keys)keysConverter.ConvertFromString(StartKeyTextBox.Text.ToString());
+            stopKey = (Keys)keysConverter.ConvertFromString(StopKeyTextBox.Text.ToString());
+            gkh.HookedKeys.Add(startKey);
+            gkh.HookedKeys.Add(stopKey);
+        }
+
+        /// <summary>
+        /// This method handles the key bind presses
+        /// </summary>
+        private void GKS_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == startKey)
+            {
+                PlayButton.PerformClick();
+            }
+            else if (e.KeyCode == stopKey)
+            {
+                StopButton.PerformClick();
+            }
+            e.Handled = true;
         }
 
         /// <summary>
@@ -40,7 +81,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         public void UpdateDelayListBox()
         {
             DelayListBox.Clear();
-            foreach (Delay delay in Program.Delays)
+            foreach (Delay delay in Autoplayer.Delays)
             {
                 DelayListBox.Text += $"Character: '{delay.Character}' : Delay: '{delay.Time}'\n";
             }
@@ -51,7 +92,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         public void UpdateNoteBox()
         {
             NoteTextBox.Clear();
-            foreach (INote note in Program.Song)
+            foreach (INote note in Autoplayer.Song)
             {
                 if (note is DelayNote)
                 {
@@ -70,46 +111,93 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 }
                 else if (note is Note)
                 {
-                    NoteTextBox.Text += ((Note)note).Key.ToString();
+                    NoteTextBox.Text += ((Note)note).Character;
                 }
                 else if (note is MultiNote)
                 {
                     NoteTextBox.Text += "[";
                     foreach (Note multiNote in ((MultiNote)note).Notes)
                     {
-                        NoteTextBox.Text += multiNote.Key.ToString();
+                        NoteTextBox.Text += multiNote.Character;
                     }
                     NoteTextBox.Text += "]";
                 }
             }
         }
-
+        /// <summary>
+        /// TODO: Add comment
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MakeSong(object sender, EventArgs e)
         {
-            Program.AddNotesFromString(NoteTextBox.Text);
+            Autoplayer.AddNotesFromString(NoteTextBox.Text);
         }
-
+        
+        /// <summary>
+        /// TODO: Add comment
+        /// </summary>
         private void DisablePlayButton(object sender, EventArgs e)
         {
             PlayButton.Enabled = false;
         }
+        /// <summary>
+        /// TODO: Add comment
+        /// </summary>
         private void EnablePlayButton()
         {
             PlayButton.Enabled = true;
         }
+        
+        /// <summary>
+        /// TODO: Add comment
+        /// </summary>
+        private void DisableClearButton()
+        {
+            ClearNotesButton.Enabled = false;
+        }
+        /// <summary>
+        /// TODO: Add comment
+        /// </summary>
+        private void EnableClearButton()
+        {
+            if (ClearNotesButton.InvokeRequired)
+            {
+                MethodInvoker methodInvokerDelegate = delegate () { ClearNotesButton.Enabled = true; };
+                ClearNotesButton.Invoke(methodInvokerDelegate);
+            }
+            else
+            {
+                ClearNotesButton.Enabled = true;
+            }
+        }
+        
+        /// <summary>
+        /// TODO: Add comment
+        /// </summary>
+        private void ExceptionHandler(AutoplayerException exception)
+        {
+            MessageBox.Show(exception.Message);
+        }
 
+        /// <summary>
+        /// This is called when we click the AddDelayButton
+        /// </summary>
         private void AddDelayButton_Click(object sender, EventArgs e)
         {
             try
             {
-                if(Program.CheckDelayExists(CustomDelayCharacterBox.Text.ToCharArray()[0]))
+                if(Autoplayer.CheckDelayExists(CustomDelayCharacterBox.Text.ToCharArray()[0]))
                 {
-                    Program.ChangeDelay(CustomDelayCharacterBox.Text.ToCharArray()[0], (int)CustomDelayTimeBox.Value);
+                    //If the delay already exists, just update the time value
+                    Autoplayer.ChangeDelay(CustomDelayCharacterBox.Text.ToCharArray()[0], (int)CustomDelayTimeBox.Value);
                 }
                 else
                 {
-                    Program.AddDelay(CustomDelayCharacterBox.Text.ToCharArray()[0], (int)CustomDelayTimeBox.Value);
+                    //If the delay does not exist, add a new entry
+                    Autoplayer.AddDelay(CustomDelayCharacterBox.Text.ToCharArray()[0], (int)CustomDelayTimeBox.Value);
                 }
+                //Update the GUI element to show the delays in the GUI
                 UpdateDelayListBox();
             }
             catch (AutoplayerCustomDelayException error)
@@ -117,11 +205,14 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 MessageBox.Show(error.Message);
             }
         }
+        /// <summary>
+        /// This is called when we click the RemoveDelayButton
+        /// </summary>
         private void RemoveDelayButton_Click(object sender, EventArgs e)
         {
             try
             {
-                Program.RemoveDelay(CustomDelayCharacterBox.Text.ToCharArray()[0]);
+                Autoplayer.RemoveDelay(CustomDelayCharacterBox.Text.ToCharArray()[0]);
                 UpdateDelayListBox();
             }
             catch (AutoplayerCustomDelayException error)
@@ -129,20 +220,41 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 MessageBox.Show(error.Message);
             }
         }
+        /// <summary>
+        /// This is called when we click the ClearNotesButton
+        /// </summary>
         private void ClearNotesButton_Click(object sender, EventArgs e)
         {
-            Program.ClearAllNotes();
+            Autoplayer.ClearAllNotes();
+            //Updates the note box GUI element to show the notes in the GUI
             UpdateNoteBox();
         }
+        /// <summary>
+        /// This is called when we click the PlayButton
+        /// </summary>
         private void PlayButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Played");
-            Program.PlaySong();
+            //Disable the clear notes button so we don't clear the notes
+            //while trying to play them
+            DisableClearButton();
+            //Start the song in a new thread so we can do other things in
+            //the program when the song is playing. Stopping the song for example
+            songThread = new Thread(Autoplayer.PlaySong);
+            songThread.Start();
         }
+        /// <summary>
+        /// This is called when we click the StopButton
+        /// </summary>
         private void StopButton_Click(object sender, EventArgs e)
         {
-            Program.StopSong();
+            Autoplayer.StopSong();
+            //Close the thread and enable the ClearNotesButton
+            songThread.Abort();
+            EnableClearButton();           
         }
+        /// <summary>
+        /// This is called when we click the LoadButton
+        /// </summary>
         private void LoadButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
@@ -154,7 +266,8 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             {
                 try
                 {
-                    Program.LoadSong(fileDialog.FileName);
+                    Autoplayer.LoadSong(fileDialog.FileName);
+                    //Update everything when we are done loading
                     UpdateEverything();
                     MessageBox.Show("Loading completed");
                 }
@@ -164,6 +277,9 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 }
             }
         }
+        /// <summary>
+        /// This is called when we click the SaveButton
+        /// </summary>
         private void SaveButton_Click(object sender, EventArgs e)
         {
             SaveFileDialog fileDialog = new SaveFileDialog();
@@ -173,9 +289,77 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
 
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
-                Program.SaveSong(fileDialog.FileName);
-                MessageBox.Show($"Notes saved as {fileDialog.FileName}.txt");
+                Autoplayer.SaveSong(fileDialog.FileName);
+                MessageBox.Show($"Notes saved at {fileDialog.FileName}");
             }
+        }
+
+        /// <summary>
+        /// This is called when we change the state of the loop checkbox
+        /// </summary>
+        private void LoopCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Autoplayer.Loop = LoopCheckBox.Checked;
+        }
+
+        /// <summary>
+        /// This is called when the text in StartKeyTextBox is changed
+        /// </summary>
+        private void StartKeyTextBox_TextChanged(object sender, EventArgs e)
+        {
+            //Using a try catch here in case the user inputs wrong key binds.
+            KeysConverter keysConverter = new KeysConverter();
+            try
+            {
+                //Remember to reset the hooked key to the new one.
+                gkh.HookedKeys.Remove(startKey);
+                startKey = (Keys)keysConverter.ConvertFromString(StartKeyTextBox.Text.ToString());
+                if (startKey == stopKey)
+                    MessageBox.Show("This key is already bound to another action!");
+                gkh.HookedKeys.Add(startKey);
+                PlayButton.Text = $"Start ({StartKeyTextBox.Text.ToString()})";
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show($"ERROR: Invalid key {StartKeyTextBox.Text.ToString()}");
+            }
+        }
+        /// <summary>
+        /// This is called when the text in StopKeyTextBox is changed
+        /// </summary>
+        private void StopKeyTextBox_TextChanged(object sender, EventArgs e)
+        {
+            //Using a try catch here in case the user inputs wrong key binds.
+            KeysConverter keysConverter = new KeysConverter();
+            try
+            {
+                //Remember to reset the hooked key to the new one.
+                gkh.HookedKeys.Remove(stopKey);
+                stopKey = (Keys)keysConverter.ConvertFromString(StopKeyTextBox.Text.ToString());
+                if (stopKey == startKey)
+                    MessageBox.Show("This key is already bound to another action!");
+                gkh.HookedKeys.Add(stopKey);
+                StopButton.Text = $"Stop ({StopKeyTextBox.Text.ToString()})";
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show($"ERROR: Invalid key {StopKeyTextBox.Text.ToString()}");
+            }
+        }
+
+        /// <summary>
+        /// This is called when the value of NormalDelayBox is changed
+        /// </summary>
+        private void NormalDelayBox_ValueChanged(object sender, EventArgs e)
+        {
+            Autoplayer.DelayAtNormalSpeed = (int)NormalDelayBox.Value;
+        }
+        /// <summary>
+        /// This is called when the value of FastDelayBox is changed
+        /// </summary>
+        private void FastDelayBox_ValueChanged(object sender, EventArgs e)
+        {
+            Autoplayer.DelayAtFastSpeed = (int)FastDelayBox.Value;
         }
     }
 }

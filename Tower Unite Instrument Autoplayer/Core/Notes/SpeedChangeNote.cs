@@ -17,7 +17,7 @@
 
         public void Play()
         {
-            Program.ChangeSpeed(TurnOnFast);
+            Autoplayer.ChangeSpeed(TurnOnFast);
         }
     }
 }

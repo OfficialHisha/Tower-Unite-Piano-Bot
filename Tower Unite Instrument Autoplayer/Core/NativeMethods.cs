@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Tower_Unite_Instrument_Autoplayer.Imported
+namespace Tower_Unite_Instrument_Autoplayer.Core
 {
     internal static class NativeMethods
     {

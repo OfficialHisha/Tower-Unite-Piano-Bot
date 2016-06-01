@@ -6,7 +6,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     /// This is the main exception class for the program
     /// All exceptions inherents from this
     /// </summary>
-    class AutoplayerException : Exception
+    public class AutoplayerException : Exception
     {
         public AutoplayerException(){}
         public AutoplayerException(string message) : base(message){}

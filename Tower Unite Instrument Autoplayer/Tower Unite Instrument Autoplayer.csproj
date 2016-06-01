@@ -44,6 +44,10 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsInput, Version=1.0.4.0, Culture=neutral, PublicKeyToken=9b287f7dc5073cad, processorArchitecture=MSIL">
+      <HintPath>..\packages\InputSimulator.1.0.4.0\lib\net20\WindowsInput.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Delay.cs" />
@@ -52,6 +56,7 @@
     <Compile Include="Core\Exceptions\AutoplayerInvalidMultiNoteException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerLoadFailedException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerMultiNoteNotDefinedException.cs" />
+    <Compile Include="Core\Exceptions\AutoplayerTargetNotFoundException.cs" />
     <Compile Include="Core\Interfaces\INote.cs" />
     <Compile Include="Core\Notes\DelayNote.cs" />
     <Compile Include="Core\Notes\SpeedChangeNote.cs" />
@@ -63,8 +68,10 @@
     </Compile>
     <Compile Include="Core\Notes\MultiNote.cs" />
     <Compile Include="Core\Notes\Note.cs" />
-    <Compile Include="Core\Program.cs" />
-    <Compile Include="Imported\NativeMethods.cs" />
+    <Compile Include="Core\Autoplayer.cs" />
+    <Compile Include="Core\NativeMethods.cs" />
+    <Compile Include="Imported\GlobalKeyboardHook.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GUI\GraphicalUserInterface.resx">
       <DependentUpon>GraphicalUserInterface.cs</DependentUpon>
@@ -78,6 +85,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

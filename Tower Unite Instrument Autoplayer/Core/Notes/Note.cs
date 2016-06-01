@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
-using Tower_Unite_Instrument_Autoplayer.Imported;
+using WindowsInput;
+using WindowsInput.Native;
 
 namespace Tower_Unite_Instrument_Autoplayer.Core
 {
@@ -12,28 +13,48 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     /// </summary>
     class Note : INote
     {
-        //These constants are used with the PostMessage method
+        //These constants are used with the SendMessage and PostMessage methods
         private const int WM_SETTEXT = 0x000c;
         private const int WM_KEYDOWN = 0x0100;
 
+        //This instantiates the InputSimulator we'll be using for HighNotes
+        InputSimulator inputSimulator = new InputSimulator();
 
-        public Keys Key { get; private set; }
+        public char Character { get; private set; }
+        public bool IsHighNote { get; private set; }
+        private Keys key;
 
-        public Note(char key)
+        public Note(char note, bool isHighNote)
         {
-            Key = (Keys)char.ToUpper(key);
+            Character = note;
+            key = (Keys)char.ToUpper(note);
+            IsHighNote = isHighNote;
         }
 
         public void Play()
         {
-            //TODO: Figure out what any of this does..
             IntPtr hWndNotepad = NativeMethods.FindWindow("Notepad", null);
+            if(hWndNotepad != IntPtr.Zero)
+            {
+                IntPtr hWndEdit = NativeMethods.FindWindowEx(hWndNotepad, IntPtr.Zero, "Edit", null);
 
-            IntPtr hWndEdit = NativeMethods.FindWindowEx(hWndNotepad, IntPtr.Zero, "Edit", null);
+                NativeMethods.SendMessage(hWndEdit, WM_SETTEXT, 0, string.Empty);
 
-            NativeMethods.SendMessage(hWndEdit, WM_SETTEXT, 0, " key");
-
-            NativeMethods.PostMessage(hWndEdit, WM_KEYDOWN, Key, IntPtr.Zero);
+                if(IsHighNote)
+                {
+                    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
+                    NativeMethods.PostMessage(hWndEdit, WM_KEYDOWN, key, IntPtr.Zero);
+                    inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+                }
+                else
+                {
+                    NativeMethods.PostMessage(hWndEdit, WM_KEYDOWN, key, IntPtr.Zero);
+                }
+            }
+            else
+            {
+                throw new AutoplayerTargetNotFoundException("The targeted application could not be found! Ensure that the application is running");
+            }
         }
     }
 }
