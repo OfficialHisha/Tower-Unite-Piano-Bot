@@ -33,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Interceptor">
-      <HintPath>Core\dll\Interceptor.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,10 +44,6 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsInput, Version=1.0.4.0, Culture=neutral, PublicKeyToken=9b287f7dc5073cad, processorArchitecture=MSIL">
-      <HintPath>..\packages\InputSimulator.1.0.4.0\lib\net20\WindowsInput.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Delay.cs" />
@@ -59,6 +52,7 @@
     <Compile Include="Core\Exceptions\AutoplayerInvalidMultiNoteException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerLoadFailedException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerMultiNoteNotDefinedException.cs" />
+    <Compile Include="Core\Exceptions\AutoplayerNoteCreationFailedException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerTargetNotFoundException.cs" />
     <Compile Include="Core\Interfaces\INote.cs" />
     <Compile Include="Core\Notes\DelayNote.cs" />
@@ -88,7 +82,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

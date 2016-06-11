@@ -25,5 +25,3 @@ C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Pian
 C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower Unite Piano Bot.csproj.GenerateResource.Cache
 C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower Unite Piano Bot.exe
 C:\Development\Projects\Tools\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\obj\Debug\Tower Unite Piano Bot.pdb
-C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\bin\Debug\WindowsInput.dll
-C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Piano Bot\bin\Debug\WindowsInput.xml

@@ -170,7 +170,7 @@
             this.StopButton.Name = "StopButton";
             this.StopButton.Size = new System.Drawing.Size(75, 51);
             this.StopButton.TabIndex = 2;
-            this.StopButton.Text = "Stop";
+            this.StopButton.Text = "Stop (F3)";
             this.StopButton.UseVisualStyleBackColor = true;
             this.StopButton.Click += new System.EventHandler(this.StopButton_Click);
             // 
@@ -180,7 +180,7 @@
             this.PlayButton.Name = "PlayButton";
             this.PlayButton.Size = new System.Drawing.Size(75, 51);
             this.PlayButton.TabIndex = 1;
-            this.PlayButton.Text = "Play";
+            this.PlayButton.Text = "Play (F2)";
             this.PlayButton.UseVisualStyleBackColor = true;
             this.PlayButton.Click += new System.EventHandler(this.PlayButton_Click);
             // 
@@ -192,7 +192,7 @@
             this.NoteTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.NoteTextBox.Size = new System.Drawing.Size(541, 355);
             this.NoteTextBox.TabIndex = 0;
-            this.NoteTextBox.Text = "Nothing to see here yet..";
+            this.NoteTextBox.Text = "Load a song or input notes here..";
             this.NoteTextBox.TextChanged += new System.EventHandler(this.NoteTextBox_TextChanged);
             // 
             // SettingsTabPage

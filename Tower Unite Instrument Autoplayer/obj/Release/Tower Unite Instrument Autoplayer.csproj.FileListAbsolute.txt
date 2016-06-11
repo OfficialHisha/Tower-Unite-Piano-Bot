@@ -1,0 +1,9 @@
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\bin\Release\Tower Unite Instrument Autoplayer.exe.config
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\bin\Release\Tower Unite Instrument Autoplayer.exe
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\bin\Release\Tower Unite Instrument Autoplayer.pdb
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\obj\Release\Tower Unite Instrument Autoplayer.csprojResolveAssemblyReference.cache
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\obj\Release\Tower_Unite_Instrument_Autoplayer.GUI.GraphicalUserInterface.resources
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\obj\Release\Tower_Unite_Instrument_Autoplayer.Properties.Resources.resources
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\obj\Release\Tower Unite Instrument Autoplayer.csproj.GenerateResource.Cache
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\obj\Release\Tower Unite Instrument Autoplayer.exe
+C:\Development\GitHub\Open source\Tower Unite Piano Bot\Tower Unite Instrument Autoplayer\obj\Release\Tower Unite Instrument Autoplayer.pdb

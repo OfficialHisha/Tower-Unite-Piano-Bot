@@ -1,4 +1,4 @@
-﻿using Interceptor;
+﻿using System.Windows.Forms;
 
 namespace Tower_Unite_Instrument_Autoplayer.Core
 {
@@ -12,27 +12,17 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     {
         public char Character { get; private set; }
         public bool IsHighNote { get; private set; }
-        private Keys key;
 
         public Note(char note, bool isHighNote)
         {
             Character = note;
-            key = (Keys)char.ToUpper(note);
             IsHighNote = isHighNote;
         }
 
         public void Play()
         {
-            if(IsHighNote)
-            {
-                Autoplayer.InterceptorInput.SendKey(Keys.LeftShift, KeyState.Down);
-                Autoplayer.InterceptorInput.SendKey(key);
-                Autoplayer.InterceptorInput.SendKey(Keys.LeftShift, KeyState.Up);
-            }
-            else
-            {
-                Autoplayer.InterceptorInput.SendKey(key);
-            }
+            //This method is used until a better solution is found. This will NOT play black keys :(
+            SendKeys.SendWait(Character.ToString());
         }
     }
 }

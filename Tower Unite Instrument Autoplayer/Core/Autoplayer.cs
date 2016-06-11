@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Interceptor;
 
 namespace Tower_Unite_Instrument_Autoplayer.Core
 {
@@ -28,9 +27,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public static string Version { get; private set; } = "Version: 2.0";
 
         public static string TargetApplication { get; private set; } = "Tower Unite";
-
-        public static Input InterceptorInput { get; private set; } = new Input();
-
+        
         //This property tells the program if we should play the next note in the song
         public static bool Stop { get; set; } = true;
         //This property tells the program to replay the song until a stop event happens
@@ -70,6 +67,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         /// </summary>
         public static void AddNotesFromString(string rawNotes)
         {
+            buildingMultiNote = false;
             foreach (char note in rawNotes)
             {
                 AddNoteFromChar(note);
@@ -99,7 +97,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 if (!buildingMultiNote)
                 {
                     AddingNotesFailed?.Invoke();
-                    throw new AutoplayerMultiNoteNotDefinedException("A multi note must be have a start before the end!");
+                    throw new AutoplayerMultiNoteNotDefinedException("A multi note must have a start before the end!");
                 }
                 buildingMultiNote = false;
                 Song.Add(new MultiNote(multiNoteBuffer.ToArray()));
@@ -133,6 +131,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     Song.Add(new SpeedChangeNote(false));
                 }
             }
+            /*
             //Interpret % as spacebar
             else if(note == '%')
             {
@@ -145,6 +144,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     Song.Add(new Note(' ', false));
                 }
             }
+            */
             //If the input is registered as a delay, add a delay note
             else if(delay != null)
             {
@@ -229,7 +229,15 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 throw new AutoplayerCustomDelayException("Trying to modify non-existent delay");
             }
         }
-        
+        /// <summary>
+        /// This method will remove all delays from the list of delays
+        /// </summary>
+        public static void ResetDelays()
+        {
+            Delays = new List<Delay>();
+        }
+
+
         /// <summary>
         /// This method will change the speed according to the changeToFast boolean
         /// </summary>

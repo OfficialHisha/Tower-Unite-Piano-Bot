@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
+using Utilities;
 //This is how to tell the form application to use the core
 //You will need to use this if you want to make your own GUI
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 using Tower_Unite_Instrument_Autoplayer.Core;
-using Utilities;
 
 namespace Tower_Unite_Instrument_Autoplayer.GUI
 {
@@ -23,6 +22,9 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         Keys startKey;
         //The key bind to stop playing
         Keys stopKey;
+
+        //This variable is used to ignore changes to the note box when loading a saved file
+        bool isLoading = false;
 
         /// <summary>
         /// This is the constructor for the GUI
@@ -47,10 +49,6 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             stopKey = (Keys)keysConverter.ConvertFromString(StopKeyTextBox.Text.ToString());
             gkh.HookedKeys.Add(startKey);
             gkh.HookedKeys.Add(stopKey);
-
-            //Activate the input interceptor that will send the keys
-            Autoplayer.InterceptorInput.KeyboardFilterMode = Interceptor.KeyboardFilterMode.All;
-            Autoplayer.InterceptorInput.Load();
         }
 
         /// <summary>
@@ -76,6 +74,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         {
             UpdateNoteBox();
             UpdateDelayListBox();
+            isLoading = false;
         }
         /// <summary>
         /// This method updates the DelayListBox with all delays from the Delays list in the main program
@@ -128,37 +127,46 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             }
         }
         /// <summary>
-        /// TODO: Add comment
+        /// This method makes or remakes the song by clearing all notes and adding the ones from NoteTextBox
         /// </summary>
-        private void MakeSong(object sender, EventArgs e)
+        private void MakeSong()
         {
-            Autoplayer.AddNotesFromString(NoteTextBox.Text);
+            try
+            {
+                DisablePlayButton();
+                Autoplayer.ClearAllNotes();
+                Autoplayer.AddNotesFromString(NoteTextBox.Text);
+            }
+            catch (AutoplayerNoteCreationFailedException e)
+            {
+                MessageBox.Show($"Error: {e.Message}");
+            }
         }
         
         /// <summary>
-        /// TODO: Add comment
+        /// This method disables the play button so the user cannot press it
         /// </summary>
         private void DisablePlayButton()
         {
             PlayButton.Enabled = false;
         }
         /// <summary>
-        /// TODO: Add comment
+        /// This method enables the play button and makes it interactable
         /// </summary>
         private void EnablePlayButton()
         {
             PlayButton.Enabled = true;
         }
-        
+
         /// <summary>
-        /// TODO: Add comment
+        /// This method disables the clear button so the user cannot press it
         /// </summary>
         private void DisableClearButton()
         {
             ClearNotesButton.Enabled = false;
         }
         /// <summary>
-        /// TODO: Add comment
+        /// This method enables the clear button and makes it interactable
         /// </summary>
         private void EnableClearButton()
         {
@@ -174,7 +182,8 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         }
         
         /// <summary>
-        /// TODO: Add comment
+        /// This method will handle exceptions thrown from other threads than the current one
+        /// This was added because I had some problems with exceptions from other threads not being catched
         /// </summary>
         private void ExceptionHandler(AutoplayerException exception)
         {
@@ -200,6 +209,9 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 }
                 //Update the GUI element to show the delays in the GUI
                 UpdateDelayListBox();
+
+                //Update the current notes to with the new rules
+                MakeSong();
             }
             catch (AutoplayerCustomDelayException error)
             {
@@ -213,8 +225,13 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         {
             try
             {
+                //Remove the delay from the list
                 Autoplayer.RemoveDelay(CustomDelayCharacterBox.Text.ToCharArray()[0]);
+                //Update the GUI
                 UpdateDelayListBox();
+
+                //Update the current notes wtih the new rules
+                MakeSong();
             }
             catch (AutoplayerCustomDelayException error)
             {
@@ -267,6 +284,8 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             {
                 try
                 {
+                    isLoading = true;
+                    Autoplayer.ResetDelays();
                     Autoplayer.LoadSong(fileDialog.FileName);
                     //Update everything when we are done loading
                     UpdateEverything();
@@ -274,6 +293,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 }
                 catch (AutoplayerLoadFailedException error)
                 {
+                    isLoading = false;
                     MessageBox.Show($"Loading failed: {error.Message}");
                 }
             }
@@ -365,8 +385,10 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
 
         private void NoteTextBox_TextChanged(object sender, EventArgs e)
         {
-            DisablePlayButton();
-            Autoplayer.AddNotesFromString(NoteTextBox.Text);
+            if(!isLoading)
+            {
+                MakeSong();
+            }
         }
     }
 }
