@@ -12,7 +12,7 @@
 
         public SpeedChangeNote(bool turnOnFast)
         {
-            TurnOnFast = TurnOnFast;
+            TurnOnFast = turnOnFast;
         }
 
         public void Play()

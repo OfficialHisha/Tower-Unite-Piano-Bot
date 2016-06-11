@@ -258,7 +258,7 @@
             0,
             0});
             this.FastDelayBox.Minimum = new decimal(new int[] {
-            25,
+            1,
             0,
             0,
             0});
@@ -290,7 +290,7 @@
             0,
             0});
             this.NormalDelayBox.Minimum = new decimal(new int[] {
-            25,
+            1,
             0,
             0,
             0});
@@ -417,7 +417,7 @@
             0,
             0});
             this.CustomDelayTimeBox.Minimum = new decimal(new int[] {
-            25,
+            1,
             0,
             0,
             0});

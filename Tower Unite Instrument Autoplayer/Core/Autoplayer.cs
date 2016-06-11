@@ -24,7 +24,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
 
         #region Field and property declarations
         //This can be accessed to get the version text
-        public static string Version { get; private set; } = "Version: 2.0";
+        public static string Version { get; private set; } = "Version: 2.0.1";
 
         public static string TargetApplication { get; private set; } = "Tower Unite";
         
@@ -266,13 +266,16 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     try
                     {
                         note.Play();
-                        if (isFastSpeed)
+                        if (note is Note || note is MultiNote)
                         {
-                            Thread.Sleep(DelayAtFastSpeed);
-                        }
-                        else
-                        {
-                            Thread.Sleep(DelayAtNormalSpeed);
+                            if (isFastSpeed)
+                            {
+                                Thread.Sleep(DelayAtFastSpeed);
+                            }
+                            else
+                            {
+                                Thread.Sleep(DelayAtNormalSpeed);
+                            }
                         }
                     }
                     catch (AutoplayerTargetNotFoundException error)
