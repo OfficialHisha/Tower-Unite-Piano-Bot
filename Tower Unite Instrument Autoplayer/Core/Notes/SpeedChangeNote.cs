@@ -6,7 +6,7 @@
     /// It needs a boolean value to define wheather or not to turn on
     /// the faster speed
     /// </summary>
-    class SpeedChangeNote : INote
+    public class SpeedChangeNote : INote
     {
         public bool TurnOnFast { get; private set; }
 

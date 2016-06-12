@@ -9,7 +9,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     /// The reason for this is that a default delay is added after each note
     /// including a delay note
     /// </summary>
-    class DelayNote : INote
+    public class DelayNote : INote
     {
         public char Character { get; private set; }
         public int Time { get; private set; }

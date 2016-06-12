@@ -5,7 +5,7 @@
     /// A MultiNote is a collection of notes to be played at once
     /// or, at least close to "at once".
     /// </summary>
-    class MultiNote : INote
+    public class MultiNote : INote
     {
         public Note[] Notes { get; set; }
 
@@ -20,6 +20,16 @@
             {
                 note.Play();
             }
+        }
+
+        public override string ToString()
+        {
+            string str = "";
+            foreach (Note note in Notes)
+            {
+                str += note.ToString();
+            }
+            return str;
         }
     }
 }

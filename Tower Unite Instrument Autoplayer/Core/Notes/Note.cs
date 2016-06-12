@@ -8,7 +8,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     /// The Key property holds information about which key
     /// on the keyboard the note corrosponds to
     /// </summary>
-    class Note : INote
+    public class Note : INote
     {
         public char Character { get; private set; }
         public bool IsHighNote { get; private set; }
@@ -23,6 +23,11 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         {
             //This method is used until a better solution is found. This will NOT play black keys :(
             SendKeys.SendWait(Character.ToString());
+        }
+
+        public override string ToString()
+        {
+            return Character.ToString();
         }
     }
 }

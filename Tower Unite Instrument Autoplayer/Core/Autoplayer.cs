@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
@@ -39,6 +40,9 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public static List<Delay> Delays { get; private set; } = new List<Delay>();
         //This buffer is used when we generate multinotes based on input
         static List<Note> multiNoteBuffer = new List<Note>();
+
+        //This array contains the known characters that cannot be accepted by the program.
+        static List<char> invalidCharacters = new List<char>(new char[] { '(', ')' });
 
         //This boolean informs the program if we're currently in the process of generating a multinote
         static bool buildingMultiNote = false;
@@ -90,6 +94,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     throw new AutoplayerInvalidMultiNoteException("A multi note cannot be defined whithin a multinote definition!");
                 }
                 buildingMultiNote = true;
+                multiNoteBuffer.Clear();
             }
             //Stop multinote building if the input is a ] and add a multinote
             else if(note == ']')
@@ -163,6 +168,12 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             {
                 return;
             }
+            //Check if the input is known as invalid
+            else if (invalidCharacters.Contains(note))
+            {
+                //I was too lazy to make a new exception for this purpose, I might add a custom one later..
+                throw new AutoplayerNoteCreationFailedException($"Invalid note '{note}' detected! If the note is a upper-case variant of a button, try to input the lower-case variant. If you're unsure how to fix this, please contact the developer.");
+            }
             //If the input is not a special character, add it as a normal note
             else
             {
@@ -234,7 +245,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         /// </summary>
         public static void ResetDelays()
         {
-            Delays = new List<Delay>();
+            Delays.Clear();
         }
 
 
@@ -282,6 +293,11 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     {
                         Stop = true;
                         SongWasInteruptedByException?.Invoke(error);
+                    }
+                    catch (ArgumentException)
+                    {
+                        Stop = true;
+                        SongWasInteruptedByException?.Invoke(new AutoplayerException($"The program encountered an invalid note. Please inform the developer of this incident so it can be added to the list of invalid characters. Info: '{note.ToString()}'"));
                     }
                 }
                 else
