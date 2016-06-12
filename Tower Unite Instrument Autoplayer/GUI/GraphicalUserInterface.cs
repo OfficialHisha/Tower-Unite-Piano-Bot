@@ -239,6 +239,22 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             }
         }
         /// <summary>
+        /// This is called when we click the RemoveAllDelayButton
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RemoveAllDelayButton_Click(object sender, EventArgs e)
+        {
+            //Clear the list of delays
+            Autoplayer.ResetDelays();
+
+            //Update the GUI
+            UpdateDelayListBox();
+
+            //Update the current notes wtih the new rules
+            MakeSong();
+        }
+        /// <summary>
         /// This is called when we click the ClearNotesButton
         /// </summary>
         private void ClearNotesButton_Click(object sender, EventArgs e)

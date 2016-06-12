@@ -62,6 +62,7 @@
             this.CustomDelayCharacterBox = new System.Windows.Forms.TextBox();
             this.AddDelayButton = new System.Windows.Forms.Button();
             this.DelayListBox = new System.Windows.Forms.TextBox();
+            this.RemoveAllDelayButton = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -375,6 +376,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.RemoveAllDelayButton);
             this.groupBox2.Controls.Add(this.RemoveDelayButton);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.CustomDelayTimeBox);
@@ -452,7 +454,7 @@
             // 
             this.AddDelayButton.Location = new System.Drawing.Point(176, 65);
             this.AddDelayButton.Name = "AddDelayButton";
-            this.AddDelayButton.Size = new System.Drawing.Size(75, 23);
+            this.AddDelayButton.Size = new System.Drawing.Size(86, 23);
             this.AddDelayButton.TabIndex = 1;
             this.AddDelayButton.Text = "Add Delay";
             this.AddDelayButton.UseVisualStyleBackColor = true;
@@ -467,6 +469,16 @@
             this.DelayListBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.DelayListBox.Size = new System.Drawing.Size(164, 349);
             this.DelayListBox.TabIndex = 0;
+            // 
+            // RemoveAllDelayButton
+            // 
+            this.RemoveAllDelayButton.Location = new System.Drawing.Point(176, 123);
+            this.RemoveAllDelayButton.Name = "RemoveAllDelayButton";
+            this.RemoveAllDelayButton.Size = new System.Drawing.Size(86, 23);
+            this.RemoveAllDelayButton.TabIndex = 7;
+            this.RemoveAllDelayButton.Text = "Remove All";
+            this.RemoveAllDelayButton.UseVisualStyleBackColor = true;
+            this.RemoveAllDelayButton.Click += new System.EventHandler(this.RemoveAllDelayButton_Click);
             // 
             // GraphicalUserInterface
             // 
@@ -531,6 +543,7 @@
         private System.Windows.Forms.NumericUpDown FastDelayBox;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown NormalDelayBox;
+        private System.Windows.Forms.Button RemoveAllDelayButton;
     }
 }
 
