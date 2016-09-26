@@ -17,17 +17,7 @@ Added character (½) to act as a spacebar (for drum set support).
 Added keybindings (Change bindings in the new settings tab).
 GUI: Moved delay settings to settings tab.
 
-1.2.2 (Last version of legacy, source code on Legacy branch on github)
+1.2.2
 Fixed playback for drums (Whoops)
 Added custom delay options. For ultimate costumization!
 New save format, backwards compatible.
-
-2.0
-Started over with a much better code design backend as well as a nicer GUI
-
-2.0.1
-Fixed speed change notes
-Removed delay time lower limit
-
-2.1
-Initial version of the custom notes functionality (Still work in progress)
