@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Core\Delay.cs" />
     <Compile Include="Core\Exceptions\AutoplayerCustomDelayException.cs" />
+    <Compile Include="Core\Exceptions\AutoplayerCustomNoteException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerInvalidMultiNoteException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerLoadFailedException.cs" />

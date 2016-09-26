@@ -55,6 +55,7 @@
             this.CustomizeTabButton = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.RemoveAllDelayButton = new System.Windows.Forms.Button();
             this.RemoveDelayButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.CustomDelayTimeBox = new System.Windows.Forms.NumericUpDown();
@@ -62,7 +63,14 @@
             this.CustomDelayCharacterBox = new System.Windows.Forms.TextBox();
             this.AddDelayButton = new System.Windows.Forms.Button();
             this.DelayListBox = new System.Windows.Forms.TextBox();
-            this.RemoveAllDelayButton = new System.Windows.Forms.Button();
+            this.CustomNoteListBox = new System.Windows.Forms.TextBox();
+            this.RemoveAllNotesButton = new System.Windows.Forms.Button();
+            this.RemoveNoteButton = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.CustomNoteCharacterBox = new System.Windows.Forms.TextBox();
+            this.AddNoteButton = new System.Windows.Forms.Button();
+            this.CustomNoteNewCharacterBox = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -72,6 +80,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.NormalDelayBox)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.CustomizeTabButton.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).BeginInit();
             this.SuspendLayout();
@@ -367,12 +376,20 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.CustomNoteNewCharacterBox);
+            this.groupBox3.Controls.Add(this.RemoveAllNotesButton);
+            this.groupBox3.Controls.Add(this.CustomNoteListBox);
+            this.groupBox3.Controls.Add(this.RemoveNoteButton);
+            this.groupBox3.Controls.Add(this.AddNoteButton);
+            this.groupBox3.Controls.Add(this.label7);
+            this.groupBox3.Controls.Add(this.CustomNoteCharacterBox);
+            this.groupBox3.Controls.Add(this.label8);
             this.groupBox3.Location = new System.Drawing.Point(317, 0);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(318, 374);
             this.groupBox3.TabIndex = 1;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Custom Notes (Coming Soon)";
+            this.groupBox3.Text = "Custom Notes (W.I.P)";
             // 
             // groupBox2
             // 
@@ -390,6 +407,16 @@
             this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Custom Delays";
+            // 
+            // RemoveAllDelayButton
+            // 
+            this.RemoveAllDelayButton.Location = new System.Drawing.Point(176, 123);
+            this.RemoveAllDelayButton.Name = "RemoveAllDelayButton";
+            this.RemoveAllDelayButton.Size = new System.Drawing.Size(86, 23);
+            this.RemoveAllDelayButton.TabIndex = 7;
+            this.RemoveAllDelayButton.Text = "Remove All";
+            this.RemoveAllDelayButton.UseVisualStyleBackColor = true;
+            this.RemoveAllDelayButton.Click += new System.EventHandler(this.RemoveAllDelayButton_Click);
             // 
             // RemoveDelayButton
             // 
@@ -470,15 +497,81 @@
             this.DelayListBox.Size = new System.Drawing.Size(164, 349);
             this.DelayListBox.TabIndex = 0;
             // 
-            // RemoveAllDelayButton
+            // CustomNoteListBox
             // 
-            this.RemoveAllDelayButton.Location = new System.Drawing.Point(176, 123);
-            this.RemoveAllDelayButton.Name = "RemoveAllDelayButton";
-            this.RemoveAllDelayButton.Size = new System.Drawing.Size(86, 23);
-            this.RemoveAllDelayButton.TabIndex = 7;
-            this.RemoveAllDelayButton.Text = "Remove All";
-            this.RemoveAllDelayButton.UseVisualStyleBackColor = true;
-            this.RemoveAllDelayButton.Click += new System.EventHandler(this.RemoveAllDelayButton_Click);
+            this.CustomNoteListBox.Location = new System.Drawing.Point(141, 19);
+            this.CustomNoteListBox.Multiline = true;
+            this.CustomNoteListBox.Name = "CustomNoteListBox";
+            this.CustomNoteListBox.ReadOnly = true;
+            this.CustomNoteListBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.CustomNoteListBox.Size = new System.Drawing.Size(164, 349);
+            this.CustomNoteListBox.TabIndex = 8;
+            // 
+            // RemoveAllNotesButton
+            // 
+            this.RemoveAllNotesButton.Location = new System.Drawing.Point(49, 123);
+            this.RemoveAllNotesButton.Name = "RemoveAllNotesButton";
+            this.RemoveAllNotesButton.Size = new System.Drawing.Size(86, 23);
+            this.RemoveAllNotesButton.TabIndex = 14;
+            this.RemoveAllNotesButton.Text = "Remove All";
+            this.RemoveAllNotesButton.UseVisualStyleBackColor = true;
+            this.RemoveAllNotesButton.Click += new System.EventHandler(this.RemoveAllNotesButton_Click);
+            // 
+            // RemoveNoteButton
+            // 
+            this.RemoveNoteButton.Location = new System.Drawing.Point(49, 94);
+            this.RemoveNoteButton.Name = "RemoveNoteButton";
+            this.RemoveNoteButton.Size = new System.Drawing.Size(86, 23);
+            this.RemoveNoteButton.TabIndex = 13;
+            this.RemoveNoteButton.Text = "Remove Note";
+            this.RemoveNoteButton.UseVisualStyleBackColor = true;
+            this.RemoveNoteButton.Click += new System.EventHandler(this.RemoveNoteButton_Click);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(35, 41);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(80, 13);
+            this.label7.TabIndex = 12;
+            this.label7.Text = "New character:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(59, 19);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(56, 13);
+            this.label8.TabIndex = 10;
+            this.label8.Text = "Character:";
+            // 
+            // CustomNoteCharacterBox
+            // 
+            this.CustomNoteCharacterBox.Location = new System.Drawing.Point(121, 16);
+            this.CustomNoteCharacterBox.MaxLength = 1;
+            this.CustomNoteCharacterBox.Name = "CustomNoteCharacterBox";
+            this.CustomNoteCharacterBox.Size = new System.Drawing.Size(14, 20);
+            this.CustomNoteCharacterBox.TabIndex = 9;
+            this.CustomNoteCharacterBox.Text = "A";
+            // 
+            // AddNoteButton
+            // 
+            this.AddNoteButton.Location = new System.Drawing.Point(49, 65);
+            this.AddNoteButton.Name = "AddNoteButton";
+            this.AddNoteButton.Size = new System.Drawing.Size(86, 23);
+            this.AddNoteButton.TabIndex = 8;
+            this.AddNoteButton.Text = "Add Note";
+            this.AddNoteButton.UseVisualStyleBackColor = true;
+            this.AddNoteButton.Click += new System.EventHandler(this.AddNoteButton_Click);
+            // 
+            // CustomNoteNewCharacterBox
+            // 
+            this.CustomNoteNewCharacterBox.Location = new System.Drawing.Point(121, 38);
+            this.CustomNoteNewCharacterBox.MaxLength = 1;
+            this.CustomNoteNewCharacterBox.Name = "CustomNoteNewCharacterBox";
+            this.CustomNoteNewCharacterBox.Size = new System.Drawing.Size(14, 20);
+            this.CustomNoteNewCharacterBox.TabIndex = 15;
+            this.CustomNoteNewCharacterBox.Text = "B";
             // 
             // GraphicalUserInterface
             // 
@@ -500,6 +593,8 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.CustomizeTabButton.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).EndInit();
@@ -544,6 +639,14 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown NormalDelayBox;
         private System.Windows.Forms.Button RemoveAllDelayButton;
+        private System.Windows.Forms.TextBox CustomNoteNewCharacterBox;
+        private System.Windows.Forms.Button RemoveAllNotesButton;
+        private System.Windows.Forms.TextBox CustomNoteListBox;
+        private System.Windows.Forms.Button RemoveNoteButton;
+        private System.Windows.Forms.Button AddNoteButton;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox CustomNoteCharacterBox;
+        private System.Windows.Forms.Label label8;
     }
 }
 

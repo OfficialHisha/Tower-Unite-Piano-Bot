@@ -29,5 +29,22 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         {
             return Character.ToString();
         }
+
+        public override bool Equals(object obj)
+        {
+            Note other = obj as Note;
+
+            if(other != null)
+            {
+                if (Character == other.Character && IsHighNote == other.IsHighNote)
+                    return true;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Character.GetHashCode();
+        }
     }
 }

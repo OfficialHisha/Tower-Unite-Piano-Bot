@@ -53,6 +53,8 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
 
         /// <summary>
         /// This method handles the key bind presses
+        /// NOTE: This might trigger anti-virus software
+        /// as this is a popular method used in keyloggers
         /// </summary>
         private void GKS_KeyDown(object sender, KeyEventArgs e)
         {
@@ -86,6 +88,20 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             foreach (Delay delay in Autoplayer.Delays)
             {
                 DelayListBox.Text += $"Character: '{delay.Character}' : Delay: '{delay.Time}'\n";
+            }
+        }
+        /// <summary>
+        /// This method updates the CustomNotesListBox with all notes from the CustomNotes list in the main program
+        /// Each custom note has its own line
+        /// </summary>
+        public void UpdateCustomNoteListBox()
+        {
+            CustomNoteListBox.Clear();
+            foreach (Note note in Autoplayer.CustomNotes.Keys)
+            {
+                Note newNote;
+                Autoplayer.CustomNotes.TryGetValue(note, out newNote);
+                CustomNoteListBox.Text += $"Changed from '{note}' to '{newNote}'\n";
             }
         }
         /// <summary>
@@ -190,6 +206,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             MessageBox.Show(exception.Message);
         }
 
+        #region Custom delay buttons
         /// <summary>
         /// This is called when we click the AddDelayButton
         /// </summary>
@@ -241,8 +258,6 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         /// <summary>
         /// This is called when we click the RemoveAllDelayButton
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void RemoveAllDelayButton_Click(object sender, EventArgs e)
         {
             //Clear the list of delays
@@ -254,6 +269,82 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             //Update the current notes wtih the new rules
             MakeSong();
         }
+        #endregion
+
+        #region Custom note buttons
+        /// <summary>
+        /// This is called when we click the AddNoteButton
+        /// </summary>
+        private void AddNoteButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                char character = CustomNoteCharacterBox.Text.ToCharArray()[0];
+                Note note = new Note(character, char.IsUpper(character));
+
+                char newCharacter = CustomNoteNewCharacterBox.Text.ToCharArray()[0];
+                Note newNote = new Note(newCharacter, char.IsUpper(character));
+
+                if (Autoplayer.CheckNoteExists(note))
+                {
+                    //If the note already exists, just update it
+                    Autoplayer.ChangeNote(note, newNote);
+                }
+                else
+                {
+                    //If the note does not exist, add a new entry
+                    Autoplayer.AddNote(note, newNote);
+                }
+                //Update the GUI element to show the delays in the GUI
+                UpdateCustomNoteListBox();
+
+                //Update the current notes to with the new rules
+                MakeSong();
+            }
+            catch (AutoplayerCustomNoteException error)
+            {
+                MessageBox.Show(error.Message);
+            }
+        }
+        /// <summary>
+        /// This is called when we click the RemoveNoteButton
+        /// </summary>
+        private void RemoveNoteButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                char character = CustomNoteCharacterBox.Text.ToCharArray()[0];
+                Note note = new Note(character, char.IsUpper(character));
+
+                //Remove the note from the dictonary
+                Autoplayer.RemoveNote(note);
+                //Update the GUI
+                UpdateCustomNoteListBox();
+
+                //Update the current notes wtih the new rules
+                MakeSong();
+            }
+            catch (AutoplayerCustomNoteException error)
+            {
+                MessageBox.Show(error.Message);
+            }
+        }
+        /// <summary>
+        /// This is called when we click the RemoveAllNotesButton
+        /// </summary>
+        private void RemoveAllNotesButton_Click(object sender, EventArgs e)
+        {
+            //Clear the dictonary of custom notes
+            Autoplayer.ResetNotes();
+
+            //Update the GUI
+            UpdateCustomNoteListBox();
+
+            //Update the current notes wtih the new rules
+            MakeSong();
+        }
+        #endregion
+
         /// <summary>
         /// This is called when we click the ClearNotesButton
         /// </summary>

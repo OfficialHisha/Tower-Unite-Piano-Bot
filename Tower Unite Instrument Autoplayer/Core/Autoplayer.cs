@@ -38,6 +38,8 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public static List<INote> Song { get; private set; } = new List<INote>();
         //The delays we generate will go in this list
         public static List<Delay> Delays { get; private set; } = new List<Delay>();
+        //The custom notes goes in this dictionary
+        public static Dictionary<Note, Note> CustomNotes { get; private set; } = new Dictionary<Note, Note>();
         //This buffer is used when we generate multinotes based on input
         static List<Note> multiNoteBuffer = new List<Note>();
 
@@ -188,7 +190,8 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             }
         }
         #endregion
-        
+
+        #region Custom delay handling
         /// <summary>
         /// This method will check if a delay exists in the list of delays
         /// If it does, it returns true, otherwise it returns false
@@ -210,7 +213,6 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             {
                 throw new AutoplayerCustomDelayException("Trying to add already existing delay");
             }
-            
         }
         /// <summary>
         /// This method will remove a delay from the list of delays
@@ -247,7 +249,82 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         {
             Delays.Clear();
         }
+        #endregion
 
+        #region Custom note handling
+        /// <summary>
+        /// This method will check if a note exists in the list of custom notes
+        /// If it does, it returns true, otherwise it returns false
+        /// </summary>
+        public static bool CheckNoteExists(Note note)
+        {
+            return CustomNotes.ContainsKey(note);
+        }
+        /// <summary>
+        /// This method will check if a note exists in the list of custom notes
+        /// as well as the connection between the note and the new note of the pair
+        /// </summary>
+        public static bool CheckNoteExists(Note note, Note newNote)
+        {
+            Note checkNote;
+            CustomNotes.TryGetValue(note, out checkNote);
+            if(checkNote != null && checkNote == newNote)
+            {
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// This method will add a note to the list of custom notes
+        /// </summary>
+        public static void AddNote(Note note, Note newNote)
+        {
+            if (!CheckNoteExists(note, newNote))
+            {
+                CustomNotes.Add(note, newNote);
+            }
+            else
+            {
+                throw new AutoplayerCustomNoteException("Trying to add already existing note");
+            }
+        }
+        /// <summary>
+        /// This method will remove a note from the list of custom notes
+        /// </summary>
+        public static void RemoveNote(Note note)
+        {
+            if (CheckNoteExists(note))
+            {
+                CustomNotes.Remove(note);
+            }
+            else
+            {
+                throw new AutoplayerCustomNoteException("Trying to remove non-existent note");
+            }
+        }
+        /// <summary>
+        /// This method will set a new note to the value of a specified note from the list of custom notes
+        /// </summary>
+        public static void ChangeNote(Note note, Note newNote)
+        {
+            if (CheckNoteExists(note))
+            {
+                CustomNotes.Remove(note);
+                CustomNotes.Add(note, newNote);
+            }
+            else
+            {
+                throw new AutoplayerCustomNoteException("Trying to modify non-existent note");
+            }
+        }
+        /// <summary>
+        /// This method will remove all notes from the list of custom notes
+        /// </summary>
+        public static void ResetNotes()
+        {
+            CustomNotes.Clear();
+        }
+        #endregion
 
         /// <summary>
         /// This method will change the speed according to the changeToFast boolean
@@ -276,7 +353,23 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 {
                     try
                     {
-                        note.Play();
+                        if(note is Note)
+                        {
+                            if(CustomNotes.ContainsKey((Note)note))
+                            {
+                                Note customNote;
+                                CustomNotes.TryGetValue((Note)note, out customNote);
+                                customNote.Play();
+                            }
+                            else
+                            {
+                                note.Play();
+                            }
+                        }
+                        else
+                        {
+                            note.Play();
+                        }
                         if (note is Note || note is MultiNote)
                         {
                             if (isFastSpeed)
