@@ -37,8 +37,10 @@ Does not support (x2) etc. tags. The workaround is to paste it for each iteratio
 These issues may lead to the software crashing or the in game character leaving the piano (See "Important").
 
 # Important
-The software will send keypresses to the game until it completes the sequence or the stop button is pressed.
 
+# Please see this reply regarding the use of macros in Tower Unite: http://forums.pixeltailgames.com/t/piano-player/10070/46?u=matias
+
+The software will send keypresses to the game until it completes the sequence or the stop button is pressed.
 This means that if you leave the piano prematurely it WILL continue to send keypresses!
 
 Use the software at your own risk.
