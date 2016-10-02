@@ -419,6 +419,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public static void SaveSong(string path)
         {
             StreamWriter sw = new StreamWriter(path);
+            sw.WriteLine(Version);
             sw.WriteLine("DELAYS");
             sw.WriteLine(Delays.Count);
             if (Delays.Count != 0)
@@ -429,6 +430,19 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     sw.WriteLine(delay.Time);
                 }
             }
+            sw.WriteLine("CUSTOM NOTES");
+            sw.WriteLine(CustomNotes.Count);
+            if (CustomNotes.Count != 0)
+            {
+                foreach (KeyValuePair<Note, Note> note in CustomNotes)
+                {
+                    sw.WriteLine(note.Value.Character);
+                    sw.WriteLine(note.Key.Character);
+                }
+            }
+            sw.WriteLine("SPEEDS");
+            sw.WriteLine(DelayAtNormalSpeed);
+            sw.WriteLine(DelayAtFastSpeed);
             sw.WriteLine("NOTES");
             sw.WriteLine(Song.Count);
             if (Song.Count != 0)
@@ -479,8 +493,68 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             bool errorWhileLoading = true;
             StreamReader sr = new StreamReader(path);
             string firstLine = sr.ReadLine();
-            
-            #region New save format
+
+            #region 2.1 save format
+            if (firstLine == "Version: 2.1")
+            {
+                if(sr.ReadLine() == "DELAY")
+                {
+                    int delayCount = 0;
+                    if (int.TryParse(sr.ReadLine(), out delayCount) && delayCount > 0)
+                    {
+                        for (int i = 0; i < delayCount; i++)
+                        {
+                            char delayChar;
+                            int delayTime = 0;
+                            if (char.TryParse(sr.ReadLine(), out delayChar))
+                            {
+                                if (int.TryParse(sr.ReadLine(), out delayTime))
+                                {
+                                    Delays.Add(new Delay(delayChar, delayTime));
+                                }
+                            }
+                        }
+                    }
+                }
+                if(sr.ReadLine() == "CUSTOM NOTES")
+                {
+                    int noteCount = 0;
+                    if (int.TryParse(sr.ReadLine(), out noteCount) && noteCount > 0)
+                    {
+                        for (int i = 0; i < noteCount; i++)
+                        {
+                            char origNoteChar;
+                            char replaceNoteChar;
+                            if (char.TryParse(sr.ReadLine(), out origNoteChar))
+                            {
+                                if (char.TryParse(sr.ReadLine(), out replaceNoteChar))
+                                {
+                                    CustomNotes.Add(new Note(origNoteChar, char.IsUpper(origNoteChar)), new Note(replaceNoteChar, char.IsUpper(replaceNoteChar)));
+                                }
+                            }
+                        }
+                    }
+                }
+                if(sr.ReadLine() == "SPEEDS")
+                {
+                    int normalSpeed, fastSpeed;
+                    int.TryParse(sr.ReadLine(), out normalSpeed);
+                    int.TryParse(sr.ReadLine(), out fastSpeed);
+                    DelayAtNormalSpeed = normalSpeed;
+                    DelayAtFastSpeed = fastSpeed;
+                }
+                if (sr.ReadLine() == "NOTES")
+                {
+                    int noteCount = 0;
+                    if (int.TryParse(sr.ReadLine(), out noteCount) && noteCount > 0)
+                    {
+                        AddNotesFromString(sr.ReadToEnd());
+                    }
+                    errorWhileLoading = false;
+                }
+            }
+            #endregion
+            #region 2.0 save format (for backwards compatibility)
             if (firstLine == "DELAYS")
             {
                 int delayCount = 0;
@@ -566,7 +640,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 }
             }
             #endregion
-            #region Old save format (For backwards compatibility)
+            #region 1.0 save format (For backwards compatibility)
             else if (firstLine == "NORMAL DELAY")
             {
                 if (int.TryParse(sr.ReadLine(), out delayAtNormalSpeed))
