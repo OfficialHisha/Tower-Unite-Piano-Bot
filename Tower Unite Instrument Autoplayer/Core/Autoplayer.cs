@@ -26,8 +26,8 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         #region Field and property declarations
         //This can be accessed to get the version text
         public static string Version { get; private set; } = "Version: 2.1";
-
-        public static string TargetApplication { get; private set; } = "Tower Unite";
+        //This will be used to define compatibility of save files between versions
+        public static List<string> SupportedVersionsSave { get; } = new List<string>() { "Version: 2.1" };
         
         //This property tells the program if we should play the next note in the song
         public static bool Stop { get; set; } = true;
@@ -138,20 +138,6 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     Song.Add(new SpeedChangeNote(false));
                 }
             }
-            /*
-            //Interpret % as spacebar
-            else if(note == '%')
-            {
-                if(buildingMultiNote)
-                {
-                    multiNoteBuffer.Add(new Note(' ', false));
-                }
-                else
-                {
-                    Song.Add(new Note(' ', false));
-                }
-            }
-            */
             //If the input is registered as a delay, add a delay note
             else if(delay != null)
             {
@@ -495,9 +481,9 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             string firstLine = sr.ReadLine();
 
             #region 2.1 save format
-            if (firstLine == "Version: 2.1")
+            if (SupportedVersionsSave.Contains(firstLine))
             {
-                if(sr.ReadLine() == "DELAY")
+                if(sr.ReadLine() == "DELAYS")
                 {
                     int delayCount = 0;
                     if (int.TryParse(sr.ReadLine(), out delayCount) && delayCount > 0)

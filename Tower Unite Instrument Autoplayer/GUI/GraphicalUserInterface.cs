@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 using Utilities;
@@ -13,7 +14,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
     {
         //Here we create a thread that will be used to play the song
         //This way the program will not freeze while playing
-        Thread songThread;
+        List<Thread> songThreads = new List<Thread>();
 
         //This is the hook for the key bindings, until I find a better solution
         GlobalKeyboardHook gkh = new GlobalKeyboardHook();
@@ -33,6 +34,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         public GraphicalUserInterface()
         {
             InitializeComponent();
+            ErrorLabel.Hide();
             VersionLabel.Text = Autoplayer.Version;
             Autoplayer.AddingNoteFinished += EnablePlayButton;
             Autoplayer.SongFinishedPlaying += EnableClearButton;
@@ -149,13 +151,15 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         {
             try
             {
+                ErrorLabel.Hide();
                 DisablePlayButton();
                 Autoplayer.ClearAllNotes();
                 Autoplayer.AddNotesFromString(NoteTextBox.Text);
             }
             catch (AutoplayerNoteCreationFailedException e)
             {
-                MessageBox.Show($"Error: {e.Message}");
+                ErrorLabel.Text = $"ERROR: {e.Message}";
+                ErrorLabel.Show();
             }
         }
         
@@ -203,7 +207,8 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         /// </summary>
         private void ExceptionHandler(AutoplayerException exception)
         {
-            MessageBox.Show(exception.Message);
+            ErrorLabel.Text = exception.Message;
+            ErrorLabel.Show();
         }
 
         #region Custom delay buttons
@@ -362,10 +367,13 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             //Disable the clear notes button so we don't clear the notes
             //while trying to play them
             DisableClearButton();
+            //Disable the play button so we don't create another thread
+            //while one is running
+            //DisablePlayButton();
             //Start the song in a new thread so we can do other things in
             //the program when the song is playing. Stopping the song for example
-            songThread = new Thread(Autoplayer.PlaySong);
-            songThread.Start();
+            songThreads.Insert(0, new Thread(Autoplayer.PlaySong));
+            songThreads[0].Start();
         }
         /// <summary>
         /// This is called when we click the StopButton
@@ -373,9 +381,10 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         private void StopButton_Click(object sender, EventArgs e)
         {
             Autoplayer.StopSong();
-            //Close the thread and enable the ClearNotesButton
-            songThread.Abort();
-            EnableClearButton();           
+            //Close the thread(s) and enable the ClearNotesButton as well as the PlayButton
+            songThreads.ForEach(x => x.Abort());
+            songThreads.Clear();
+            EnableClearButton();
         }
         /// <summary>
         /// This is called when we click the LoadButton

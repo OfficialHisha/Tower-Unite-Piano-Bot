@@ -71,6 +71,7 @@
             this.CustomDelayCharacterBox = new System.Windows.Forms.TextBox();
             this.AddDelayButton = new System.Windows.Forms.Button();
             this.DelayListBox = new System.Windows.Forms.TextBox();
+            this.ErrorLabel = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -109,6 +110,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.ErrorLabel);
             this.groupBox1.Controls.Add(this.LoopCheckBox);
             this.groupBox1.Controls.Add(this.ClearNotesButton);
             this.groupBox1.Controls.Add(this.VersionLabel);
@@ -200,7 +202,7 @@
             this.NoteTextBox.Multiline = true;
             this.NoteTextBox.Name = "NoteTextBox";
             this.NoteTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.NoteTextBox.Size = new System.Drawing.Size(541, 355);
+            this.NoteTextBox.Size = new System.Drawing.Size(541, 330);
             this.NoteTextBox.TabIndex = 0;
             this.NoteTextBox.Text = "Load a song or input notes here..";
             this.NoteTextBox.TextChanged += new System.EventHandler(this.NoteTextBox_TextChanged);
@@ -573,6 +575,16 @@
             this.DelayListBox.Size = new System.Drawing.Size(164, 349);
             this.DelayListBox.TabIndex = 0;
             // 
+            // ErrorLabel
+            // 
+            this.ErrorLabel.AutoSize = true;
+            this.ErrorLabel.ForeColor = System.Drawing.Color.Red;
+            this.ErrorLabel.Location = new System.Drawing.Point(3, 352);
+            this.ErrorLabel.Name = "ErrorLabel";
+            this.ErrorLabel.Size = new System.Drawing.Size(163, 13);
+            this.ErrorLabel.TabIndex = 8;
+            this.ErrorLabel.Text = "ERROR: Something went wrong!";
+            // 
             // GraphicalUserInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -647,6 +659,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox CustomNoteCharacterBox;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label ErrorLabel;
     }
 }
 
