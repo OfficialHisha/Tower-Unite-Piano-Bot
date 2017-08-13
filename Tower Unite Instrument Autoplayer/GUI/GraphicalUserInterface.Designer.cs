@@ -31,6 +31,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.MainTabPage = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ErrorLabel = new System.Windows.Forms.Label();
             this.LoopCheckBox = new System.Windows.Forms.CheckBox();
             this.ClearNotesButton = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
@@ -71,7 +72,6 @@
             this.CustomDelayCharacterBox = new System.Windows.Forms.TextBox();
             this.AddDelayButton = new System.Windows.Forms.Button();
             this.DelayListBox = new System.Windows.Forms.TextBox();
-            this.ErrorLabel = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -126,6 +126,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Notes";
             // 
+            // ErrorLabel
+            // 
+            this.ErrorLabel.AutoSize = true;
+            this.ErrorLabel.ForeColor = System.Drawing.Color.Red;
+            this.ErrorLabel.Location = new System.Drawing.Point(3, 352);
+            this.ErrorLabel.Name = "ErrorLabel";
+            this.ErrorLabel.Size = new System.Drawing.Size(163, 13);
+            this.ErrorLabel.TabIndex = 8;
+            this.ErrorLabel.Text = "ERROR: Something went wrong!";
+            // 
             // LoopCheckBox
             // 
             this.LoopCheckBox.AutoSize = true;
@@ -150,7 +160,7 @@
             // VersionLabel
             // 
             this.VersionLabel.AutoSize = true;
-            this.VersionLabel.Location = new System.Drawing.Point(544, 358);
+            this.VersionLabel.Location = new System.Drawing.Point(560, 358);
             this.VersionLabel.Name = "VersionLabel";
             this.VersionLabel.Size = new System.Drawing.Size(69, 13);
             this.VersionLabel.TabIndex = 5;
@@ -574,16 +584,6 @@
             this.DelayListBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.DelayListBox.Size = new System.Drawing.Size(164, 349);
             this.DelayListBox.TabIndex = 0;
-            // 
-            // ErrorLabel
-            // 
-            this.ErrorLabel.AutoSize = true;
-            this.ErrorLabel.ForeColor = System.Drawing.Color.Red;
-            this.ErrorLabel.Location = new System.Drawing.Point(3, 352);
-            this.ErrorLabel.Name = "ErrorLabel";
-            this.ErrorLabel.Size = new System.Drawing.Size(163, 13);
-            this.ErrorLabel.TabIndex = 8;
-            this.ErrorLabel.Text = "ERROR: Something went wrong!";
             // 
             // GraphicalUserInterface
             // 

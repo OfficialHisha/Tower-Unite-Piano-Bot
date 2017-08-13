@@ -21,6 +21,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public Note(char character, VirtualKeyCode note, bool isHighNote)
         {
             NoteToPlay = note;
+            Character = character;
             IsHighNote = isHighNote;
         }
 

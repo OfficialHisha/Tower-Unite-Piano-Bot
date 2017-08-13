@@ -34,3 +34,10 @@ Initial version of the custom notes functionality
 Fixed a problem that could cause the program to make your computer press keys continously even when closing the program (As a side effect, this also allows users to play multiple songs should that be wanted)
 Errors will now appear in red text under the note field rather than the annoying popup!
 A major oversight in the save system has been fixed (Of cause with backwards compatibility)
+
+2.2
+Fixed gmod compatibility
+Finally got black notes to work!
+
+2.2a
+Fixed save and load
