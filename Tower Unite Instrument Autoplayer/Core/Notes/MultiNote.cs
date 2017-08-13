@@ -1,4 +1,8 @@
-﻿namespace Tower_Unite_Instrument_Autoplayer.Core
+﻿using System.Threading;
+using WindowsInput;
+using WindowsInput.Native;
+
+namespace Tower_Unite_Instrument_Autoplayer.Core
 {
     /// <summary>
     /// This class defines a MultiNote
@@ -7,18 +11,60 @@
     /// </summary>
     public class MultiNote : INote
     {
-        public Note[] Notes { get; set; }
+        InputSimulator sim = new InputSimulator();
 
-        public MultiNote(Note[] notes)
+        public Note[] Notes { get; private set; }
+        public bool IsHighNote { get; private set; }
+
+        public MultiNote(Note[] notes, bool isHighNote)
         {
             Notes = notes;
+            IsHighNote = isHighNote;
         }
 
         public void Play()
         {
+            //EXPERIMENTAL SOLUTION
+            //This method is a better solution as you can define a delay. However, this may result in unexpected behaviour should the program be terminated before KeyUp is run!
+            if (IsHighNote)
+            {
+                sim.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
+                Thread.Sleep(8);
+                foreach (Note note in Notes)
+                {
+                    sim.Keyboard.KeyDown(note.NoteToPlay);
+                }
+                Thread.Sleep(8);
+                foreach (Note note in Notes)
+                {
+                    sim.Keyboard.KeyUp(note.NoteToPlay);
+                }
+                sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
+            }
+            else
+            {
+                foreach (Note note in Notes)
+                {
+                    sim.Keyboard.KeyDown(note.NoteToPlay);
+                }
+                Thread.Sleep(8);
+                foreach (Note note in Notes)
+                {
+                    sim.Keyboard.KeyUp(note.NoteToPlay);
+                }
+            }
+            
+            //foreach (Note note in Notes)
+            //{
+            //    note.Play();
+            //}
+        }
+
+        public void Stop()
+        {
             foreach (Note note in Notes)
             {
-                note.Play();
+                note.Stop();
             }
         }
 

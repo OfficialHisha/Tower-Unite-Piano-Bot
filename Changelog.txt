@@ -41,3 +41,8 @@ Finally got black notes to work!
 
 2.2a
 Fixed save and load
+
+2.2b
+Fixed space not working
+Fixed the remaining black keys
+Fixed multi notes for the new system

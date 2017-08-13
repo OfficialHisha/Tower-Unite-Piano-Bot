@@ -25,9 +25,9 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
 
         #region Field and property declarations
         //This can be accessed to get the version text
-        public static string Version { get; private set; } = "Version: 2.2a";
+        public static string Version { get; private set; } = "Version: 2.2b";
         //This will be used to define compatibility of save files between versions
-        public static List<string> SupportedVersionsSave { get; } = new List<string>() { "Version: 2.1", "Version: 2.2a" };
+        public static List<string> SupportedVersionsSave { get; } = new List<string>() { "Version: 2.1", "Version: 2.2a", "Version: 2.2b" };
         
         //This property tells the program if we should play the next note in the song
         public static bool Stop { get; set; } = true;
@@ -44,10 +44,12 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         static List<Note> multiNoteBuffer = new List<Note>();
 
         //This array contains the known characters that cannot be accepted by the program.
-        static List<char> invalidCharacters = new List<char>(new char[] { '(', ')' });
+        //static List<char> invalidCharacters = new List<char>(new char[] { '(', ')' }); - Disabled as of version 2.2b
 
         //This boolean informs the program if we're currently in the process of generating a multinote
         static bool buildingMultiNote = false;
+        //This boolean informs the program whether the current multinote consists of high notes or not
+        static bool multiNoteIsHighNote = false;
         //This boolean informs the program if it should use the fast delay or not when playing notes
         static bool isFastSpeed = false;
         //This is the delay (in milliseconds) at normal speed
@@ -100,9 +102,36 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             ['8'] = WindowsInput.Native.VirtualKeyCode.VK_8,
             ['9'] = WindowsInput.Native.VirtualKeyCode.VK_9,
             #endregion
+            #region Symbols
+            [' '] = WindowsInput.Native.VirtualKeyCode.SPACE,
+            ['='] = WindowsInput.Native.VirtualKeyCode.VK_0,
+            ['!'] = WindowsInput.Native.VirtualKeyCode.VK_1,
+            ['"'] = WindowsInput.Native.VirtualKeyCode.VK_2,
+            ['#'] = WindowsInput.Native.VirtualKeyCode.VK_3,
+            ['¤'] = WindowsInput.Native.VirtualKeyCode.VK_4,
+            ['%'] = WindowsInput.Native.VirtualKeyCode.VK_5,
+            ['&'] = WindowsInput.Native.VirtualKeyCode.VK_6,
+            ['/'] = WindowsInput.Native.VirtualKeyCode.VK_7,
+            ['('] = WindowsInput.Native.VirtualKeyCode.VK_8,
+            [')'] = WindowsInput.Native.VirtualKeyCode.VK_9
+            #endregion
+        };
+        //TESTING: This list will contain notes that should always be considered a high note
+        public static List<char> AlwaysHighNotes = new List<char>()
+        {
+            '=',
+            '!',
+            '"',
+            '#',
+            '¤',
+            '%',
+            '&',
+            '/',
+            '(',
+            ')',
         };
         #endregion
-
+        
         #region Note handling
         /// <summary>
         /// This method will clear the song from all notes
@@ -152,7 +181,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     throw new AutoplayerMultiNoteNotDefinedException("A multi note must have a start before the end!");
                 }
                 buildingMultiNote = false;
-                Song.Add(new MultiNote(multiNoteBuffer.ToArray()));
+                Song.Add(new MultiNote(multiNoteBuffer.ToArray(), multiNoteIsHighNote));
                 multiNoteBuffer.Clear();
             }
             //Start fast speed if the input is a {
@@ -201,12 +230,12 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             {
                 return;
             }
-            //Check if the input is known as invalid
-            else if (invalidCharacters.Contains(note))
-            {
-                //I was too lazy to make a new exception for this purpose, I might add a custom one later..
-                throw new AutoplayerNoteCreationFailedException($"Invalid note '{note}' detected! If the note is a upper-case variant of a button, try to input the lower-case variant. If you're unsure how to fix this, please contact the developer.");
-            }
+            //Check if the input is known as invalid - Might not be needed anymore
+            //else if (invalidCharacters.Contains(note))
+            //{
+            //    //I was too lazy to make a new exception for this purpose, I might add a custom one later..
+            //    throw new AutoplayerNoteCreationFailedException($"Invalid note '{note}' detected! If the note is a upper-case variant of a button, try to input the lower-case variant. If you're unsure how to fix this, please contact the developer.");
+            //}
             //If the input is not a special character, add it as a normal note
             else
             {
@@ -225,13 +254,26 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     return;
                 }
 
+                //This will check if the note is an uppercase letter, or if the note is in the list of high notes
+                bool isHighNote = char.IsUpper(note) || AlwaysHighNotes.Contains(note);
+
                 if (buildingMultiNote)
                 {
-                    multiNoteBuffer.Add(new Note(note, vk, char.IsUpper(note)));
+                    if (multiNoteBuffer.Count == 0)
+                    {
+                        multiNoteIsHighNote = char.IsUpper(note) || AlwaysHighNotes.Contains(note);
+                    }
+
+                    if (isHighNote != multiNoteIsHighNote)
+                    {
+                        throw new AutoplayerNoteCreationFailedException($"A multinote cannot contain both high and low keys!");
+                    }
+
+                    multiNoteBuffer.Add(new Note(note, vk, isHighNote));
                 }
                 else
                 {
-                    Song.Add(new Note(note, vk, char.IsUpper(note)));
+                    Song.Add(new Note(note, vk, isHighNote));
                 }
             }
         }
@@ -442,9 +484,16 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 else
                 {
                     //The foreach loop here is to avoid any keys getting stuck when the song is stopped by the stop keybinding
-                    foreach (Note n in Song)
+                    foreach (INote n in Song)
                     {
-                        n.Stop();
+                        if (n is Note)
+                        {
+                            ((Note)n).Stop();
+                        }
+                        if (n is MultiNote)
+                        {
+                            ((MultiNote)n).Stop();
+                        }
                     }
                     SongWasStopped?.Invoke();
                 }
@@ -463,7 +512,8 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         {
             Stop = true;
         }
-        
+
+        #region Save & Load
         /// <summary>
         /// This method will save the song and its settings to a file at the "path" variable's destination
         /// </summary>
@@ -545,7 +595,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             StreamReader sr = new StreamReader(path);
             string firstLine = sr.ReadLine();
 
-            #region 2.1 save format
+            #region 2.1+ save format
             if (SupportedVersionsSave.Contains(firstLine))
             {
                 if(sr.ReadLine() == "DELAYS")
@@ -735,5 +785,6 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             }
             LoadCompleted?.Invoke();
         }
+        #endregion
     }
 }

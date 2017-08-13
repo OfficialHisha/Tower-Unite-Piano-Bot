@@ -305,8 +305,12 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                     return;
                 }
 
-                Note note = new Note(character, vkOld, char.IsUpper(character));
-                Note newNote = new Note(newCharacter, vkNew, char.IsUpper(character));
+                //This will check if the note is an uppercase letter, or if the note is in the list of high notes
+                bool isOldHighNote = char.IsUpper(character) || Autoplayer.AlwaysHighNotes.Contains(character);
+                bool isNewHighNote = char.IsUpper(newCharacter) || Autoplayer.AlwaysHighNotes.Contains(newCharacter);
+
+                Note note = new Note(character, vkOld, isOldHighNote);
+                Note newNote = new Note(newCharacter, vkNew, isNewHighNote);
 
                 if (Autoplayer.CheckNoteExists(note))
                 {
@@ -353,7 +357,10 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                     return;
                 }
 
-                Note note = new Note(character, vk, char.IsUpper(character));
+                //This will check if the note is an uppercase letter, or if the note is in the list of high notes
+                bool isHighNote = char.IsUpper(character) || Autoplayer.AlwaysHighNotes.Contains(character);
+
+                Note note = new Note(character, vk, isHighNote);
 
                 //Remove the note from the dictonary
                 Autoplayer.RemoveNote(note);
