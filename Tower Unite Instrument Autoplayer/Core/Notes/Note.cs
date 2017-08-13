@@ -1,4 +1,6 @@
-﻿using System.Windows.Forms;
+﻿using System.Threading;
+using WindowsInput;
+using WindowsInput.Native;
 
 namespace Tower_Unite_Instrument_Autoplayer.Core
 {
@@ -10,19 +12,46 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     /// </summary>
     public class Note : INote
     {
+        InputSimulator sim = new InputSimulator();
+
+        public VirtualKeyCode NoteToPlay { get; private set; }
         public char Character { get; private set; }
         public bool IsHighNote { get; private set; }
 
-        public Note(char note, bool isHighNote)
+        public Note(char character, VirtualKeyCode note, bool isHighNote)
         {
-            Character = note;
+            NoteToPlay = note;
             IsHighNote = isHighNote;
         }
 
         public void Play()
         {
             //This method is used until a better solution is found. This will NOT play black keys :(
-            SendKeys.SendWait(Character.ToString());
+            //SendKeys.SendWait(Character.ToString());
+
+            //EXPERIMENTAL SOLUTION
+            //This method is a better solution as you can define a delay. However, this may result in unexpected behaviour should the program be terminated before KeyUp is run!
+            if (IsHighNote)
+            {
+                sim.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
+                Thread.Sleep(50);
+                sim.Keyboard.KeyDown(NoteToPlay);
+                Thread.Sleep(50);
+                sim.Keyboard.KeyUp(NoteToPlay);
+                sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
+            }
+            else
+            {
+                sim.Keyboard.KeyDown(NoteToPlay);
+                Thread.Sleep(50);
+                sim.Keyboard.KeyUp(NoteToPlay);
+            }
+        }
+
+        public void Stop()
+        {
+            sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
+            sim.Keyboard.KeyPress(NoteToPlay);
         }
 
         public override string ToString()

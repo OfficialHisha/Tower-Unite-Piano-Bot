@@ -25,9 +25,9 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
 
         #region Field and property declarations
         //This can be accessed to get the version text
-        public static string Version { get; private set; } = "Version: 2.1";
+        public static string Version { get; private set; } = "Version: 2.2";
         //This will be used to define compatibility of save files between versions
-        public static List<string> SupportedVersionsSave { get; } = new List<string>() { "Version: 2.1" };
+        public static List<string> SupportedVersionsSave { get; } = new List<string>() { "Version: 2.1", "Version: 2.2" };
         
         //This property tells the program if we should play the next note in the song
         public static bool Stop { get; set; } = true;
@@ -56,6 +56,51 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         //This is the delay (in milliseconds) at fast speed
         private static int delayAtFastSpeed = 100;
         public static int DelayAtFastSpeed { get { return delayAtFastSpeed; } set { delayAtFastSpeed = value; } }
+
+        //TESTING: This dictionary will serve as a virtual key lookup. So when a note is created, it will check the dictionary for the virtual keycode of the character
+        public static Dictionary<char, WindowsInput.Native.VirtualKeyCode> VirtualDictionary { get; private set; } = new Dictionary<char, WindowsInput.Native.VirtualKeyCode>()
+        {
+            #region Characters
+            ['A'] = WindowsInput.Native.VirtualKeyCode.VK_A,
+            ['B'] = WindowsInput.Native.VirtualKeyCode.VK_B,
+            ['C'] = WindowsInput.Native.VirtualKeyCode.VK_C,
+            ['D'] = WindowsInput.Native.VirtualKeyCode.VK_D,
+            ['E'] = WindowsInput.Native.VirtualKeyCode.VK_E,
+            ['F'] = WindowsInput.Native.VirtualKeyCode.VK_F,
+            ['G'] = WindowsInput.Native.VirtualKeyCode.VK_G,
+            ['H'] = WindowsInput.Native.VirtualKeyCode.VK_H,
+            ['I'] = WindowsInput.Native.VirtualKeyCode.VK_I,
+            ['J'] = WindowsInput.Native.VirtualKeyCode.VK_J,
+            ['K'] = WindowsInput.Native.VirtualKeyCode.VK_K,
+            ['L'] = WindowsInput.Native.VirtualKeyCode.VK_L,
+            ['M'] = WindowsInput.Native.VirtualKeyCode.VK_M,
+            ['N'] = WindowsInput.Native.VirtualKeyCode.VK_N,
+            ['O'] = WindowsInput.Native.VirtualKeyCode.VK_O,
+            ['P'] = WindowsInput.Native.VirtualKeyCode.VK_P,
+            ['Q'] = WindowsInput.Native.VirtualKeyCode.VK_Q,
+            ['R'] = WindowsInput.Native.VirtualKeyCode.VK_R,
+            ['S'] = WindowsInput.Native.VirtualKeyCode.VK_S,
+            ['T'] = WindowsInput.Native.VirtualKeyCode.VK_T,
+            ['U'] = WindowsInput.Native.VirtualKeyCode.VK_U,
+            ['V'] = WindowsInput.Native.VirtualKeyCode.VK_V,
+            ['W'] = WindowsInput.Native.VirtualKeyCode.VK_W,
+            ['X'] = WindowsInput.Native.VirtualKeyCode.VK_X,
+            ['Y'] = WindowsInput.Native.VirtualKeyCode.VK_Y,
+            ['Z'] = WindowsInput.Native.VirtualKeyCode.VK_Z,
+            #endregion
+            #region Numbers
+            ['0'] = WindowsInput.Native.VirtualKeyCode.VK_0,
+            ['1'] = WindowsInput.Native.VirtualKeyCode.VK_1,
+            ['2'] = WindowsInput.Native.VirtualKeyCode.VK_2,
+            ['3'] = WindowsInput.Native.VirtualKeyCode.VK_3,
+            ['4'] = WindowsInput.Native.VirtualKeyCode.VK_4,
+            ['5'] = WindowsInput.Native.VirtualKeyCode.VK_5,
+            ['6'] = WindowsInput.Native.VirtualKeyCode.VK_6,
+            ['7'] = WindowsInput.Native.VirtualKeyCode.VK_7,
+            ['8'] = WindowsInput.Native.VirtualKeyCode.VK_8,
+            ['9'] = WindowsInput.Native.VirtualKeyCode.VK_9,
+            #endregion
+        };
         #endregion
 
         #region Note handling
@@ -165,13 +210,28 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             //If the input is not a special character, add it as a normal note
             else
             {
-                if(buildingMultiNote)
+                WindowsInput.Native.VirtualKeyCode vk;
+                try
                 {
-                    multiNoteBuffer.Add(new Note(note, char.IsUpper(note)));
+                    VirtualDictionary.TryGetValue(char.ToUpper(note), out vk);
+
+                    if (vk == 0)
+                    {
+                        return;
+                    }
+                }
+                catch (ArgumentNullException)
+                {
+                    return;
+                }
+
+                if (buildingMultiNote)
+                {
+                    multiNoteBuffer.Add(new Note(note, vk, char.IsUpper(note)));
                 }
                 else
                 {
-                    Song.Add(new Note(note, char.IsUpper(note)));
+                    Song.Add(new Note(note, vk, char.IsUpper(note)));
                 }
             }
         }
@@ -381,6 +441,11 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 }
                 else
                 {
+                    //The foreach loop here is to avoid any keys getting stuck when the song is stopped by the stop keybinding
+                    foreach (Note n in Song)
+                    {
+                        n.Stop();
+                    }
                     SongWasStopped?.Invoke();
                 }
             }
@@ -515,7 +580,24 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                             {
                                 if (char.TryParse(sr.ReadLine(), out replaceNoteChar))
                                 {
-                                    CustomNotes.Add(new Note(origNoteChar, char.IsUpper(origNoteChar)), new Note(replaceNoteChar, char.IsUpper(replaceNoteChar)));
+                                    WindowsInput.Native.VirtualKeyCode vkOld;
+                                    WindowsInput.Native.VirtualKeyCode vkNew;
+                                    try
+                                    {
+                                        VirtualDictionary.TryGetValue(origNoteChar, out vkOld);
+                                        VirtualDictionary.TryGetValue(replaceNoteChar, out vkNew);
+
+                                        if (vkOld == 0 || vkNew == 0)
+                                        {
+                                            return;
+                                        }
+                                    }
+                                    catch (ArgumentNullException)
+                                    {
+                                        return;
+                                    }
+
+                                    CustomNotes.Add(new Note(origNoteChar, vkOld, char.IsUpper(origNoteChar)), new Note(replaceNoteChar, vkNew, char.IsUpper(replaceNoteChar)));
                                 }
                             }
                         }

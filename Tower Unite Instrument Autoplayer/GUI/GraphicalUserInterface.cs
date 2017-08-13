@@ -39,6 +39,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             Autoplayer.AddingNoteFinished += EnablePlayButton;
             Autoplayer.SongFinishedPlaying += EnableClearButton;
             Autoplayer.SongWasStopped += EnableClearButton;
+            Autoplayer.SongWasStopped += SongStopped;
             Autoplayer.SongWasInteruptedByException += ExceptionHandler;
 
             //Subscribe the method "GKS_KeyDown" to the KeyDown event of the GlobalKeyboardHook
@@ -285,10 +286,27 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             try
             {
                 char character = CustomNoteCharacterBox.Text.ToCharArray()[0];
-                Note note = new Note(character, char.IsUpper(character));
-
                 char newCharacter = CustomNoteNewCharacterBox.Text.ToCharArray()[0];
-                Note newNote = new Note(newCharacter, char.IsUpper(character));
+
+                WindowsInput.Native.VirtualKeyCode vkOld;
+                WindowsInput.Native.VirtualKeyCode vkNew;
+                try
+                {
+                    Autoplayer.VirtualDictionary.TryGetValue(character, out vkOld);
+                    Autoplayer.VirtualDictionary.TryGetValue(newCharacter, out vkNew);
+
+                    if (vkOld == 0 || vkNew == 0)
+                    {
+                        return;
+                    }
+                }
+                catch (ArgumentNullException)
+                {
+                    return;
+                }
+
+                Note note = new Note(character, vkOld, char.IsUpper(character));
+                Note newNote = new Note(newCharacter, vkNew, char.IsUpper(character));
 
                 if (Autoplayer.CheckNoteExists(note))
                 {
@@ -319,7 +337,23 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             try
             {
                 char character = CustomNoteCharacterBox.Text.ToCharArray()[0];
-                Note note = new Note(character, char.IsUpper(character));
+
+                WindowsInput.Native.VirtualKeyCode vk;
+                try
+                {
+                    Autoplayer.VirtualDictionary.TryGetValue(character, out vk);
+
+                    if (vk == 0)
+                    {
+                        return;
+                    }
+                }
+                catch (ArgumentNullException)
+                {
+                    return;
+                }
+
+                Note note = new Note(character, vk, char.IsUpper(character));
 
                 //Remove the note from the dictonary
                 Autoplayer.RemoveNote(note);
@@ -381,6 +415,13 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         private void StopButton_Click(object sender, EventArgs e)
         {
             Autoplayer.StopSong();
+            //Close the thread(s) and enable the ClearNotesButton as well as the PlayButton
+            //songThreads.ForEach(x => x.Abort());
+            //songThreads.Clear();
+            //EnableClearButton();
+        }
+        private void SongStopped()
+        {
             //Close the thread(s) and enable the ClearNotesButton as well as the PlayButton
             songThreads.ForEach(x => x.Abort());
             songThreads.Clear();
