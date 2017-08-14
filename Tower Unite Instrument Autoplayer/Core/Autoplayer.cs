@@ -42,10 +42,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public static Dictionary<Note, Note> CustomNotes { get; private set; } = new Dictionary<Note, Note>();
         //This buffer is used when we generate multinotes based on input
         static List<Note> multiNoteBuffer = new List<Note>();
-
-        //This array contains the known characters that cannot be accepted by the program.
-        //static List<char> invalidCharacters = new List<char>(new char[] { '(', ')' }); - Disabled as of version 2.2b
-
+        
         //This boolean informs the program if we're currently in the process of generating a multinote
         static bool buildingMultiNote = false;
         //This boolean informs the program whether the current multinote consists of high notes or not
@@ -230,13 +227,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             {
                 return;
             }
-            //Check if the input is known as invalid - Might not be needed anymore
-            //else if (invalidCharacters.Contains(note))
-            //{
-            //    //I was too lazy to make a new exception for this purpose, I might add a custom one later..
-            //    throw new AutoplayerNoteCreationFailedException($"Invalid note '{note}' detected! If the note is a upper-case variant of a button, try to input the lower-case variant. If you're unsure how to fix this, please contact the developer.");
-            //}
-            //If the input is not a special character, add it as a normal note
+            //If it didn't match any case, it must be a normal note
             else
             {
                 WindowsInput.Native.VirtualKeyCode vk;
@@ -506,7 +497,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         }
 
         /// <summary>
-        /// This method sets the Stop property which will (hopefully) stop the song from playing any further
+        /// This method sets the Stop property which will stop the song from playing any further
         /// </summary>
         public static void StopSong()
         {
