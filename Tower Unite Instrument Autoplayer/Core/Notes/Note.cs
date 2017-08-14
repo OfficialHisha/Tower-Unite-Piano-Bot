@@ -52,7 +52,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public void Stop()
         {
             sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
-            sim.Keyboard.KeyPress(NoteToPlay);
+            sim.Keyboard.KeyUp(NoteToPlay);
         }
 
         public override string ToString()

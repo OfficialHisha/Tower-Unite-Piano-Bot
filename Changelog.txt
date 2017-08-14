@@ -46,3 +46,6 @@ Fixed save and load
 Fixed space not working
 Fixed the remaining black keys
 Fixed multi notes for the new system
+
+2.2c (Unreleased)
+Fixed note spam when stopping playback with keybind
