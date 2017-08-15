@@ -79,6 +79,8 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         {
             UpdateNoteBox();
             UpdateDelayListBox();
+            NormalDelayBox.Value = Autoplayer.DelayAtNormalSpeed;
+            FastDelayBox.Value = Autoplayer.DelayAtFastSpeed;
             isLoading = false;
         }
         /// <summary>
