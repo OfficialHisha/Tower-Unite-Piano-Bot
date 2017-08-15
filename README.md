@@ -24,25 +24,21 @@ as described in Known issues.
 
 # Planned features
 
-Suggestions?
+* Faster reuse of notes through "music pieces".
+* Ability to use x2 or something similair to play a certain series of notes multiple times without copying and pasting them over and over again.
 
 # Known issues
-Cannot play black keys.
-(I have tried to overcome this issue with everything I could think of, no luck so far.
-I've tried to send capital letters and I've tried emulating holding the shift key. But it looks straight through my trixes.
-If anyone has any idea how to solve this issue, please tell me :> )
-
-Does not support (x2) etc. tags. The workaround is to paste it for each iteration.
-
 These issues may lead to the software crashing or the in game character leaving the piano (See "Important").
+
+* Does not support (x2) etc. tags. The workaround is to paste it for each iteration.
 
 # Important
 
 # Please see this reply regarding the use of macros in Tower Unite: http://forums.pixeltailgames.com/t/piano-player/10070/46?u=matias
 
-The software will send keypresses to the game until it completes the sequence or the stop button is pressed.
+* The software will send keypresses to the game until it completes the sequence or the stop button is pressed.
 This means that if you leave the piano prematurely it WILL continue to send keypresses!
 
 Use the software at your own risk.
 
-Copyright © 2016 Matias Jensen
+Copyright © 2016-2017 Matias Jensen
