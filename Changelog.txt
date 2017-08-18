@@ -49,3 +49,5 @@ Fixed multi notes for the new system
 
 2.2c (Unreleased)
 Fixed note spam when stopping playback with keybind
+
+3.0 (Development branch)
