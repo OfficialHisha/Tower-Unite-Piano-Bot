@@ -1,4 +1,6 @@
 # Tower Unite Piano Bot
+Please note that this version is very old and no longer supported. However, the latest stable version can be found on master branch and the latest experimental can be found on the experimental branch.
+
 This program will play the pasted song in Tower United.
 
 You are free to download, modify and redistribute modified versions of the software under the GNU General Public License V3.
@@ -27,10 +29,7 @@ as described in Known issues.
 Suggestions?
 
 # Known issues
-Cannot play black keys.
-(I have tried to overcome this issue with everything I could think of, no luck so far.
-I've tried to send capital letters and I've tried emulating holding the shift key. But it looks straight through my trixes.
-If anyone has any idea how to solve this issue, please tell me :> )
+Cannot play black keys. (This has since been fixed in later versions, see master branch)
 
 Does not support (x2) etc. tags. The workaround is to paste it for each iteration.
 
