@@ -25,9 +25,9 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
 
         #region Field and property declarations
         //This can be accessed to get the version text
-        public static string Version { get; private set; } = "Version: 2.2c";
+        public static string Version { get; private set; } = "Version: 3.0";
         //This will be used to define compatibility of save files between versions
-        public static List<string> SupportedVersionsSave { get; } = new List<string>() { "Version: 2.1", "Version: 2.2a", "Version: 2.2b", "Version: 2.2c"};
+        public static List<string> SupportedVersionsSave { get; } = new List<string>() { "Version: 2.1", "Version: 2.2a", "Version: 2.2b", "Version: 2.2c", "Version: 3.0"};
         
         //This property tells the program if we should play the next note in the song
         public static bool Stop { get; set; } = true;

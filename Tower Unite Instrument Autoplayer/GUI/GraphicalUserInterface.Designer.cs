@@ -31,7 +31,6 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.MainTabPage = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.ErrorLabel = new System.Windows.Forms.Label();
             this.LoopCheckBox = new System.Windows.Forms.CheckBox();
             this.ClearNotesButton = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
@@ -72,6 +71,25 @@
             this.CustomDelayCharacterBox = new System.Windows.Forms.TextBox();
             this.AddDelayButton = new System.Windows.Forms.Button();
             this.DelayListBox = new System.Windows.Forms.TextBox();
+            this.MenuStrip = new System.Windows.Forms.MenuStrip();
+            this.FileToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.SaveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LoadMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ExportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ImportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ErrorTextBox = new System.Windows.Forms.RichTextBox();
+            this.AutoplayerToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.ClearMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.PlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.StopMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LoopMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.HelpToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.HelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AutoplayerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MusicPiecesTabButton = new System.Windows.Forms.TabPage();
+            this.PlayTogetherTabButton = new System.Windows.Forms.TabPage();
+            this.label9 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -84,6 +102,8 @@
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).BeginInit();
+            this.MenuStrip.SuspendLayout();
+            this.PlayTogetherTabButton.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -91,10 +111,12 @@
             this.tabControl1.Controls.Add(this.MainTabPage);
             this.tabControl1.Controls.Add(this.SettingsTabPage);
             this.tabControl1.Controls.Add(this.CustomizeTabButton);
-            this.tabControl1.Location = new System.Drawing.Point(-5, 0);
+            this.tabControl1.Controls.Add(this.MusicPiecesTabButton);
+            this.tabControl1.Controls.Add(this.PlayTogetherTabButton);
+            this.tabControl1.Location = new System.Drawing.Point(-5, 20);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(643, 400);
+            this.tabControl1.Size = new System.Drawing.Size(643, 380);
             this.tabControl1.TabIndex = 0;
             // 
             // MainTabPage
@@ -103,14 +125,14 @@
             this.MainTabPage.Location = new System.Drawing.Point(4, 22);
             this.MainTabPage.Name = "MainTabPage";
             this.MainTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MainTabPage.Size = new System.Drawing.Size(635, 374);
+            this.MainTabPage.Size = new System.Drawing.Size(635, 354);
             this.MainTabPage.TabIndex = 0;
             this.MainTabPage.Text = "Main";
             this.MainTabPage.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.ErrorLabel);
+            this.groupBox1.Controls.Add(this.ErrorTextBox);
             this.groupBox1.Controls.Add(this.LoopCheckBox);
             this.groupBox1.Controls.Add(this.ClearNotesButton);
             this.groupBox1.Controls.Add(this.VersionLabel);
@@ -125,16 +147,6 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Notes";
-            // 
-            // ErrorLabel
-            // 
-            this.ErrorLabel.AutoSize = true;
-            this.ErrorLabel.ForeColor = System.Drawing.Color.Red;
-            this.ErrorLabel.Location = new System.Drawing.Point(3, 352);
-            this.ErrorLabel.Name = "ErrorLabel";
-            this.ErrorLabel.Size = new System.Drawing.Size(163, 13);
-            this.ErrorLabel.TabIndex = 8;
-            this.ErrorLabel.Text = "ERROR: Something went wrong!";
             // 
             // LoopCheckBox
             // 
@@ -160,7 +172,7 @@
             // VersionLabel
             // 
             this.VersionLabel.AutoSize = true;
-            this.VersionLabel.Location = new System.Drawing.Point(560, 358);
+            this.VersionLabel.Location = new System.Drawing.Point(553, 297);
             this.VersionLabel.Name = "VersionLabel";
             this.VersionLabel.Size = new System.Drawing.Size(69, 13);
             this.VersionLabel.TabIndex = 5;
@@ -212,7 +224,7 @@
             this.NoteTextBox.Multiline = true;
             this.NoteTextBox.Name = "NoteTextBox";
             this.NoteTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.NoteTextBox.Size = new System.Drawing.Size(541, 330);
+            this.NoteTextBox.Size = new System.Drawing.Size(541, 275);
             this.NoteTextBox.TabIndex = 0;
             this.NoteTextBox.Text = "Load a song or input notes here..";
             this.NoteTextBox.TextChanged += new System.EventHandler(this.NoteTextBox_TextChanged);
@@ -224,7 +236,7 @@
             this.SettingsTabPage.Location = new System.Drawing.Point(4, 22);
             this.SettingsTabPage.Name = "SettingsTabPage";
             this.SettingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.SettingsTabPage.Size = new System.Drawing.Size(635, 374);
+            this.SettingsTabPage.Size = new System.Drawing.Size(635, 354);
             this.SettingsTabPage.TabIndex = 1;
             this.SettingsTabPage.Text = "Settings";
             this.SettingsTabPage.UseVisualStyleBackColor = true;
@@ -381,7 +393,7 @@
             this.CustomizeTabButton.Controls.Add(this.groupBox2);
             this.CustomizeTabButton.Location = new System.Drawing.Point(4, 22);
             this.CustomizeTabButton.Name = "CustomizeTabButton";
-            this.CustomizeTabButton.Size = new System.Drawing.Size(635, 374);
+            this.CustomizeTabButton.Size = new System.Drawing.Size(635, 354);
             this.CustomizeTabButton.TabIndex = 2;
             this.CustomizeTabButton.Text = "Customize";
             this.CustomizeTabButton.UseVisualStyleBackColor = true;
@@ -398,7 +410,7 @@
             this.groupBox3.Controls.Add(this.label8);
             this.groupBox3.Location = new System.Drawing.Point(317, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(318, 374);
+            this.groupBox3.Size = new System.Drawing.Size(318, 358);
             this.groupBox3.TabIndex = 1;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Custom Notes";
@@ -429,7 +441,7 @@
             this.CustomNoteListBox.Name = "CustomNoteListBox";
             this.CustomNoteListBox.ReadOnly = true;
             this.CustomNoteListBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.CustomNoteListBox.Size = new System.Drawing.Size(164, 349);
+            this.CustomNoteListBox.Size = new System.Drawing.Size(164, 332);
             this.CustomNoteListBox.TabIndex = 8;
             // 
             // RemoveNoteButton
@@ -491,7 +503,7 @@
             this.groupBox2.Controls.Add(this.DelayListBox);
             this.groupBox2.Location = new System.Drawing.Point(0, 0);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(311, 374);
+            this.groupBox2.Size = new System.Drawing.Size(311, 358);
             this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Custom Delays";
@@ -582,8 +594,159 @@
             this.DelayListBox.Name = "DelayListBox";
             this.DelayListBox.ReadOnly = true;
             this.DelayListBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.DelayListBox.Size = new System.Drawing.Size(164, 349);
+            this.DelayListBox.Size = new System.Drawing.Size(164, 332);
             this.DelayListBox.TabIndex = 0;
+            // 
+            // MenuStrip
+            // 
+            this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.FileToolStrip,
+            this.AutoplayerToolStrip,
+            this.HelpToolStrip});
+            this.MenuStrip.Location = new System.Drawing.Point(0, 0);
+            this.MenuStrip.Name = "MenuStrip";
+            this.MenuStrip.Size = new System.Drawing.Size(633, 24);
+            this.MenuStrip.TabIndex = 1;
+            this.MenuStrip.Text = "menuStrip1";
+            // 
+            // FileToolStrip
+            // 
+            this.FileToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SaveMenuItem,
+            this.LoadMenuItem,
+            this.ExportMenuItem,
+            this.ImportMenuItem,
+            this.ExitMenuItem});
+            this.FileToolStrip.Name = "FileToolStrip";
+            this.FileToolStrip.Size = new System.Drawing.Size(37, 20);
+            this.FileToolStrip.Text = "File";
+            // 
+            // SaveMenuItem
+            // 
+            this.SaveMenuItem.Name = "SaveMenuItem";
+            this.SaveMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.SaveMenuItem.Text = "Save";
+            // 
+            // LoadMenuItem
+            // 
+            this.LoadMenuItem.Name = "LoadMenuItem";
+            this.LoadMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.LoadMenuItem.Text = "Load";
+            // 
+            // ExportMenuItem
+            // 
+            this.ExportMenuItem.Name = "ExportMenuItem";
+            this.ExportMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.ExportMenuItem.Text = "Export";
+            this.ExportMenuItem.Click += new System.EventHandler(this.ExportMenuItem_Click);
+            // 
+            // ImportMenuItem
+            // 
+            this.ImportMenuItem.Name = "ImportMenuItem";
+            this.ImportMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.ImportMenuItem.Text = "Import";
+            this.ImportMenuItem.Click += new System.EventHandler(this.ImportMenuItem_Click);
+            // 
+            // ExitMenuItem
+            // 
+            this.ExitMenuItem.Name = "ExitMenuItem";
+            this.ExitMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.ExitMenuItem.Text = "Exit";
+            // 
+            // ErrorTextBox
+            // 
+            this.ErrorTextBox.ForeColor = System.Drawing.Color.Red;
+            this.ErrorTextBox.Location = new System.Drawing.Point(0, 297);
+            this.ErrorTextBox.Name = "ErrorTextBox";
+            this.ErrorTextBox.ReadOnly = true;
+            this.ErrorTextBox.Size = new System.Drawing.Size(541, 51);
+            this.ErrorTextBox.TabIndex = 9;
+            this.ErrorTextBox.Text = "ERROR: Something went wrong!";
+            // 
+            // AutoplayerToolStrip
+            // 
+            this.AutoplayerToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ClearMenuItem,
+            this.PlayMenuItem,
+            this.StopMenuItem,
+            this.LoopMenuItem});
+            this.AutoplayerToolStrip.Name = "AutoplayerToolStrip";
+            this.AutoplayerToolStrip.Size = new System.Drawing.Size(77, 20);
+            this.AutoplayerToolStrip.Text = "Autoplayer";
+            // 
+            // ClearMenuItem
+            // 
+            this.ClearMenuItem.Name = "ClearMenuItem";
+            this.ClearMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.ClearMenuItem.Text = "Clear Notes";
+            // 
+            // PlayMenuItem
+            // 
+            this.PlayMenuItem.Name = "PlayMenuItem";
+            this.PlayMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.PlayMenuItem.Text = "Play Song (F2)";
+            // 
+            // StopMenuItem
+            // 
+            this.StopMenuItem.Name = "StopMenuItem";
+            this.StopMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.StopMenuItem.Text = "Stop Song (F3)";
+            // 
+            // LoopMenuItem
+            // 
+            this.LoopMenuItem.Name = "LoopMenuItem";
+            this.LoopMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.LoopMenuItem.Text = "Loop Song";
+            // 
+            // HelpToolStrip
+            // 
+            this.HelpToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.HelpMenuItem,
+            this.AutoplayerMenuItem});
+            this.HelpToolStrip.Name = "HelpToolStrip";
+            this.HelpToolStrip.Size = new System.Drawing.Size(44, 20);
+            this.HelpToolStrip.Text = "Help";
+            // 
+            // HelpMenuItem
+            // 
+            this.HelpMenuItem.Name = "HelpMenuItem";
+            this.HelpMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.HelpMenuItem.Text = "Documentation";
+            // 
+            // AutoplayerMenuItem
+            // 
+            this.AutoplayerMenuItem.Name = "AutoplayerMenuItem";
+            this.AutoplayerMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.AutoplayerMenuItem.Text = "About the Autoplayer";
+            // 
+            // MusicPiecesTabButton
+            // 
+            this.MusicPiecesTabButton.Location = new System.Drawing.Point(4, 22);
+            this.MusicPiecesTabButton.Name = "MusicPiecesTabButton";
+            this.MusicPiecesTabButton.Size = new System.Drawing.Size(635, 354);
+            this.MusicPiecesTabButton.TabIndex = 3;
+            this.MusicPiecesTabButton.Text = "Music Pieces (W.I.P)";
+            this.MusicPiecesTabButton.UseVisualStyleBackColor = true;
+            // 
+            // PlayTogetherTabButton
+            // 
+            this.PlayTogetherTabButton.Controls.Add(this.label9);
+            this.PlayTogetherTabButton.Location = new System.Drawing.Point(4, 22);
+            this.PlayTogetherTabButton.Name = "PlayTogetherTabButton";
+            this.PlayTogetherTabButton.Size = new System.Drawing.Size(635, 354);
+            this.PlayTogetherTabButton.TabIndex = 4;
+            this.PlayTogetherTabButton.Text = "Doesn\'t look like anything to me...";
+            this.PlayTogetherTabButton.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.label9.Location = new System.Drawing.Point(27, 156);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(577, 25);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "Seriously, there\'s nothing here.. Why did you even click this tab?..";
             // 
             // GraphicalUserInterface
             // 
@@ -591,6 +754,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(633, 395);
             this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.MenuStrip);
             this.Name = "GraphicalUserInterface";
             this.Text = "Tower Unite Instrument Autoplayer";
             this.tabControl1.ResumeLayout(false);
@@ -610,7 +774,12 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).EndInit();
+            this.MenuStrip.ResumeLayout(false);
+            this.MenuStrip.PerformLayout();
+            this.PlayTogetherTabButton.ResumeLayout(false);
+            this.PlayTogetherTabButton.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -659,7 +828,25 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox CustomNoteCharacterBox;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label ErrorLabel;
+        private System.Windows.Forms.RichTextBox ErrorTextBox;
+        private System.Windows.Forms.MenuStrip MenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem FileToolStrip;
+        private System.Windows.Forms.ToolStripMenuItem SaveMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem LoadMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ExportMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ImportMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ExitMenuItem;
+        private System.Windows.Forms.TabPage MusicPiecesTabButton;
+        private System.Windows.Forms.TabPage PlayTogetherTabButton;
+        private System.Windows.Forms.ToolStripMenuItem AutoplayerToolStrip;
+        private System.Windows.Forms.ToolStripMenuItem ClearMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem PlayMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem StopMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem LoopMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem HelpToolStrip;
+        private System.Windows.Forms.ToolStripMenuItem HelpMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem AutoplayerMenuItem;
+        private System.Windows.Forms.Label label9;
     }
 }
 

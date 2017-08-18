@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 using Utilities;
+using ABC_Utility;
 //This is how to tell the form application to use the core
 //You will need to use this if you want to make your own GUI
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -34,7 +35,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         public GraphicalUserInterface()
         {
             InitializeComponent();
-            ErrorLabel.Hide();
+            ErrorTextBox.Hide();
             VersionLabel.Text = Autoplayer.Version;
             Autoplayer.AddingNoteFinished += EnablePlayButton;
             Autoplayer.SongFinishedPlaying += EnableClearButton;
@@ -154,15 +155,15 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         {
             try
             {
-                ErrorLabel.Hide();
+                ErrorTextBox.Hide();
                 DisablePlayButton();
                 Autoplayer.ClearAllNotes();
                 Autoplayer.AddNotesFromString(NoteTextBox.Text);
             }
             catch (AutoplayerNoteCreationFailedException e)
             {
-                ErrorLabel.Text = $"ERROR: {e.Message}";
-                ErrorLabel.Show();
+                ErrorTextBox.Text = $"ERROR: {e.Message}";
+                ErrorTextBox.Show();
             }
         }
         
@@ -210,8 +211,8 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         /// </summary>
         private void ExceptionHandler(AutoplayerException exception)
         {
-            ErrorLabel.Text = exception.Message;
-            ErrorLabel.Show();
+            ErrorTextBox.Text = exception.Message;
+            ErrorTextBox.Show();
         }
 
         #region Custom delay buttons
@@ -477,7 +478,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 Autoplayer.SaveSong(fileDialog.FileName);
-                MessageBox.Show($"Notes saved at {fileDialog.FileName}");
+                MessageBox.Show($"Notes saved to {fileDialog.FileName}");
             }
         }
 
@@ -554,6 +555,37 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             if(!isLoading)
             {
                 MakeSong();
+            }
+        }
+
+        private void ExportMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ImportMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+
+            //This sets the load dialog to filter on .txt files.
+            fileDialog.Filter = "ABC File | *.abc";
+
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    isLoading = true;
+                    Autoplayer.ResetDelays();
+                    ABCObject abcObject = ABCTool.ImportABC(fileDialog.FileName);
+                    //Update everything when we are done loading
+                    UpdateEverything();
+                    MessageBox.Show("Import completed");
+                }
+                catch (ABCException error)
+                {
+                    isLoading = false;
+                    MessageBox.Show($"Importing failed: {error.Message}");
+                }
             }
         }
     }
