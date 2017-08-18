@@ -50,10 +50,10 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         //This boolean informs the program if it should use the fast delay or not when playing notes
         static bool isFastSpeed = false;
         //This is the delay (in milliseconds) at normal speed
-        private static int delayAtNormalSpeed = 200;
+        private static int delayAtNormalSpeed = 250;
         public static int DelayAtNormalSpeed { get { return delayAtNormalSpeed; } set { delayAtNormalSpeed = value; } }
         //This is the delay (in milliseconds) at fast speed
-        private static int delayAtFastSpeed = 100;
+        private static int delayAtFastSpeed = 125;
         public static int DelayAtFastSpeed { get { return delayAtFastSpeed; } set { delayAtFastSpeed = value; } }
 
         //TESTING: This dictionary will serve as a virtual key lookup. So when a note is created, it will check the dictionary for the virtual keycode of the character
