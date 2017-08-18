@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsInput, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\WindowsInput.dll</HintPath>
+      <HintPath>dll\WindowsInput.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
