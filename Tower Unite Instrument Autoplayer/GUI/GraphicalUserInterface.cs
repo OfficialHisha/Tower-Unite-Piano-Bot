@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Utilities;
@@ -36,6 +37,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         {
             InitializeComponent();
             ErrorTextBox.Hide();
+            ErrorTextBox.Text = "";
             VersionLabel.Text = Autoplayer.Version;
             Autoplayer.AddingNoteFinished += EnablePlayButton;
             Autoplayer.SongFinishedPlaying += EnableClearButton;
@@ -576,7 +578,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 {
                     isLoading = true;
                     Autoplayer.ResetDelays();
-                    ABCObject abcObject = ABCTool.ImportABC(fileDialog.FileName);
+                    Convert(ABCTool.ImportABC(fileDialog.FileName));
                     //Update everything when we are done loading
                     UpdateEverything();
                     MessageBox.Show("Import completed");
@@ -587,6 +589,187 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                     MessageBox.Show($"Importing failed: {error.Message}");
                 }
             }
+        }
+
+        private void Convert(ABCObject abcToConvert)
+        {
+            Dictionary<string, string> noteTranslator = new Dictionary<string, string>()
+            {
+                ["A,,"] = "6",
+                ["B,,"] = "7",
+                ["C,,"] = "1",
+                ["D,,"] = "2",
+                ["E,,"] = "3",
+                ["F,,"] = "4",
+                ["G,,"] = "5",
+                ["A,"] = "e",
+                ["B,"] = "r",
+                ["C,"] = "8",
+                ["D,"] = "9",
+                ["E,"] = "0",
+                ["F,"] = "q",
+                ["G,"] = "w",
+                ["A"] = "p",
+                ["B"] = "a",
+                ["C"] = "t",
+                ["D"] = "y",
+                ["E"] = "u",
+                ["F"] = "i",
+                ["G"] = "o",
+                ["a"] = "j",
+                ["b"] = "k",
+                ["c"] = "s",
+                ["d"] = "d",
+                ["e"] = "f",
+                ["f"] = "g",
+                ["g"] = "h",
+                ["a'"] = "b",
+                ["B'"] = "n",
+                ["c'"] = "l",
+                ["d'"] = "z",
+                ["e'"] = "x",
+                ["f'"] = "c",
+                ["g'"] = "v",
+                ["c''"] = "m"
+            };
+            char[] commonDelayCharacters = { '-', '_', ',', ';', '.', ':', '\'', '*', '¨', '^', '`', '´', '+', '?', '<', '>', '@', '£', '€', '$'};
+            //DEBUG
+            List<Delay> usedDelays = new List<Delay>();
+            //DEBUG
+            double speed = 1000 * FractionToDouble(abcToConvert.NoteLength);
+            Autoplayer.DelayAtNormalSpeed = (int)speed;
+            //DEBUG
+            List<string> convertedNotes = new List<string>();
+            
+            foreach (string line in abcToConvert.Notes)
+            {
+                string[] notes = line.Split(' ');
+
+                foreach (string note in notes)
+                {
+                    string val;
+                    if (noteTranslator.TryGetValue(note, out val))
+                    {
+                        //DEBUG
+                        convertedNotes.Add(val);
+                        convertedNotes.Add(" ");
+
+                        Autoplayer.AddNotesFromString(val + ' ');
+                    }
+                    else
+                    {
+                        char[] noteBits = note.ToCharArray();
+                        string number = "";
+                        bool slowDown = false;
+
+                        string curNote = "";
+                        foreach (char bit in noteBits)
+                        {
+                            if (noteTranslator.ContainsKey(bit.ToString()))
+                            {
+                                if (!noteTranslator.TryGetValue(bit.ToString(), out curNote))
+                                {
+                                    MessageBox.Show($"Invalid note '{note}'");
+                                }
+                            }
+                            else if (curNote != "")
+                            {
+                                int num;
+                                if (int.TryParse(bit.ToString(), out num))
+                                {
+                                    number += num;
+                                }
+                                else if (bit == '/')
+                                {
+                                    slowDown = true;
+                                }
+                            }
+                        }
+
+                        if (curNote != "")
+                        {
+                            if (number == "")
+                            {
+                                number = "2";
+                            }
+                            int actualNumber;
+                            if (int.TryParse(number, out actualNumber))
+                            {
+                                Delay delay = Autoplayer.Delays.FirstOrDefault(x => slowDown ? x.Time == speed / actualNumber : x.Time == speed * (actualNumber - 1));
+                                if (delay == null)
+                                {
+                                    foreach (char character in commonDelayCharacters)
+                                    {
+                                        if (!usedDelays.Any(x => x.Character == character))
+                                        {
+                                            usedDelays.Add(new Delay(character, slowDown ? (int)speed / actualNumber : (int)speed * (actualNumber - 1)));
+                                            Autoplayer.AddDelay(character, slowDown ? (int)speed / actualNumber : (int)speed * (actualNumber - 1));
+                                            Autoplayer.AddNotesFromString(curNote + character.ToString());
+                                            
+                                            //DEBUG
+                                            convertedNotes.Add(curNote);
+                                            convertedNotes.Add(character.ToString());
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Autoplayer.AddNotesFromString(curNote + delay.Character.ToString());
+                                    
+                                    //DEBUG
+                                    convertedNotes.Add(curNote);
+                                    convertedNotes.Add(delay.Character.ToString());
+                                }
+                            }
+                            else
+                            {
+                                ErrorTextBox.Text += $"Invalid note: {note}. ";
+                                ErrorTextBox.Show();
+                            }
+                        }
+                        else
+                        {
+                            ErrorTextBox.Text += $"Invalid note: {note}. ";
+                            ErrorTextBox.Show();
+                        }
+                    }
+                }
+            }
+        }
+
+        double FractionToDouble(string fraction)
+        {
+            double result;
+
+            if (double.TryParse(fraction, out result))
+            {
+                return result;
+            }
+
+            string[] split = fraction.Split(new char[] { ' ', '/' });
+
+            if (split.Length == 2 || split.Length == 3)
+            {
+                int a, b;
+
+                if (int.TryParse(split[0], out a) && int.TryParse(split[1], out b))
+                {
+                    if (split.Length == 2)
+                    {
+                        return (double)a / b;
+                    }
+
+                    int c;
+
+                    if (int.TryParse(split[2], out c))
+                    {
+                        return a + (double)b / c;
+                    }
+                }
+            }
+
+            throw new FormatException("Not a valid fraction.");
         }
     }
 }
