@@ -1,4 +1,6 @@
 # Tower Unite Piano Bot
+Please note that this is an experimental version of the software, which might be more unstable than the stable version on master branch. However, this version might have updated or new features that are not yet on master branch. Use at your own risk!
+
 This program will play the pasted song in Tower United.
 
 You are free to download, modify and redistribute modified versions of the software under the GNU General Public License V3.
@@ -26,6 +28,7 @@ as described in Known issues.
 
 * Faster reuse of notes through "music pieces".
 * Ability to use x2 or something similair to play a certain series of notes multiple times without copying and pasting them over and over again.
+* Some features I am not ready to talk about yet ;)
 
 # Known issues
 These issues may lead to the software crashing or the in game character leaving the piano (See "Important").
