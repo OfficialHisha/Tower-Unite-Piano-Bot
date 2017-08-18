@@ -1,4 +1,7 @@
 # Tower Unite Piano Bot
+Note that this version is obsolete and is no longer supported.
+However, it is still available in case some people want to play around with it.
+
 This program will play the pasted song in Tower United.
 
 You are free to download, modify and redistribute modified versions of the software under the GNU General Public License V3.
