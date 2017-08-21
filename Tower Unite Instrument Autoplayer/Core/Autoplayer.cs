@@ -159,7 +159,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public static void AddNoteFromChar(char note)
         {
             int modifier, breakTime;
-            Breaks.TryGetValue(note, out modifier);
+            NoteModifiers.TryGetValue(note, out modifier);
             Breaks.TryGetValue(note, out breakTime);
 
 
@@ -224,13 +224,13 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 }
                 else
                 {
-                    if (modifier < 0)
+                    if (modifier < NormalSpeed)
                     {
-                        ((Note)Song[Song.Count]).NoteLength -= Math.Abs(modifier);
+                        ((Note)Song[Song.Count-1]).NoteLength -= Math.Abs(modifier);
                     }
                     else
                     {
-                        ((Note)Song[Song.Count]).NoteLength += Math.Abs(modifier);
+                        ((Note)Song[Song.Count-1]).NoteLength += Math.Abs(modifier);
                     }
                 }
             }

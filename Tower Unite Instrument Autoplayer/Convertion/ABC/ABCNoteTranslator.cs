@@ -187,7 +187,7 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                                 }
                                 else
                                 {
-                                    sb.Append(curNote + virtualObject.NoteModifiers[speed]);
+                                    sb.Append(curNote + virtualObject.NoteModifiers[speed].ToString());
                                 }
                             }
                         }
@@ -213,7 +213,7 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                                     }
                                     else
                                     {
-                                        sb.Append(virtualObject.Breaks[actualNumber]);
+                                        sb.Append(virtualObject.Breaks[actualNumber].ToString());
                                     }
                                 }
                             }
