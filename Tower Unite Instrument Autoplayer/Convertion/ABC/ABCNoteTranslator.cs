@@ -117,7 +117,8 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                     {
                         char[] noteBits = note.ToCharArray();
                         string number = "";
-                        bool slowDown = false;
+                        bool isModifier = false;
+                        bool isBreak = false;
 
                         char curNote = '\0';
                         foreach (char bit in noteBits)
@@ -131,7 +132,11 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                                 }
                                 else if (bit == '/')
                                 {
-                                    slowDown = true;
+                                    isModifier = true;
+                                }
+                                else if (bit == 'z')
+                                {
+                                    isBreak = true;
                                 }
                             }
                             else
@@ -150,21 +155,29 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                             }
                         }
 
-                        if (curNote != '\0')
+                        if (number == "")
                         {
-                            if (number == "")
+                            if (isBreak)
+                            {
+                                number = "1";
+                            }
+                            else
                             {
                                 number = "2";
                             }
+                        }
+
+                        if (curNote != '\0')
+                        {
                             int actualNumber;
                             if (int.TryParse(number, out actualNumber))
                             {
-                                int speed = slowDown ? virtualObject.Speed / actualNumber : virtualObject.Speed * (actualNumber - 1);
+                                int speed = isModifier ? virtualObject.Speed / actualNumber : virtualObject.Speed * (actualNumber - 1);
                                 if (!virtualObject.NoteModifiers.ContainsKey(speed))
                                 {
                                     foreach (char character in commonDelayCharacters)
                                     {
-                                        if (!virtualObject.NoteModifiers.ContainsKey(character))
+                                        if (!virtualObject.NoteModifiers.ContainsValue(character) && !virtualObject.Breaks.ContainsKey(character))
                                         {
                                             virtualObject.NoteModifiers.Add(speed, character);
                                             sb.Append(curNote + character.ToString());
@@ -175,6 +188,33 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                                 else
                                 {
                                     sb.Append(curNote + virtualObject.NoteModifiers[speed]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (isBreak)
+                            {
+                                int actualNumber;
+                                if (int.TryParse(number, out actualNumber))
+                                {
+                                    actualNumber *= virtualObject.Speed;
+                                    if (!virtualObject.NoteModifiers.ContainsKey(actualNumber))
+                                    {
+                                        foreach (char character in commonDelayCharacters)
+                                        {
+                                            if (!virtualObject.NoteModifiers.ContainsValue(character) && !virtualObject.Breaks.ContainsKey(character))
+                                            {
+                                                virtualObject.Breaks.Add(actualNumber, character);
+                                                sb.Append(character.ToString());
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        sb.Append(virtualObject.Breaks[actualNumber]);
+                                    }
                                 }
                             }
                         }

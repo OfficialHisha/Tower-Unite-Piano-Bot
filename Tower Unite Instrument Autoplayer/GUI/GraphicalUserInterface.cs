@@ -667,18 +667,25 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                     return;
                 }
 
+                Autoplayer.ResetModifiers();
                 Autoplayer.ResetBreaks();
+                Autoplayer.ResetNotes();
 
                 try
                 {
                     ConvertedObject obj = ABCNoteTranslator.TranslateNotes(abc);
 
-                    foreach (KeyValuePair<int, char> delay in obj.NoteModifiers)
+                    foreach (KeyValuePair<int, char> modifier in obj.NoteModifiers)
                     {
-                        Autoplayer.AddBreak(delay.Value, delay.Key);
+                        Autoplayer.AddModifier(modifier.Value, modifier.Key);
+                    }
+                    foreach (KeyValuePair<int, char> breaks in obj.Breaks)
+                    {
+                        Autoplayer.AddBreak(breaks.Value, breaks.Key);
                     }
                     Autoplayer.AddNotesFromString(obj.Notes);
                     Autoplayer.NormalSpeed = obj.Speed;
+                    Autoplayer.FastSpeed = obj.Speed / 2;
 
                     //Update everything when we are done loading
                     UpdateEverything();
