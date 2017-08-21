@@ -54,6 +54,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Convertion\ABC\ABCNoteTranslator.cs" />
+    <Compile Include="Convertion\ABC\Exceptions\ABCNoteTranslatorException.cs" />
+    <Compile Include="Convertion\ConvertedObject.cs" />
     <Compile Include="Core\Delay.cs" />
     <Compile Include="Core\Exceptions\AutoplayerCustomDelayException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerCustomNoteException.cs" />
@@ -77,6 +80,7 @@
     <Compile Include="Core\Autoplayer.cs" />
     <Compile Include="Core\NativeMethods.cs" />
     <Compile Include="Imported\GlobalKeyboardHook.cs" />
+    <Compile Include="MathExtension.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GUI\GraphicalUserInterface.resx">
