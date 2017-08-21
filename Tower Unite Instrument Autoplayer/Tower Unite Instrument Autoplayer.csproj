@@ -57,7 +57,6 @@
     <Compile Include="Convertion\ABC\ABCNoteTranslator.cs" />
     <Compile Include="Convertion\ABC\Exceptions\ABCNoteTranslatorException.cs" />
     <Compile Include="Convertion\ConvertedObject.cs" />
-    <Compile Include="Core\Delay.cs" />
     <Compile Include="Core\Exceptions\AutoplayerCustomDelayException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerCustomNoteException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerException.cs" />
@@ -67,8 +66,7 @@
     <Compile Include="Core\Exceptions\AutoplayerNoteCreationFailedException.cs" />
     <Compile Include="Core\Exceptions\AutoplayerTargetNotFoundException.cs" />
     <Compile Include="Core\Interfaces\INote.cs" />
-    <Compile Include="Core\Notes\DelayNote.cs" />
-    <Compile Include="Core\Notes\SpeedChangeNote.cs" />
+    <Compile Include="Core\Notes\BreakNote.cs" />
     <Compile Include="GUI\GraphicalUserInterface.cs">
       <SubType>Form</SubType>
     </Compile>

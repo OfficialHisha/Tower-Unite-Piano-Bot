@@ -51,3 +51,4 @@ Fixed multi notes for the new system
 Fixed note spam when stopping playback with keybind
 
 3.0 (Development branch)
+Added support for importing ABC files

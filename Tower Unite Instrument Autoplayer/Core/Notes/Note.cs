@@ -17,12 +17,15 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         public VirtualKeyCode NoteToPlay { get; private set; }
         public char Character { get; private set; }
         public bool IsHighNote { get; private set; }
+        public int NoteLength { get; set; }
 
-        public Note(char character, VirtualKeyCode note, bool isHighNote)
+        public Note(char character, VirtualKeyCode note, bool isHighNote) : this(character, note, isHighNote, Autoplayer.NormalSpeed){}
+        public Note(char character, VirtualKeyCode note, bool isHighNote, int noteLength)
         {
             NoteToPlay = note;
             Character = character;
             IsHighNote = isHighNote;
+            NoteLength = noteLength;
         }
 
         public void Play()
@@ -35,16 +38,16 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             if (IsHighNote)
             {
                 sim.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
-                Thread.Sleep(50);
+                Thread.Sleep(8);
                 sim.Keyboard.KeyDown(NoteToPlay);
-                Thread.Sleep(50);
+                Thread.Sleep(NoteLength-8);
                 sim.Keyboard.KeyUp(NoteToPlay);
                 sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
             }
             else
             {
                 sim.Keyboard.KeyDown(NoteToPlay);
-                Thread.Sleep(50);
+                Thread.Sleep(NoteLength);
                 sim.Keyboard.KeyUp(NoteToPlay);
             }
         }

@@ -26,38 +26,38 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         {
             //EXPERIMENTAL SOLUTION
             //This method is a better solution as you can define a delay. However, this may result in unexpected behaviour should the program be terminated before KeyUp is run!
-            if (IsHighNote)
-            {
-                sim.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
-                Thread.Sleep(8);
-                foreach (Note note in Notes)
-                {
-                    sim.Keyboard.KeyDown(note.NoteToPlay);
-                }
-                Thread.Sleep(8);
-                foreach (Note note in Notes)
-                {
-                    sim.Keyboard.KeyUp(note.NoteToPlay);
-                }
-                sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
-            }
-            else
-            {
-                foreach (Note note in Notes)
-                {
-                    sim.Keyboard.KeyDown(note.NoteToPlay);
-                }
-                Thread.Sleep(8);
-                foreach (Note note in Notes)
-                {
-                    sim.Keyboard.KeyUp(note.NoteToPlay);
-                }
-            }
-            
-            //foreach (Note note in Notes)
+            //if (IsHighNote)
             //{
-            //    note.Play();
+            //    sim.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
+            //    Thread.Sleep(8);
+            //    foreach (Note note in Notes)
+            //    {
+            //        sim.Keyboard.KeyDown(note.NoteToPlay);
+            //    }
+            //    Thread.Sleep(8);
+            //    foreach (Note note in Notes)
+            //    {
+            //        sim.Keyboard.KeyUp(note.NoteToPlay);
+            //    }
+            //    sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
             //}
+            //else
+            //{
+            //    foreach (Note note in Notes)
+            //    {
+            //        sim.Keyboard.KeyDown(note.NoteToPlay);
+            //    }
+            //    Thread.Sleep(8);
+            //    foreach (Note note in Notes)
+            //    {
+            //        sim.Keyboard.KeyUp(note.NoteToPlay);
+            //    }
+            //}
+
+            foreach (Note note in Notes)
+            {
+                note.Play();
+            }
         }
 
         public void Stop()

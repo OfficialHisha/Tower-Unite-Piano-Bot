@@ -8,7 +8,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     public delegate void AutoplayerEvent();
     public delegate void AutoplayerExceptionEvent(AutoplayerException e);
 
-    static class Autoplayer
+    public static class Autoplayer
     {
         #region Events
         public static event AutoplayerEvent AddingNoteFinished;
@@ -36,8 +36,10 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
 
         //The note we generate will go in here to form the song
         public static List<INote> Song { get; private set; } = new List<INote>();
-        //The delays we generate will go in this list
-        public static List<Delay> Delays { get; private set; } = new List<Delay>();
+        //Note length modifiers will modify the length of the note, how long it's held down for
+        public static Dictionary<char, int> Breaks { get; private set; } = new Dictionary<char, int>();
+        //Breaks will define a pause inbetween played notes
+        public static Dictionary<char, int> NoteModifiers { get; private set; } = new Dictionary<char, int>();
         //The custom notes goes in this dictionary
         public static Dictionary<Note, Note> CustomNotes { get; private set; } = new Dictionary<Note, Note>();
         //This buffer is used when we generate multinotes based on input
@@ -51,10 +53,10 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         static bool isFastSpeed = false;
         //This is the delay (in milliseconds) at normal speed
         private static int delayAtNormalSpeed = 250;
-        public static int DelayAtNormalSpeed { get { return delayAtNormalSpeed; } set { delayAtNormalSpeed = value; } }
+        public static int NormalSpeed { get { return delayAtNormalSpeed; } set { delayAtNormalSpeed = value; } }
         //This is the delay (in milliseconds) at fast speed
         private static int delayAtFastSpeed = 125;
-        public static int DelayAtFastSpeed { get { return delayAtFastSpeed; } set { delayAtFastSpeed = value; } }
+        public static int FastSpeed { get { return delayAtFastSpeed; } set { delayAtFastSpeed = value; } }
 
         //TESTING: This dictionary will serve as a virtual key lookup. So when a note is created, it will check the dictionary for the virtual keycode of the character
         public static Dictionary<char, WindowsInput.Native.VirtualKeyCode> VirtualDictionary { get; private set; } = new Dictionary<char, WindowsInput.Native.VirtualKeyCode>()
@@ -156,10 +158,13 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
         /// </summary>
         public static void AddNoteFromChar(char note)
         {
-            Delay delay = Delays.Find(x => x.Character == note);
+            int modifier, breakTime;
+            Breaks.TryGetValue(note, out modifier);
+            Breaks.TryGetValue(note, out breakTime);
+
 
             //Start multinote building if the input is a [
-            if(note == '[')
+            if (note == '[')
             {
                 if (buildingMultiNote)
                 {
@@ -184,7 +189,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             //Start fast speed if the input is a {
             else if(note == '{')
             {
-                //If it's part of a multinote we want to add it to the multinote buffer
+                //If it's part of a multinote we want to give an error
                 //Otherwise add it as a single note
                 if(buildingMultiNote)
                 {
@@ -193,7 +198,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 }
                 else
                 {
-                    Song.Add(new SpeedChangeNote(true));
+                    isFastSpeed = true;
                 }
             }
             //Stop fast speed if the input is a }
@@ -206,21 +211,37 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 }
                 else
                 {
-                    Song.Add(new SpeedChangeNote(false));
+                    isFastSpeed = false;
                 }
             }
-            //If the input is registered as a delay, add a delay note
-            else if(delay != null)
+            //If the input is registered as a modifier, modify the last note added
+            else if (modifier != 0)
             {
                 if(buildingMultiNote)
                 {
                     AddingNotesFailed?.Invoke();
-                    throw new AutoplayerInvalidMultiNoteException("A delay note cannot be defined whithin a multinote definition!");
+                    throw new AutoplayerInvalidMultiNoteException("A multinote cannot be modified!");
                 }
                 else
                 {
-                    Song.Add(new DelayNote(delay.Character, delay.Time));
+                    if (modifier < 0)
+                    {
+                        ((Note)Song[Song.Count]).NoteLength -= Math.Abs(modifier);
+                    }
+                    else
+                    {
+                        ((Note)Song[Song.Count]).NoteLength += Math.Abs(modifier);
+                    }
                 }
+            }
+            //If the input is registered as a break, add a break note
+            else if (breakTime != 0)
+            {
+                if (breakTime < 0)
+                {
+                    throw new AutoplayerNoteCreationFailedException($"A break cannot be negative!");
+                }
+                Song.Add(new BreakNote(note, breakTime));
             }
             //If we reach a newline, we just ignore it
             else if (note == '\n' || note == '\r')
@@ -260,73 +281,150 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                         throw new AutoplayerNoteCreationFailedException($"A multinote cannot contain both high and low keys!");
                     }
 
-                    multiNoteBuffer.Add(new Note(note, vk, isHighNote));
+                    if (isFastSpeed)
+                    {
+                        multiNoteBuffer.Add(new Note(note, vk, isHighNote, FastSpeed));
+                    }
+                    else
+                    {
+                        multiNoteBuffer.Add(new Note(note, vk, isHighNote, NormalSpeed));
+                    }
+                    
                 }
                 else
                 {
-                    Song.Add(new Note(note, vk, isHighNote));
+                    if (isFastSpeed)
+                    {
+                        Song.Add(new Note(note, vk, isHighNote, FastSpeed));
+                    }
+                    else
+                    {
+                        Song.Add(new Note(note, vk, isHighNote, NormalSpeed));
+                    }
                 }
             }
         }
         #endregion
 
-        #region Custom delay handling
+        #region Custom break handling
         /// <summary>
-        /// This method will check if a delay exists in the list of delays
+        /// This method will check if a break exists in the list of breaks
         /// If it does, it returns true, otherwise it returns false
         /// </summary>
-        public static bool CheckDelayExists(char character)
+        public static bool CheckBreakExists(char character)
         {
-            return (Delays.Find(x => x.Character == character) != null);
+            return (Breaks.ContainsKey(character));
         }
         /// <summary>
-        /// This method will add a delay to the list of delays
+        /// This method will add a break to the list of breaks
         /// </summary>
-        public static void AddDelay(char character, int time)
+        public static void AddBreak(char character, int time)
         {
-            if (!CheckDelayExists(character))
+            if (!CheckBreakExists(character))
             {
-                Delays.Add(new Delay(character, time));
+                Breaks.Add(character, time);
             }
             else
             {
-                throw new AutoplayerCustomDelayException("Trying to add already existing delay");
+                throw new AutoplayerCustomException("Trying to add already existing break");
             }
         }
         /// <summary>
-        /// This method will remove a delay from the list of delays
+        /// This method will remove a break from the list of breaks
         /// </summary>
-        public static void RemoveDelay(char character)
+        public static void RemoveBreak(char character)
         {
-            if (CheckDelayExists(character))
+            if (CheckBreakExists(character))
             {
-                Delays.Remove(Delays.Find(x => x.Character == character));
+                Breaks.Remove(character);
             }
             else
             {
-                throw new AutoplayerCustomDelayException("Trying to remove non-existent delay");
+                throw new AutoplayerCustomException("Trying to remove non-existent break");
             }
         }
         /// <summary>
-        /// This method will set a new time to a specified delay from the list of delays
+        /// This method will set a new time to a specified break from the list of breaks
         /// </summary>
-        public static void ChangeDelay(char character, int newTime)
+        public static void ChangeBreak(char character, int newTime)
         {
-            if (CheckDelayExists(character))
+            if (CheckBreakExists(character))
             {
-                Delays.Find(x => x.Character == character).Time = newTime;
+
+                Breaks[character] = newTime;
             }
             else
             {
-                throw new AutoplayerCustomDelayException("Trying to modify non-existent delay");
+                throw new AutoplayerCustomException("Trying to modify non-existent delay");
             }
         }
         /// <summary>
-        /// This method will remove all delays from the list of delays
+        /// This method will remove all breaks from the list of breaks
         /// </summary>
-        public static void ResetDelays()
+        public static void ResetBreaks()
         {
-            Delays.Clear();
+            Breaks.Clear();
+        }
+        #endregion
+
+        #region Custom modifier handling
+        /// <summary>
+        /// This method will check if a modifier exists in the list of modifiers
+        /// If it does, it returns true, otherwise it returns false
+        /// </summary>
+        public static bool CheckModifierExists(char character)
+        {
+            return (NoteModifiers.ContainsKey(character));
+        }
+        /// <summary>
+        /// This method will add a modifier to the list of modifiers
+        /// </summary>
+        public static void AddModifier(char character, int time)
+        {
+            if (!CheckModifierExists(character))
+            {
+                NoteModifiers.Add(character, time);
+            }
+            else
+            {
+                throw new AutoplayerCustomException("Trying to add already existing modifier");
+            }
+        }
+        /// <summary>
+        /// This method will remove a modifier from the list of modifiers
+        /// </summary>
+        public static void RemoveModifier(char character)
+        {
+            if (CheckModifierExists(character))
+            {
+                NoteModifiers.Remove(character);
+            }
+            else
+            {
+                throw new AutoplayerCustomException("Trying to remove non-existent modifier");
+            }
+        }
+        /// <summary>
+        /// This method will set a new time to a specified modifier from the list of modifiers
+        /// </summary>
+        public static void ChangeModifier(char character, int newTime)
+        {
+            if (CheckModifierExists(character))
+            {
+
+                NoteModifiers[character] = newTime;
+            }
+            else
+            {
+                throw new AutoplayerCustomException("Trying to modify non-existent modifier");
+            }
+        }
+        /// <summary>
+        /// This method will remove all modifiers from the list of modifiers
+        /// </summary>
+        public static void ResetModifiers()
+        {
+            NoteModifiers.Clear();
         }
         #endregion
 
@@ -404,22 +502,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             CustomNotes.Clear();
         }
         #endregion
-
-        /// <summary>
-        /// This method will change the speed according to the changeToFast boolean
-        /// </summary>
-        public static void ChangeSpeed(bool changeToFast)
-        {
-            if(changeToFast)
-            {
-                isFastSpeed = true;
-            }
-            else
-            {
-                isFastSpeed = false;
-            }
-        }
-
+        
         /// <summary>
         /// This method will play the notes in the song in sequence
         /// </summary>
@@ -448,17 +531,6 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                         else
                         {
                             note.Play();
-                        }
-                        if (note is Note || note is MultiNote)
-                        {
-                            if (isFastSpeed)
-                            {
-                                Thread.Sleep(DelayAtFastSpeed);
-                            }
-                            else
-                            {
-                                Thread.Sleep(DelayAtNormalSpeed);
-                            }
                         }
                     }
                     catch (AutoplayerTargetNotFoundException error)
@@ -513,13 +585,13 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
             StreamWriter sw = new StreamWriter(path);
             sw.WriteLine(Version);
             sw.WriteLine("DELAYS");
-            sw.WriteLine(Delays.Count);
-            if (Delays.Count != 0)
+            sw.WriteLine(Breaks.Count);
+            if (Breaks.Count != 0)
             {
-                foreach (Delay delay in Delays)
+                foreach (KeyValuePair<char, int> SongBreak in Breaks)
                 {
-                    sw.WriteLine(delay.Character);
-                    sw.WriteLine(delay.Time);
+                    sw.WriteLine(SongBreak.Key);
+                    sw.WriteLine(SongBreak.Value);
                 }
             }
             sw.WriteLine("CUSTOM NOTES");
@@ -533,31 +605,31 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 }
             }
             sw.WriteLine("SPEEDS");
-            sw.WriteLine(DelayAtNormalSpeed);
-            sw.WriteLine(DelayAtFastSpeed);
+            sw.WriteLine(NormalSpeed);
+            sw.WriteLine(FastSpeed);
             sw.WriteLine("NOTES");
             sw.WriteLine(Song.Count);
             if (Song.Count != 0)
             {
+                bool isFastSpeedOn = false;
                 foreach (INote note in Song)
                 {
-                    if(note is DelayNote)
+                    if(note is BreakNote)
                     {
-                        sw.Write(((DelayNote)note).Character);
-                    }
-                    else if (note is SpeedChangeNote)
-                    {
-                        if(((SpeedChangeNote)note).TurnOnFast)
-                        {
-                            sw.Write("{");
-                        }
-                        else
-                        {
-                            sw.Write("}");
-                        }
+                        sw.Write(((BreakNote)note).Character);
                     }
                     else if (note is Note)
                     {
+                        if (((Note)note).NoteLength == FastSpeed && !isFastSpeedOn)
+                        {
+                            sw.Write("{");
+                            isFastSpeedOn = true;
+                        }
+                        else if (((Note)note).NoteLength == NormalSpeed && isFastSpeedOn)
+                        {
+                            sw.Write("}");
+                            isFastSpeedOn = false;
+                        }
                         sw.Write(((Note)note).Character);
                     }
                     else if (note is MultiNote)
@@ -602,7 +674,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                             {
                                 if (int.TryParse(sr.ReadLine(), out delayTime))
                                 {
-                                    Delays.Add(new Delay(delayChar, delayTime));
+                                    Breaks.Add(delayChar, delayTime);
                                 }
                             }
                         }
@@ -649,8 +721,8 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     int normalSpeed, fastSpeed;
                     int.TryParse(sr.ReadLine(), out normalSpeed);
                     int.TryParse(sr.ReadLine(), out fastSpeed);
-                    DelayAtNormalSpeed = normalSpeed;
-                    DelayAtFastSpeed = fastSpeed;
+                    NormalSpeed = normalSpeed;
+                    FastSpeed = fastSpeed;
                 }
                 if (sr.ReadLine() == "NOTES")
                 {
@@ -677,7 +749,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                         {
                             if (int.TryParse(sr.ReadLine(), out delayTime))
                             {
-                                Delays.Add(new Delay(delayChar, delayTime));
+                                Breaks.Add(delayChar, delayTime);
                             }
                         }
                     }
@@ -703,7 +775,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                     {
                         if (int.TryParse(sr.ReadLine(), out delayAtNormalSpeed))
                         {
-                            Delays.Add(new Delay(' ', DelayAtNormalSpeed));
+                            Breaks.Add(' ', NormalSpeed);
                             if (sr.ReadLine() == "FAST DELAY")
                             {
                                 if (int.TryParse(sr.ReadLine(), out delayAtFastSpeed))
@@ -728,7 +800,7 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                                                             {
                                                                 if (int.TryParse(sr.ReadLine(), out customDelayTime))
                                                                 {
-                                                                    Delays.Add(new Delay(customDelayChar, customDelayTime));
+                                                                    Breaks.Add(customDelayChar, customDelayTime);
                                                                 }
                                                             }
                                                         }

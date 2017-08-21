@@ -5,10 +5,10 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
     /// <summary>
     /// This exception is thrown if you are interacting with a custom delay in a wrong way
     /// </summary>
-    public class AutoplayerCustomDelayException : AutoplayerException
+    public class AutoplayerCustomException : AutoplayerException
     {
-        public AutoplayerCustomDelayException(){}
-        public AutoplayerCustomDelayException(string message) : base(message){}
-        public AutoplayerCustomDelayException(string message, Exception innerException) : base(message, innerException){}
+        public AutoplayerCustomException(){}
+        public AutoplayerCustomException(string message) : base(message){}
+        public AutoplayerCustomException(string message, Exception innerException) : base(message, innerException){}
     }
 }

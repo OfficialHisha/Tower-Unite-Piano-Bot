@@ -31,6 +31,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.MainTabPage = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ErrorTextBox = new System.Windows.Forms.RichTextBox();
             this.LoopCheckBox = new System.Windows.Forms.CheckBox();
             this.ClearNotesButton = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
@@ -44,15 +45,24 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.FastDelayBox = new System.Windows.Forms.NumericUpDown();
+            this.FastSpeedBox = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
-            this.NormalDelayBox = new System.Windows.Forms.NumericUpDown();
+            this.NormalSpeedBox = new System.Windows.Forms.NumericUpDown();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.StopKeyTextBox = new System.Windows.Forms.TextBox();
             this.StartKeyTextBox = new System.Windows.Forms.TextBox();
             this.StopKeyLabel = new System.Windows.Forms.Label();
             this.StartKeyLabel = new System.Windows.Forms.Label();
             this.CustomizeTabButton = new System.Windows.Forms.TabPage();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.RemoveAllModifiersButton = new System.Windows.Forms.Button();
+            this.RemoveModifierButton = new System.Windows.Forms.Button();
+            this.label10 = new System.Windows.Forms.Label();
+            this.CustomModifierTimeBox = new System.Windows.Forms.NumericUpDown();
+            this.label11 = new System.Windows.Forms.Label();
+            this.CustomModifierCharacterBox = new System.Windows.Forms.TextBox();
+            this.AddModifierButton = new System.Windows.Forms.Button();
+            this.ModifierListBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.CustomNoteNewCharacterBox = new System.Windows.Forms.TextBox();
             this.RemoveAllNotesButton = new System.Windows.Forms.Button();
@@ -63,14 +73,17 @@
             this.CustomNoteCharacterBox = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.RemoveAllDelayButton = new System.Windows.Forms.Button();
-            this.RemoveDelayButton = new System.Windows.Forms.Button();
+            this.RemoveAllBreaksButton = new System.Windows.Forms.Button();
+            this.RemoveBreakButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.CustomDelayTimeBox = new System.Windows.Forms.NumericUpDown();
+            this.CustomBreakTimeBox = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.CustomDelayCharacterBox = new System.Windows.Forms.TextBox();
-            this.AddDelayButton = new System.Windows.Forms.Button();
-            this.DelayListBox = new System.Windows.Forms.TextBox();
+            this.CustomBreakCharacterBox = new System.Windows.Forms.TextBox();
+            this.AddBreakButton = new System.Windows.Forms.Button();
+            this.BreakListBox = new System.Windows.Forms.TextBox();
+            this.MusicPiecesTabButton = new System.Windows.Forms.TabPage();
+            this.PlayTogetherTabButton = new System.Windows.Forms.TabPage();
+            this.label9 = new System.Windows.Forms.Label();
             this.MenuStrip = new System.Windows.Forms.MenuStrip();
             this.FileToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,7 +91,6 @@
             this.ExportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ImportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ErrorTextBox = new System.Windows.Forms.RichTextBox();
             this.AutoplayerToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.ClearMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -87,23 +99,22 @@
             this.HelpToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.HelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AutoplayerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.MusicPiecesTabButton = new System.Windows.Forms.TabPage();
-            this.PlayTogetherTabButton = new System.Windows.Forms.TabPage();
-            this.label9 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SettingsTabPage.SuspendLayout();
             this.groupBox5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FastDelayBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NormalDelayBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FastSpeedBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NormalSpeedBox)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.CustomizeTabButton.SuspendLayout();
+            this.groupBox6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CustomModifierTimeBox)).BeginInit();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).BeginInit();
-            this.MenuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CustomBreakTimeBox)).BeginInit();
             this.PlayTogetherTabButton.SuspendLayout();
+            this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -147,6 +158,16 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Notes";
+            // 
+            // ErrorTextBox
+            // 
+            this.ErrorTextBox.ForeColor = System.Drawing.Color.Red;
+            this.ErrorTextBox.Location = new System.Drawing.Point(0, 297);
+            this.ErrorTextBox.Name = "ErrorTextBox";
+            this.ErrorTextBox.ReadOnly = true;
+            this.ErrorTextBox.Size = new System.Drawing.Size(541, 51);
+            this.ErrorTextBox.TabIndex = 9;
+            this.ErrorTextBox.Text = "ERROR: Something went wrong!";
             // 
             // LoopCheckBox
             // 
@@ -246,9 +267,9 @@
             this.groupBox5.Controls.Add(this.label3);
             this.groupBox5.Controls.Add(this.label4);
             this.groupBox5.Controls.Add(this.label5);
-            this.groupBox5.Controls.Add(this.FastDelayBox);
+            this.groupBox5.Controls.Add(this.FastSpeedBox);
             this.groupBox5.Controls.Add(this.label6);
-            this.groupBox5.Controls.Add(this.NormalDelayBox);
+            this.groupBox5.Controls.Add(this.NormalSpeedBox);
             this.groupBox5.Location = new System.Drawing.Point(0, 108);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(263, 91);
@@ -283,28 +304,28 @@
             this.label5.TabIndex = 12;
             this.label5.Text = "Delay for fast speed:";
             // 
-            // FastDelayBox
+            // FastSpeedBox
             // 
-            this.FastDelayBox.Location = new System.Drawing.Point(131, 54);
-            this.FastDelayBox.Maximum = new decimal(new int[] {
+            this.FastSpeedBox.Location = new System.Drawing.Point(131, 54);
+            this.FastSpeedBox.Maximum = new decimal(new int[] {
             100000,
             0,
             0,
             0});
-            this.FastDelayBox.Minimum = new decimal(new int[] {
+            this.FastSpeedBox.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.FastDelayBox.Name = "FastDelayBox";
-            this.FastDelayBox.Size = new System.Drawing.Size(49, 20);
-            this.FastDelayBox.TabIndex = 16;
-            this.FastDelayBox.Value = new decimal(new int[] {
+            this.FastSpeedBox.Name = "FastSpeedBox";
+            this.FastSpeedBox.Size = new System.Drawing.Size(49, 20);
+            this.FastSpeedBox.TabIndex = 16;
+            this.FastSpeedBox.Value = new decimal(new int[] {
             100,
             0,
             0,
             0});
-            this.FastDelayBox.ValueChanged += new System.EventHandler(this.FastDelayBox_ValueChanged);
+            this.FastSpeedBox.ValueChanged += new System.EventHandler(this.FastSpeedBox_ValueChanged);
             // 
             // label6
             // 
@@ -315,28 +336,28 @@
             this.label6.TabIndex = 11;
             this.label6.Text = "Delay for normal speed:";
             // 
-            // NormalDelayBox
+            // NormalSpeedBox
             // 
-            this.NormalDelayBox.Location = new System.Drawing.Point(131, 28);
-            this.NormalDelayBox.Maximum = new decimal(new int[] {
+            this.NormalSpeedBox.Location = new System.Drawing.Point(131, 28);
+            this.NormalSpeedBox.Maximum = new decimal(new int[] {
             100000,
             0,
             0,
             0});
-            this.NormalDelayBox.Minimum = new decimal(new int[] {
+            this.NormalSpeedBox.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.NormalDelayBox.Name = "NormalDelayBox";
-            this.NormalDelayBox.Size = new System.Drawing.Size(49, 20);
-            this.NormalDelayBox.TabIndex = 15;
-            this.NormalDelayBox.Value = new decimal(new int[] {
+            this.NormalSpeedBox.Name = "NormalSpeedBox";
+            this.NormalSpeedBox.Size = new System.Drawing.Size(49, 20);
+            this.NormalSpeedBox.TabIndex = 15;
+            this.NormalSpeedBox.Value = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            this.NormalDelayBox.ValueChanged += new System.EventHandler(this.NormalDelayBox_ValueChanged);
+            this.NormalSpeedBox.ValueChanged += new System.EventHandler(this.NormalSpeedBox_ValueChanged);
             // 
             // groupBox4
             // 
@@ -389,6 +410,7 @@
             // 
             // CustomizeTabButton
             // 
+            this.CustomizeTabButton.Controls.Add(this.groupBox6);
             this.CustomizeTabButton.Controls.Add(this.groupBox3);
             this.CustomizeTabButton.Controls.Add(this.groupBox2);
             this.CustomizeTabButton.Location = new System.Drawing.Point(4, 22);
@@ -397,6 +419,112 @@
             this.CustomizeTabButton.TabIndex = 2;
             this.CustomizeTabButton.Text = "Customize";
             this.CustomizeTabButton.UseVisualStyleBackColor = true;
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.RemoveAllModifiersButton);
+            this.groupBox6.Controls.Add(this.RemoveModifierButton);
+            this.groupBox6.Controls.Add(this.label10);
+            this.groupBox6.Controls.Add(this.CustomModifierTimeBox);
+            this.groupBox6.Controls.Add(this.label11);
+            this.groupBox6.Controls.Add(this.CustomModifierCharacterBox);
+            this.groupBox6.Controls.Add(this.AddModifierButton);
+            this.groupBox6.Controls.Add(this.ModifierListBox);
+            this.groupBox6.Location = new System.Drawing.Point(0, 170);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(311, 181);
+            this.groupBox6.TabIndex = 8;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Custom Modifiers (W.I.P)";
+            // 
+            // RemoveAllModifiersButton
+            // 
+            this.RemoveAllModifiersButton.Location = new System.Drawing.Point(176, 123);
+            this.RemoveAllModifiersButton.Name = "RemoveAllModifiersButton";
+            this.RemoveAllModifiersButton.Size = new System.Drawing.Size(101, 23);
+            this.RemoveAllModifiersButton.TabIndex = 7;
+            this.RemoveAllModifiersButton.Text = "Remove All";
+            this.RemoveAllModifiersButton.UseVisualStyleBackColor = true;
+            this.RemoveAllModifiersButton.Click += new System.EventHandler(this.RemoveAllModifiersButton_Click);
+            // 
+            // RemoveModifierButton
+            // 
+            this.RemoveModifierButton.Location = new System.Drawing.Point(176, 94);
+            this.RemoveModifierButton.Name = "RemoveModifierButton";
+            this.RemoveModifierButton.Size = new System.Drawing.Size(101, 23);
+            this.RemoveModifierButton.TabIndex = 6;
+            this.RemoveModifierButton.Text = "Remove Modifier";
+            this.RemoveModifierButton.UseVisualStyleBackColor = true;
+            this.RemoveModifierButton.Click += new System.EventHandler(this.RemoveModifierButton_Click);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(173, 41);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(69, 13);
+            this.label10.TabIndex = 5;
+            this.label10.Text = "Modifier (ms):";
+            // 
+            // CustomModifierTimeBox
+            // 
+            this.CustomModifierTimeBox.Location = new System.Drawing.Point(248, 39);
+            this.CustomModifierTimeBox.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.CustomModifierTimeBox.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.CustomModifierTimeBox.Name = "CustomModifierTimeBox";
+            this.CustomModifierTimeBox.Size = new System.Drawing.Size(51, 20);
+            this.CustomModifierTimeBox.TabIndex = 4;
+            this.CustomModifierTimeBox.Value = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(173, 19);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(56, 13);
+            this.label11.TabIndex = 3;
+            this.label11.Text = "Character:";
+            // 
+            // CustomModifierCharacterBox
+            // 
+            this.CustomModifierCharacterBox.Location = new System.Drawing.Point(248, 16);
+            this.CustomModifierCharacterBox.MaxLength = 1;
+            this.CustomModifierCharacterBox.Name = "CustomModifierCharacterBox";
+            this.CustomModifierCharacterBox.Size = new System.Drawing.Size(14, 20);
+            this.CustomModifierCharacterBox.TabIndex = 2;
+            this.CustomModifierCharacterBox.Text = ".";
+            // 
+            // AddModifierButton
+            // 
+            this.AddModifierButton.Location = new System.Drawing.Point(176, 65);
+            this.AddModifierButton.Name = "AddModifierButton";
+            this.AddModifierButton.Size = new System.Drawing.Size(101, 23);
+            this.AddModifierButton.TabIndex = 1;
+            this.AddModifierButton.Text = "Add Modifier";
+            this.AddModifierButton.UseVisualStyleBackColor = true;
+            this.AddModifierButton.Click += new System.EventHandler(this.AddModifierButton_Click);
+            // 
+            // ModifierListBox
+            // 
+            this.ModifierListBox.Location = new System.Drawing.Point(6, 19);
+            this.ModifierListBox.Multiline = true;
+            this.ModifierListBox.Name = "ModifierListBox";
+            this.ModifierListBox.ReadOnly = true;
+            this.ModifierListBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ModifierListBox.Size = new System.Drawing.Size(164, 152);
+            this.ModifierListBox.TabIndex = 0;
             // 
             // groupBox3
             // 
@@ -493,67 +621,67 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.RemoveAllDelayButton);
-            this.groupBox2.Controls.Add(this.RemoveDelayButton);
+            this.groupBox2.Controls.Add(this.RemoveAllBreaksButton);
+            this.groupBox2.Controls.Add(this.RemoveBreakButton);
             this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Controls.Add(this.CustomDelayTimeBox);
+            this.groupBox2.Controls.Add(this.CustomBreakTimeBox);
             this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Controls.Add(this.CustomDelayCharacterBox);
-            this.groupBox2.Controls.Add(this.AddDelayButton);
-            this.groupBox2.Controls.Add(this.DelayListBox);
+            this.groupBox2.Controls.Add(this.CustomBreakCharacterBox);
+            this.groupBox2.Controls.Add(this.AddBreakButton);
+            this.groupBox2.Controls.Add(this.BreakListBox);
             this.groupBox2.Location = new System.Drawing.Point(0, 0);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(311, 358);
+            this.groupBox2.Size = new System.Drawing.Size(311, 172);
             this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Custom Delays";
+            this.groupBox2.Text = "Custom Breaks";
             // 
-            // RemoveAllDelayButton
+            // RemoveAllBreaksButton
             // 
-            this.RemoveAllDelayButton.Location = new System.Drawing.Point(176, 123);
-            this.RemoveAllDelayButton.Name = "RemoveAllDelayButton";
-            this.RemoveAllDelayButton.Size = new System.Drawing.Size(86, 23);
-            this.RemoveAllDelayButton.TabIndex = 7;
-            this.RemoveAllDelayButton.Text = "Remove All";
-            this.RemoveAllDelayButton.UseVisualStyleBackColor = true;
-            this.RemoveAllDelayButton.Click += new System.EventHandler(this.RemoveAllDelayButton_Click);
+            this.RemoveAllBreaksButton.Location = new System.Drawing.Point(176, 123);
+            this.RemoveAllBreaksButton.Name = "RemoveAllBreaksButton";
+            this.RemoveAllBreaksButton.Size = new System.Drawing.Size(107, 23);
+            this.RemoveAllBreaksButton.TabIndex = 7;
+            this.RemoveAllBreaksButton.Text = "Remove All";
+            this.RemoveAllBreaksButton.UseVisualStyleBackColor = true;
+            this.RemoveAllBreaksButton.Click += new System.EventHandler(this.RemoveAllBreaksButton_Click);
             // 
-            // RemoveDelayButton
+            // RemoveBreakButton
             // 
-            this.RemoveDelayButton.Location = new System.Drawing.Point(176, 94);
-            this.RemoveDelayButton.Name = "RemoveDelayButton";
-            this.RemoveDelayButton.Size = new System.Drawing.Size(86, 23);
-            this.RemoveDelayButton.TabIndex = 6;
-            this.RemoveDelayButton.Text = "Remove Delay";
-            this.RemoveDelayButton.UseVisualStyleBackColor = true;
-            this.RemoveDelayButton.Click += new System.EventHandler(this.RemoveDelayButton_Click);
+            this.RemoveBreakButton.Location = new System.Drawing.Point(176, 94);
+            this.RemoveBreakButton.Name = "RemoveBreakButton";
+            this.RemoveBreakButton.Size = new System.Drawing.Size(107, 23);
+            this.RemoveBreakButton.TabIndex = 6;
+            this.RemoveBreakButton.Text = "Remove Break";
+            this.RemoveBreakButton.UseVisualStyleBackColor = true;
+            this.RemoveBreakButton.Click += new System.EventHandler(this.RemoveBreakButton_Click);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(173, 41);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(59, 13);
+            this.label2.Size = new System.Drawing.Size(55, 13);
             this.label2.TabIndex = 5;
-            this.label2.Text = "Delay (ms):";
+            this.label2.Text = "Time (ms):";
             // 
-            // CustomDelayTimeBox
+            // CustomBreakTimeBox
             // 
-            this.CustomDelayTimeBox.Location = new System.Drawing.Point(238, 39);
-            this.CustomDelayTimeBox.Maximum = new decimal(new int[] {
+            this.CustomBreakTimeBox.Location = new System.Drawing.Point(254, 39);
+            this.CustomBreakTimeBox.Maximum = new decimal(new int[] {
             100000,
             0,
             0,
             0});
-            this.CustomDelayTimeBox.Minimum = new decimal(new int[] {
+            this.CustomBreakTimeBox.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.CustomDelayTimeBox.Name = "CustomDelayTimeBox";
-            this.CustomDelayTimeBox.Size = new System.Drawing.Size(67, 20);
-            this.CustomDelayTimeBox.TabIndex = 4;
-            this.CustomDelayTimeBox.Value = new decimal(new int[] {
+            this.CustomBreakTimeBox.Name = "CustomBreakTimeBox";
+            this.CustomBreakTimeBox.Size = new System.Drawing.Size(51, 20);
+            this.CustomBreakTimeBox.TabIndex = 4;
+            this.CustomBreakTimeBox.Value = new decimal(new int[] {
             200,
             0,
             0,
@@ -568,156 +696,34 @@
             this.label1.TabIndex = 3;
             this.label1.Text = "Character:";
             // 
-            // CustomDelayCharacterBox
+            // CustomBreakCharacterBox
             // 
-            this.CustomDelayCharacterBox.Location = new System.Drawing.Point(238, 16);
-            this.CustomDelayCharacterBox.MaxLength = 1;
-            this.CustomDelayCharacterBox.Name = "CustomDelayCharacterBox";
-            this.CustomDelayCharacterBox.Size = new System.Drawing.Size(14, 20);
-            this.CustomDelayCharacterBox.TabIndex = 2;
-            this.CustomDelayCharacterBox.Text = ".";
+            this.CustomBreakCharacterBox.Location = new System.Drawing.Point(254, 16);
+            this.CustomBreakCharacterBox.MaxLength = 1;
+            this.CustomBreakCharacterBox.Name = "CustomBreakCharacterBox";
+            this.CustomBreakCharacterBox.Size = new System.Drawing.Size(14, 20);
+            this.CustomBreakCharacterBox.TabIndex = 2;
+            this.CustomBreakCharacterBox.Text = ".";
             // 
-            // AddDelayButton
+            // AddBreakButton
             // 
-            this.AddDelayButton.Location = new System.Drawing.Point(176, 65);
-            this.AddDelayButton.Name = "AddDelayButton";
-            this.AddDelayButton.Size = new System.Drawing.Size(86, 23);
-            this.AddDelayButton.TabIndex = 1;
-            this.AddDelayButton.Text = "Add Delay";
-            this.AddDelayButton.UseVisualStyleBackColor = true;
-            this.AddDelayButton.Click += new System.EventHandler(this.AddDelayButton_Click);
+            this.AddBreakButton.Location = new System.Drawing.Point(176, 65);
+            this.AddBreakButton.Name = "AddBreakButton";
+            this.AddBreakButton.Size = new System.Drawing.Size(107, 23);
+            this.AddBreakButton.TabIndex = 1;
+            this.AddBreakButton.Text = "Add Break";
+            this.AddBreakButton.UseVisualStyleBackColor = true;
+            this.AddBreakButton.Click += new System.EventHandler(this.AddBreakButton_Click);
             // 
-            // DelayListBox
+            // BreakListBox
             // 
-            this.DelayListBox.Location = new System.Drawing.Point(6, 19);
-            this.DelayListBox.Multiline = true;
-            this.DelayListBox.Name = "DelayListBox";
-            this.DelayListBox.ReadOnly = true;
-            this.DelayListBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.DelayListBox.Size = new System.Drawing.Size(164, 332);
-            this.DelayListBox.TabIndex = 0;
-            // 
-            // MenuStrip
-            // 
-            this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.FileToolStrip,
-            this.AutoplayerToolStrip,
-            this.HelpToolStrip});
-            this.MenuStrip.Location = new System.Drawing.Point(0, 0);
-            this.MenuStrip.Name = "MenuStrip";
-            this.MenuStrip.Size = new System.Drawing.Size(633, 24);
-            this.MenuStrip.TabIndex = 1;
-            this.MenuStrip.Text = "menuStrip1";
-            // 
-            // FileToolStrip
-            // 
-            this.FileToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.SaveMenuItem,
-            this.LoadMenuItem,
-            this.ExportMenuItem,
-            this.ImportMenuItem,
-            this.ExitMenuItem});
-            this.FileToolStrip.Name = "FileToolStrip";
-            this.FileToolStrip.Size = new System.Drawing.Size(37, 20);
-            this.FileToolStrip.Text = "File";
-            // 
-            // SaveMenuItem
-            // 
-            this.SaveMenuItem.Name = "SaveMenuItem";
-            this.SaveMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.SaveMenuItem.Text = "Save";
-            // 
-            // LoadMenuItem
-            // 
-            this.LoadMenuItem.Name = "LoadMenuItem";
-            this.LoadMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.LoadMenuItem.Text = "Load";
-            // 
-            // ExportMenuItem
-            // 
-            this.ExportMenuItem.Name = "ExportMenuItem";
-            this.ExportMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.ExportMenuItem.Text = "Export";
-            this.ExportMenuItem.Click += new System.EventHandler(this.ExportMenuItem_Click);
-            // 
-            // ImportMenuItem
-            // 
-            this.ImportMenuItem.Name = "ImportMenuItem";
-            this.ImportMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.ImportMenuItem.Text = "Import";
-            this.ImportMenuItem.Click += new System.EventHandler(this.ImportMenuItem_Click);
-            // 
-            // ExitMenuItem
-            // 
-            this.ExitMenuItem.Name = "ExitMenuItem";
-            this.ExitMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.ExitMenuItem.Text = "Exit";
-            // 
-            // ErrorTextBox
-            // 
-            this.ErrorTextBox.ForeColor = System.Drawing.Color.Red;
-            this.ErrorTextBox.Location = new System.Drawing.Point(0, 297);
-            this.ErrorTextBox.Name = "ErrorTextBox";
-            this.ErrorTextBox.ReadOnly = true;
-            this.ErrorTextBox.Size = new System.Drawing.Size(541, 51);
-            this.ErrorTextBox.TabIndex = 9;
-            this.ErrorTextBox.Text = "ERROR: Something went wrong!";
-            // 
-            // AutoplayerToolStrip
-            // 
-            this.AutoplayerToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ClearMenuItem,
-            this.PlayMenuItem,
-            this.StopMenuItem,
-            this.LoopMenuItem});
-            this.AutoplayerToolStrip.Name = "AutoplayerToolStrip";
-            this.AutoplayerToolStrip.Size = new System.Drawing.Size(77, 20);
-            this.AutoplayerToolStrip.Text = "Autoplayer";
-            // 
-            // ClearMenuItem
-            // 
-            this.ClearMenuItem.Name = "ClearMenuItem";
-            this.ClearMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.ClearMenuItem.Text = "Clear Notes";
-            // 
-            // PlayMenuItem
-            // 
-            this.PlayMenuItem.Name = "PlayMenuItem";
-            this.PlayMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.PlayMenuItem.Text = "Play Song (F2)";
-            // 
-            // StopMenuItem
-            // 
-            this.StopMenuItem.Name = "StopMenuItem";
-            this.StopMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.StopMenuItem.Text = "Stop Song (F3)";
-            // 
-            // LoopMenuItem
-            // 
-            this.LoopMenuItem.Name = "LoopMenuItem";
-            this.LoopMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.LoopMenuItem.Text = "Loop Song";
-            // 
-            // HelpToolStrip
-            // 
-            this.HelpToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.HelpMenuItem,
-            this.AutoplayerMenuItem});
-            this.HelpToolStrip.Name = "HelpToolStrip";
-            this.HelpToolStrip.Size = new System.Drawing.Size(44, 20);
-            this.HelpToolStrip.Text = "Help";
-            // 
-            // HelpMenuItem
-            // 
-            this.HelpMenuItem.Name = "HelpMenuItem";
-            this.HelpMenuItem.Size = new System.Drawing.Size(188, 22);
-            this.HelpMenuItem.Text = "Documentation";
-            // 
-            // AutoplayerMenuItem
-            // 
-            this.AutoplayerMenuItem.Name = "AutoplayerMenuItem";
-            this.AutoplayerMenuItem.Size = new System.Drawing.Size(188, 22);
-            this.AutoplayerMenuItem.Text = "About the Autoplayer";
+            this.BreakListBox.Location = new System.Drawing.Point(6, 19);
+            this.BreakListBox.Multiline = true;
+            this.BreakListBox.Name = "BreakListBox";
+            this.BreakListBox.ReadOnly = true;
+            this.BreakListBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.BreakListBox.Size = new System.Drawing.Size(164, 145);
+            this.BreakListBox.TabIndex = 0;
             // 
             // MusicPiecesTabButton
             // 
@@ -748,6 +754,118 @@
             this.label9.TabIndex = 1;
             this.label9.Text = "Seriously, there\'s nothing here.. Why did you even click this tab?..";
             // 
+            // MenuStrip
+            // 
+            this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.FileToolStrip,
+            this.AutoplayerToolStrip,
+            this.HelpToolStrip});
+            this.MenuStrip.Location = new System.Drawing.Point(0, 0);
+            this.MenuStrip.Name = "MenuStrip";
+            this.MenuStrip.Size = new System.Drawing.Size(633, 24);
+            this.MenuStrip.TabIndex = 1;
+            this.MenuStrip.Text = "menuStrip1";
+            // 
+            // FileToolStrip
+            // 
+            this.FileToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SaveMenuItem,
+            this.LoadMenuItem,
+            this.ExportMenuItem,
+            this.ImportMenuItem,
+            this.ExitMenuItem});
+            this.FileToolStrip.Name = "FileToolStrip";
+            this.FileToolStrip.Size = new System.Drawing.Size(37, 20);
+            this.FileToolStrip.Text = "File";
+            // 
+            // SaveMenuItem
+            // 
+            this.SaveMenuItem.Name = "SaveMenuItem";
+            this.SaveMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.SaveMenuItem.Text = "Save";
+            // 
+            // LoadMenuItem
+            // 
+            this.LoadMenuItem.Name = "LoadMenuItem";
+            this.LoadMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.LoadMenuItem.Text = "Load";
+            // 
+            // ExportMenuItem
+            // 
+            this.ExportMenuItem.Name = "ExportMenuItem";
+            this.ExportMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.ExportMenuItem.Text = "Export";
+            this.ExportMenuItem.Click += new System.EventHandler(this.ExportMenuItem_Click);
+            // 
+            // ImportMenuItem
+            // 
+            this.ImportMenuItem.Name = "ImportMenuItem";
+            this.ImportMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.ImportMenuItem.Text = "Import";
+            this.ImportMenuItem.Click += new System.EventHandler(this.ImportMenuItem_Click);
+            // 
+            // ExitMenuItem
+            // 
+            this.ExitMenuItem.Name = "ExitMenuItem";
+            this.ExitMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.ExitMenuItem.Text = "Exit";
+            // 
+            // AutoplayerToolStrip
+            // 
+            this.AutoplayerToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ClearMenuItem,
+            this.PlayMenuItem,
+            this.StopMenuItem,
+            this.LoopMenuItem});
+            this.AutoplayerToolStrip.Name = "AutoplayerToolStrip";
+            this.AutoplayerToolStrip.Size = new System.Drawing.Size(77, 20);
+            this.AutoplayerToolStrip.Text = "Autoplayer";
+            // 
+            // ClearMenuItem
+            // 
+            this.ClearMenuItem.Name = "ClearMenuItem";
+            this.ClearMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.ClearMenuItem.Text = "Clear Notes";
+            // 
+            // PlayMenuItem
+            // 
+            this.PlayMenuItem.Name = "PlayMenuItem";
+            this.PlayMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.PlayMenuItem.Text = "Play Song (F2)";
+            // 
+            // StopMenuItem
+            // 
+            this.StopMenuItem.Name = "StopMenuItem";
+            this.StopMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.StopMenuItem.Text = "Stop Song (F3)";
+            // 
+            // LoopMenuItem
+            // 
+            this.LoopMenuItem.Name = "LoopMenuItem";
+            this.LoopMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.LoopMenuItem.Text = "Loop Song";
+            // 
+            // HelpToolStrip
+            // 
+            this.HelpToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.HelpMenuItem,
+            this.AutoplayerMenuItem});
+            this.HelpToolStrip.Name = "HelpToolStrip";
+            this.HelpToolStrip.Size = new System.Drawing.Size(44, 20);
+            this.HelpToolStrip.Text = "Help";
+            // 
+            // HelpMenuItem
+            // 
+            this.HelpMenuItem.Name = "HelpMenuItem";
+            this.HelpMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.HelpMenuItem.Text = "Documentation";
+            // 
+            // AutoplayerMenuItem
+            // 
+            this.AutoplayerMenuItem.Name = "AutoplayerMenuItem";
+            this.AutoplayerMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.AutoplayerMenuItem.Text = "About the Autoplayer";
+            // 
             // GraphicalUserInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -764,20 +882,23 @@
             this.SettingsTabPage.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FastDelayBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NormalDelayBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FastSpeedBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NormalSpeedBox)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.CustomizeTabButton.ResumeLayout(false);
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CustomModifierTimeBox)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.CustomDelayTimeBox)).EndInit();
-            this.MenuStrip.ResumeLayout(false);
-            this.MenuStrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CustomBreakTimeBox)).EndInit();
             this.PlayTogetherTabButton.ResumeLayout(false);
             this.PlayTogetherTabButton.PerformLayout();
+            this.MenuStrip.ResumeLayout(false);
+            this.MenuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -799,12 +920,12 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.NumericUpDown CustomDelayTimeBox;
+        private System.Windows.Forms.NumericUpDown CustomBreakTimeBox;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox CustomDelayCharacterBox;
-        private System.Windows.Forms.Button AddDelayButton;
-        private System.Windows.Forms.TextBox DelayListBox;
-        private System.Windows.Forms.Button RemoveDelayButton;
+        private System.Windows.Forms.TextBox CustomBreakCharacterBox;
+        private System.Windows.Forms.Button AddBreakButton;
+        private System.Windows.Forms.TextBox BreakListBox;
+        private System.Windows.Forms.Button RemoveBreakButton;
         private System.Windows.Forms.Button ClearNotesButton;
         private System.Windows.Forms.CheckBox LoopCheckBox;
         private System.Windows.Forms.GroupBox groupBox4;
@@ -816,10 +937,10 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.NumericUpDown FastDelayBox;
+        private System.Windows.Forms.NumericUpDown FastSpeedBox;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.NumericUpDown NormalDelayBox;
-        private System.Windows.Forms.Button RemoveAllDelayButton;
+        private System.Windows.Forms.NumericUpDown NormalSpeedBox;
+        private System.Windows.Forms.Button RemoveAllBreaksButton;
         private System.Windows.Forms.TextBox CustomNoteNewCharacterBox;
         private System.Windows.Forms.Button RemoveAllNotesButton;
         private System.Windows.Forms.TextBox CustomNoteListBox;
@@ -847,6 +968,15 @@
         private System.Windows.Forms.ToolStripMenuItem HelpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem AutoplayerMenuItem;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.Button RemoveAllModifiersButton;
+        private System.Windows.Forms.Button RemoveModifierButton;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.NumericUpDown CustomModifierTimeBox;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox CustomModifierCharacterBox;
+        private System.Windows.Forms.Button AddModifierButton;
+        private System.Windows.Forms.TextBox ModifierListBox;
     }
 }
 

@@ -83,21 +83,34 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         public void UpdateEverything()
         {
             UpdateNoteBox();
-            UpdateDelayListBox();
-            NormalDelayBox.Value = Autoplayer.DelayAtNormalSpeed;
-            FastDelayBox.Value = Autoplayer.DelayAtFastSpeed;
+            UpdateModifierListBox();
+            UpdateBreakListBox();
+            NormalSpeedBox.Value = Autoplayer.NormalSpeed;
+            FastSpeedBox.Value = Autoplayer.FastSpeed;
             isLoading = false;
         }
         /// <summary>
-        /// This method updates the DelayListBox with all delays from the Delays list in the main program
-        /// Each custom delay has its own line
+        /// This method updates the BreakListBox with all breaks from the Breaks list in the main program
+        /// Each custom break has its own line
         /// </summary>
-        public void UpdateDelayListBox()
+        public void UpdateBreakListBox()
         {
-            DelayListBox.Clear();
-            foreach (Delay delay in Autoplayer.Delays)
+            BreakListBox.Clear();
+            foreach (KeyValuePair<char, int> songBreak in Autoplayer.Breaks)
             {
-                DelayListBox.Text += $"Character: '{delay.Character}' : Delay: '{delay.Time}'\n";
+                BreakListBox.Text += $"Character: '{songBreak.Key}' : Modifier: '{songBreak.Value}'\n";
+            }
+        }
+        /// <summary>
+        /// This method updates the ModifierListBox with all modifiers from the NoteModifiers list in the main program
+        /// Each custom modifier has its own line
+        /// </summary>
+        public void UpdateModifierListBox()
+        {
+            ModifierListBox.Clear();
+            foreach (KeyValuePair<char, int> modifer in Autoplayer.Breaks)
+            {
+                ModifierListBox.Text += $"Character: '{modifer.Key}' : Time: '{modifer.Value}'\n";
             }
         }
         /// <summary>
@@ -119,26 +132,26 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         /// </summary>
         public void UpdateNoteBox()
         {
+            bool isFastSpeedOn = false;
             NoteTextBox.Clear();
             foreach (INote note in Autoplayer.Song)
             {
-                if (note is DelayNote)
+                if (note is BreakNote)
                 {
-                    NoteTextBox.Text += (((DelayNote)note).Character);
-                }
-                else if (note is SpeedChangeNote)
-                {
-                    if (((SpeedChangeNote)note).TurnOnFast)
-                    {
-                        NoteTextBox.Text += "{";
-                    }
-                    else
-                    {
-                        NoteTextBox.Text += "}";
-                    }
+                    NoteTextBox.Text += (((BreakNote)note).Character);
                 }
                 else if (note is Note)
                 {
+                    if (((Note)note).NoteLength == Autoplayer.FastSpeed && !isFastSpeedOn)
+                    {
+                        NoteTextBox.Text += '{';
+                        isFastSpeedOn = true;
+                    }
+                    else if (((Note)note).NoteLength == Autoplayer.NormalSpeed && isFastSpeedOn)
+                    {
+                        NoteTextBox.Text += '}';
+                        isFastSpeedOn = false;
+                    }
                     NoteTextBox.Text += ((Note)note).Character;
                 }
                 else if (note is MultiNote)
@@ -219,65 +232,130 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             ErrorTextBox.Show();
         }
 
-        #region Custom delay buttons
+        #region Custom break buttons
         /// <summary>
-        /// This is called when we click the AddDelayButton
+        /// This is called when we click the AddBreakButton
         /// </summary>
-        private void AddDelayButton_Click(object sender, EventArgs e)
+        private void AddBreakButton_Click(object sender, EventArgs e)
         {
             try
             {
-                if(Autoplayer.CheckDelayExists(CustomDelayCharacterBox.Text.ToCharArray()[0]))
+                if(Autoplayer.CheckBreakExists(CustomBreakCharacterBox.Text.ToCharArray()[0]))
                 {
-                    //If the delay already exists, just update the time value
-                    Autoplayer.ChangeDelay(CustomDelayCharacterBox.Text.ToCharArray()[0], (int)CustomDelayTimeBox.Value);
+                    //If the break already exists, just update the time value
+                    Autoplayer.ChangeBreak(CustomBreakCharacterBox.Text.ToCharArray()[0], (int)CustomBreakTimeBox.Value);
                 }
                 else
                 {
-                    //If the delay does not exist, add a new entry
-                    Autoplayer.AddDelay(CustomDelayCharacterBox.Text.ToCharArray()[0], (int)CustomDelayTimeBox.Value);
+                    //If the break does not exist, add a new entry
+                    Autoplayer.AddBreak(CustomBreakCharacterBox.Text.ToCharArray()[0], (int)CustomBreakTimeBox.Value);
                 }
-                //Update the GUI element to show the delays in the GUI
-                UpdateDelayListBox();
+                //Update the GUI element to show the break in the GUI
+                UpdateBreakListBox();
 
                 //Update the current notes to with the new rules
                 MakeSong();
             }
-            catch (AutoplayerCustomDelayException error)
+            catch (AutoplayerCustomException error)
             {
                 MessageBox.Show(error.Message);
             }
         }
         /// <summary>
-        /// This is called when we click the RemoveDelayButton
+        /// This is called when we click the RemoveBreakButton
         /// </summary>
-        private void RemoveDelayButton_Click(object sender, EventArgs e)
+        private void RemoveBreakButton_Click(object sender, EventArgs e)
         {
             try
             {
-                //Remove the delay from the list
-                Autoplayer.RemoveDelay(CustomDelayCharacterBox.Text.ToCharArray()[0]);
+                //Remove the break from the list
+                Autoplayer.RemoveBreak(CustomBreakCharacterBox.Text.ToCharArray()[0]);
                 //Update the GUI
-                UpdateDelayListBox();
+                UpdateBreakListBox();
 
                 //Update the current notes wtih the new rules
                 MakeSong();
             }
-            catch (AutoplayerCustomDelayException error)
+            catch (AutoplayerCustomException error)
             {
                 MessageBox.Show(error.Message);
             }
         }
         /// <summary>
-        /// This is called when we click the RemoveAllDelayButton
+        /// This is called when we click the RemoveAllBreaksButton
         /// </summary>
-        private void RemoveAllDelayButton_Click(object sender, EventArgs e)
+        private void RemoveAllBreaksButton_Click(object sender, EventArgs e)
         {
-            //Clear the list of delays
-            Autoplayer.ResetDelays();
+            //Clear the list of breaks
+            Autoplayer.ResetBreaks();
 
             //Update the GUI
-            UpdateDelayListBox();
+            UpdateBreakListBox();
+
+            //Update the current notes wtih the new rules
+            MakeSong();
+        }
+        #endregion
+
+        #region Custom modifiers buttons
+        /// <summary>
+        /// This is called when we click the AddModifierButton
+        /// </summary>
+        private void AddModifierButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (Autoplayer.CheckModifierExists(CustomModifierCharacterBox.Text.ToCharArray()[0]))
+                {
+                    //If the modifier already exists, just update the time value
+                    Autoplayer.ChangeModifier(CustomModifierCharacterBox.Text.ToCharArray()[0], (int)CustomModifierTimeBox.Value);
+                }
+                else
+                {
+                    //If the modifier does not exist, add a new entry
+                    Autoplayer.AddBreak(CustomModifierCharacterBox.Text.ToCharArray()[0], (int)CustomModifierTimeBox.Value);
+                }
+                //Update the GUI element to show the modifier in the GUI
+                UpdateModifierListBox();
+
+                //Update the current notes to with the new rules
+                MakeSong();
+            }
+            catch (AutoplayerCustomException error)
+            {
+                MessageBox.Show(error.Message);
+            }
+        }
+        /// <summary>
+        /// This is called when we click the RemoveModifierButton
+        /// </summary>
+        private void RemoveModifierButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //Remove the modifier from the list
+                Autoplayer.RemoveBreak(CustomBreakCharacterBox.Text.ToCharArray()[0]);
+                //Update the GUI
+                UpdateBreakListBox();
+
+                //Update the current notes wtih the new rules
+                MakeSong();
+            }
+            catch (AutoplayerCustomException error)
+            {
+                MessageBox.Show(error.Message);
+            }
+        }
+        /// <summary>
+        /// This is called when we click the RemoveAllModifiersButton
+        /// </summary>
+        private void RemoveAllModifiersButton_Click(object sender, EventArgs e)
+        {
+            //Clear the list of modifiers
+            Autoplayer.ResetBreaks();
+
+            //Update the GUI
+            UpdateBreakListBox();
 
             //Update the current notes wtih the new rules
             MakeSong();
@@ -456,7 +534,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 try
                 {
                     isLoading = true;
-                    Autoplayer.ResetDelays();
+                    Autoplayer.ResetBreaks();
                     Autoplayer.LoadSong(fileDialog.FileName);
                     //Update everything when we are done loading
                     UpdateEverything();
@@ -542,16 +620,16 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
         /// <summary>
         /// This is called when the value of NormalDelayBox is changed
         /// </summary>
-        private void NormalDelayBox_ValueChanged(object sender, EventArgs e)
+        private void NormalSpeedBox_ValueChanged(object sender, EventArgs e)
         {
-            Autoplayer.DelayAtNormalSpeed = (int)NormalDelayBox.Value;
+            Autoplayer.NormalSpeed = (int)NormalSpeedBox.Value;
         }
         /// <summary>
         /// This is called when the value of FastDelayBox is changed
         /// </summary>
-        private void FastDelayBox_ValueChanged(object sender, EventArgs e)
+        private void FastSpeedBox_ValueChanged(object sender, EventArgs e)
         {
-            Autoplayer.DelayAtFastSpeed = (int)FastDelayBox.Value;
+            Autoplayer.FastSpeed = (int)FastSpeedBox.Value;
         }
 
         private void NoteTextBox_TextChanged(object sender, EventArgs e)
@@ -589,7 +667,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                     return;
                 }
 
-                Autoplayer.ResetDelays();
+                Autoplayer.ResetBreaks();
 
                 try
                 {
@@ -597,10 +675,10 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
 
                     foreach (Tuple<char, int> delay in obj.Delays)
                     {
-                        Autoplayer.AddDelay(delay.Item1, delay.Item2);
+                        Autoplayer.AddBreak(delay.Item1, delay.Item2);
                     }
                     Autoplayer.AddNotesFromString(obj.Notes);
-                    Autoplayer.DelayAtNormalSpeed = obj.Speed;
+                    Autoplayer.NormalSpeed = obj.Speed;
 
                     //Update everything when we are done loading
                     UpdateEverything();
