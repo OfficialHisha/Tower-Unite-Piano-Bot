@@ -159,14 +159,14 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                             int actualNumber;
                             if (int.TryParse(number, out actualNumber))
                             {
-                                Tuple<char, int> delay = virtualObject.Delays.FirstOrDefault(x => slowDown ? x.Item2 == virtualObject.Speed / actualNumber : x.Item2 == virtualObject.Speed * (actualNumber - 1));
-                                if (delay == null)
+                                int speed = slowDown ? virtualObject.Speed / actualNumber : virtualObject.Speed * (actualNumber - 1);
+                                if (!virtualObject.NoteModifiers.ContainsKey(speed))
                                 {
                                     foreach (char character in commonDelayCharacters)
                                     {
-                                        if (!virtualObject.Delays.Any(x => x.Item1 == character))
+                                        if (!virtualObject.NoteModifiers.ContainsKey(character))
                                         {
-                                            virtualObject.Delays.Add(new Tuple<char, int>(character, slowDown ? virtualObject.Speed / actualNumber : virtualObject.Speed * (actualNumber - 1)));
+                                            virtualObject.NoteModifiers.Add(speed, character);
                                             sb.Append(curNote + character.ToString());
                                             break;
                                         }
@@ -174,7 +174,7 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                                 }
                                 else
                                 {
-                                    sb.Append(curNote + delay.Item1.ToString());
+                                    sb.Append(curNote + virtualObject.NoteModifiers[speed]);
                                 }
                             }
                         }

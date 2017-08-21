@@ -673,9 +673,9 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 {
                     ConvertedObject obj = ABCNoteTranslator.TranslateNotes(abc);
 
-                    foreach (Tuple<char, int> delay in obj.Delays)
+                    foreach (KeyValuePair<int, char> delay in obj.NoteModifiers)
                     {
-                        Autoplayer.AddBreak(delay.Item1, delay.Item2);
+                        Autoplayer.AddBreak(delay.Value, delay.Key);
                     }
                     Autoplayer.AddNotesFromString(obj.Notes);
                     Autoplayer.NormalSpeed = obj.Speed;

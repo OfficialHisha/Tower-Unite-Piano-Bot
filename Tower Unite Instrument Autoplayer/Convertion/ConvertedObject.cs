@@ -10,7 +10,8 @@ namespace Tower_Unite_Instrument_Autoplayer.Convertion
     public class ConvertedObject
     {
         public string Notes { get; set; }
-        public List<Tuple<char, int>> Delays { get; set; } = new List<Tuple<char, int>>();
+        public Dictionary<int, char> NoteModifiers { get; set; } = new Dictionary<int, char>();
+        public Dictionary<char, int> Breaks { get; set; } = new Dictionary<char, int>();
         public int Speed { get; set; }
     }
 }
