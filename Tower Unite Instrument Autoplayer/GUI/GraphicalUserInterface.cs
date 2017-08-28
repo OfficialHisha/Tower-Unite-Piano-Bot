@@ -670,6 +670,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 Autoplayer.ResetModifiers();
                 Autoplayer.ResetBreaks();
                 Autoplayer.ResetNotes();
+                Autoplayer.ClearAllNotes();
 
                 try
                 {
@@ -695,7 +696,10 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 {
                     MessageBox.Show($"Importing failed (Translation): {error.Message}");
                 }
-                isLoading = false;
+                finally
+                {
+                    isLoading = false;
+                }
             }
         }
 

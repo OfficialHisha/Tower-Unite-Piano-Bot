@@ -10,7 +10,6 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
 {
     public static class ABCNoteTranslator
     {
-        static Dictionary<Tuple<string, string>, char> keyToNoteDictionary = new Dictionary<Tuple<string, string>, char>();
         static Dictionary<string, char> noteToVirtualDictionary = new Dictionary<string, char>()
         {
             ["A,,"] = '6',
@@ -55,38 +54,6 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
 
         public static ConvertedObject TranslateNotes(ABCObject abcObject)
         {
-            #region Special cases
-                keyToNoteDictionary.Add(new Tuple<string, string>("A", "C"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("A", "F"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("A", "G"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("B", "C"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("B", "D"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("B", "F"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("B", "G"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("B", "A"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("D", "F"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("D", "C"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("E", "F"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("E", "G"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("E", "C"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("E", "D"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("F", "B"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("G", "F"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Bm", "C"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Bm", "F"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Cm", "E"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Cm", "A"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Cm", "B"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Dm", "B"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Em", "F"), '^');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Fm", "A"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Fm", "B"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Fm", "D"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Fm", "E"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Gm", "B"), '_');
-                keyToNoteDictionary.Add(new Tuple<string, string>("Gm", "E"), '_');
-            #endregion
-
             ConvertedObject virtualObject = new ConvertedObject();
 
             StringBuilder sb = new StringBuilder();
@@ -98,9 +65,7 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
                 
                 foreach (string note in notes)
                 {
-                    char val, modifier = '\0';
-
-                    keyToNoteDictionary.TryGetValue(new Tuple<string, string>(abcObject.Key, note.ToUpper()), out modifier);
+                    char val, modifier = GetModifier(abcObject.Key, note.ToUpper());
 
                     if (noteToVirtualDictionary.TryGetValue(note, out val))
                     {
@@ -145,8 +110,7 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
 
                                 if (curNote != '\0')
                                 {
-                                    modifier = '\0';
-                                    keyToNoteDictionary.TryGetValue(new Tuple<string, string>(abcObject.Key, char.ToUpper(bit).ToString()), out modifier);
+                                    modifier = GetModifier(abcObject.Key, char.ToUpper(bit).ToString());
                                     if (modifier != '\0')
                                     {
                                         curNote = GetUpper(curNote);
@@ -223,6 +187,99 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
             }
             virtualObject.Notes = sb.ToString();
             return virtualObject;
+        }
+
+        private static char GetModifier(string key, string note)
+        {
+            switch (key)
+            {
+                case "A":
+                    if (note == "C" || note == "F" || note == "G")
+                    {
+                        return '^';
+                    }
+                    break;
+
+                case "B":
+                    if (note == "C" || note == "D" || note == "F" || note == "G" || note == "A")
+                    {
+                        return '^';
+                    }
+                    break;
+
+                case "D":
+                    if (note == "F" || note == "C")
+                    {
+                        return '^';
+                    }
+                    break;
+
+                case "E":
+                    if (note == "F" || note == "G" || note == "C" || note == "D")
+                    {
+                        return '^';
+                    }
+                    break;
+
+                case "F":
+                    if (note == "B")
+                    {
+                        return '_';
+                    }
+                    break;
+
+                case "G":
+                    if (note == "F")
+                    {
+                        return '^';
+                    }
+                    break;
+
+                case "Bm":
+                    if (note == "C" || note == "F")
+                    {
+                        return '^';
+                    }
+                    break;
+
+                case "Cm":
+                    if (note == "E" || note == "A" || note == "B")
+                    {
+                        return '_';
+                    }
+                    break;
+
+                case "Dm":
+                    if (note == "B")
+                    {
+                        return '_';
+                    }
+                    break;
+
+                case "Em":
+                    if (note == "F")
+                    {
+                        return '^';
+                    }
+                    break;
+
+                case "Fm":
+                    if (note == "A" || note == "B" || note == "D" || note == "E")
+                    {
+                        return '_';
+                    }
+                    break;
+
+                case "Gm":
+                    if (note == "B" || note == "E")
+                    {
+                        return '_';
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return '\0';
         }
 
         private static char GetUpper(char character)

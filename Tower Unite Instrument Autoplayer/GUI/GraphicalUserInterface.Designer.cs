@@ -97,6 +97,14 @@
             this.HelpToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.DocumentationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AutoplayerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MusicPieceListBox = new System.Windows.Forms.ListBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -111,6 +119,7 @@
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomBreakTimeBox)).BeginInit();
+            this.MusicPiecesTabButton.SuspendLayout();
             this.PlayTogetherTabButton.SuspendLayout();
             this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -163,7 +172,7 @@
             this.ErrorTextBox.Location = new System.Drawing.Point(0, 297);
             this.ErrorTextBox.Name = "ErrorTextBox";
             this.ErrorTextBox.ReadOnly = true;
-            this.ErrorTextBox.Size = new System.Drawing.Size(541, 51);
+            this.ErrorTextBox.Size = new System.Drawing.Size(541, 57);
             this.ErrorTextBox.TabIndex = 9;
             this.ErrorTextBox.Text = "ERROR: Something went wrong!";
             // 
@@ -725,6 +734,14 @@
             // 
             // MusicPiecesTabButton
             // 
+            this.MusicPiecesTabButton.Controls.Add(this.label14);
+            this.MusicPiecesTabButton.Controls.Add(this.label13);
+            this.MusicPiecesTabButton.Controls.Add(this.label12);
+            this.MusicPiecesTabButton.Controls.Add(this.textBox1);
+            this.MusicPiecesTabButton.Controls.Add(this.richTextBox1);
+            this.MusicPiecesTabButton.Controls.Add(this.button2);
+            this.MusicPiecesTabButton.Controls.Add(this.button1);
+            this.MusicPiecesTabButton.Controls.Add(this.MusicPieceListBox);
             this.MusicPiecesTabButton.Location = new System.Drawing.Point(4, 22);
             this.MusicPiecesTabButton.Name = "MusicPiecesTabButton";
             this.MusicPiecesTabButton.Size = new System.Drawing.Size(635, 354);
@@ -852,6 +869,81 @@
             this.AutoplayerMenuItem.Text = "About the Autoplayer";
             this.AutoplayerMenuItem.Click += new System.EventHandler(this.AutoplayerMenuItem_Click);
             // 
+            // MusicPieceListBox
+            // 
+            this.MusicPieceListBox.FormattingEnabled = true;
+            this.MusicPieceListBox.Location = new System.Drawing.Point(3, 3);
+            this.MusicPieceListBox.Name = "MusicPieceListBox";
+            this.MusicPieceListBox.Size = new System.Drawing.Size(120, 342);
+            this.MusicPieceListBox.TabIndex = 0;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(129, 29);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "New Piece";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(129, 58);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Save";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.BackColor = System.Drawing.SystemColors.Window;
+            this.richTextBox1.Location = new System.Drawing.Point(210, 0);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(425, 354);
+            this.richTextBox1.TabIndex = 3;
+            this.richTextBox1.Text = "";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(129, 3);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(75, 20);
+            this.textBox1.TabIndex = 4;
+            this.textBox1.Text = "Piece Name";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(309, 148);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(222, 39);
+            this.label12.TabIndex = 5;
+            this.label12.Text = "Note Window";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.Location = new System.Drawing.Point(-4, 128);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(143, 37);
+            this.label13.TabIndex = 6;
+            this.label13.Text = "Piece list";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label14.ForeColor = System.Drawing.Color.Red;
+            this.label14.Location = new System.Drawing.Point(65, 296);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(522, 48);
+            this.label14.TabIndex = 7;
+            this.label14.Text = "This is just a visual representation of how this tab will look like.\r\nIt is NOT f" +
+    "unctional at this time";
+            // 
             // GraphicalUserInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -881,6 +973,8 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CustomBreakTimeBox)).EndInit();
+            this.MusicPiecesTabButton.ResumeLayout(false);
+            this.MusicPiecesTabButton.PerformLayout();
             this.PlayTogetherTabButton.ResumeLayout(false);
             this.PlayTogetherTabButton.PerformLayout();
             this.MenuStrip.ResumeLayout(false);
@@ -963,6 +1057,14 @@
         private System.Windows.Forms.TextBox CustomModifierCharacterBox;
         private System.Windows.Forms.Button AddModifierButton;
         private System.Windows.Forms.TextBox ModifierListBox;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ListBox MusicPieceListBox;
     }
 }
 

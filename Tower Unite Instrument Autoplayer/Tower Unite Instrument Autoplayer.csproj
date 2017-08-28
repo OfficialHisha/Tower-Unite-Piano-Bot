@@ -68,6 +68,7 @@
     <Compile Include="Core\Exceptions\AutoplayerTargetNotFoundException.cs" />
     <Compile Include="Core\Interfaces\INote.cs" />
     <Compile Include="Core\Notes\BreakNote.cs" />
+    <Compile Include="Core\Notes\MusicPiece.cs" />
     <Compile Include="GUI\DocumentationViewer.cs">
       <SubType>Form</SubType>
     </Compile>
