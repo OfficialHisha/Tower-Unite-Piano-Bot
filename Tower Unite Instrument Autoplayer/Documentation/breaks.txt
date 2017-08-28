@@ -1,0 +1,2 @@
+Breaks allow you to make longer (or shorter) pauses between notes.
+Just define a break and use the character in the note creator to use it.

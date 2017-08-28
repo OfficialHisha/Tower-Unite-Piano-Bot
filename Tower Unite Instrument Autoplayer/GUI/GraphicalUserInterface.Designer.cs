@@ -90,14 +90,12 @@
             this.LoadMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ImportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AutoplayerToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.ClearMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StopMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.LoopMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.HelpToolStrip = new System.Windows.Forms.ToolStripMenuItem();
-            this.HelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DocumentationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AutoplayerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.MainTabPage.SuspendLayout();
@@ -772,8 +770,7 @@
             this.SaveMenuItem,
             this.LoadMenuItem,
             this.ExportMenuItem,
-            this.ImportMenuItem,
-            this.ExitMenuItem});
+            this.ImportMenuItem});
             this.FileToolStrip.Name = "FileToolStrip";
             this.FileToolStrip.Size = new System.Drawing.Size(37, 20);
             this.FileToolStrip.Text = "File";
@@ -804,19 +801,12 @@
             this.ImportMenuItem.Text = "Import";
             this.ImportMenuItem.Click += new System.EventHandler(this.ImportMenuItem_Click);
             // 
-            // ExitMenuItem
-            // 
-            this.ExitMenuItem.Name = "ExitMenuItem";
-            this.ExitMenuItem.Size = new System.Drawing.Size(110, 22);
-            this.ExitMenuItem.Text = "Exit";
-            // 
             // AutoplayerToolStrip
             // 
             this.AutoplayerToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ClearMenuItem,
             this.PlayMenuItem,
-            this.StopMenuItem,
-            this.LoopMenuItem});
+            this.StopMenuItem});
             this.AutoplayerToolStrip.Name = "AutoplayerToolStrip";
             this.AutoplayerToolStrip.Size = new System.Drawing.Size(77, 20);
             this.AutoplayerToolStrip.Text = "Autoplayer";
@@ -839,32 +829,28 @@
             this.StopMenuItem.Size = new System.Drawing.Size(151, 22);
             this.StopMenuItem.Text = "Stop Song (F3)";
             // 
-            // LoopMenuItem
-            // 
-            this.LoopMenuItem.Name = "LoopMenuItem";
-            this.LoopMenuItem.Size = new System.Drawing.Size(151, 22);
-            this.LoopMenuItem.Text = "Loop Song";
-            // 
             // HelpToolStrip
             // 
             this.HelpToolStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.HelpMenuItem,
+            this.DocumentationMenuItem,
             this.AutoplayerMenuItem});
             this.HelpToolStrip.Name = "HelpToolStrip";
             this.HelpToolStrip.Size = new System.Drawing.Size(44, 20);
             this.HelpToolStrip.Text = "Help";
             // 
-            // HelpMenuItem
+            // DocumentationMenuItem
             // 
-            this.HelpMenuItem.Name = "HelpMenuItem";
-            this.HelpMenuItem.Size = new System.Drawing.Size(188, 22);
-            this.HelpMenuItem.Text = "Documentation";
+            this.DocumentationMenuItem.Name = "DocumentationMenuItem";
+            this.DocumentationMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.DocumentationMenuItem.Text = "Documentation";
+            this.DocumentationMenuItem.Click += new System.EventHandler(this.DocumentationMenuItem_Click);
             // 
             // AutoplayerMenuItem
             // 
             this.AutoplayerMenuItem.Name = "AutoplayerMenuItem";
             this.AutoplayerMenuItem.Size = new System.Drawing.Size(188, 22);
             this.AutoplayerMenuItem.Text = "About the Autoplayer";
+            this.AutoplayerMenuItem.Click += new System.EventHandler(this.AutoplayerMenuItem_Click);
             // 
             // GraphicalUserInterface
             // 
@@ -965,7 +951,7 @@
         private System.Windows.Forms.ToolStripMenuItem StopMenuItem;
         private System.Windows.Forms.ToolStripMenuItem LoopMenuItem;
         private System.Windows.Forms.ToolStripMenuItem HelpToolStrip;
-        private System.Windows.Forms.ToolStripMenuItem HelpMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem DocumentationMenuItem;
         private System.Windows.Forms.ToolStripMenuItem AutoplayerMenuItem;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.GroupBox groupBox6;

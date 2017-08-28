@@ -1,0 +1,2 @@
+Keybindings allow you to define a set of buttons that will let you play and stop the song from within the application on which you use the software.
+That way you will not need to tab out between the software and the application.

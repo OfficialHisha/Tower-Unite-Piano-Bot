@@ -1,0 +1,9 @@
+breaks,
+custom_notes,
+default_breaks,
+export_import,
+key_bindings,
+main_note_window,
+modifiers,
+music_pieces,
+save_load

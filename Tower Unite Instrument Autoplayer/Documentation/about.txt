@@ -1,0 +1,4 @@
+Tower Unite Instrument Autoplayer is developed by Matias Jensen.
+
+This program gives players the ability to play songs in games that supports virtual pianos.
+The software is primarily made for Tower Unite and therefore it is not guarantied to work in any other case but it very likely will.

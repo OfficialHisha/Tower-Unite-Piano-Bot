@@ -698,5 +698,17 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
                 isLoading = false;
             }
         }
+
+        private void DocumentationMenuItem_Click(object sender, EventArgs e)
+        {
+            DocumentationViewer documentationForm = new DocumentationViewer();
+
+            documentationForm.Show();
+        }
+
+        private void AutoplayerMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(Properties.Resources.about);
+        }
     }
 }
