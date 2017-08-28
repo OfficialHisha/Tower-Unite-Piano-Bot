@@ -58,128 +58,82 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
 
             StringBuilder sb = new StringBuilder();
             virtualObject.Speed = (int)(MathExtension.FractionToDouble(abcObject.NoteLength) * 1000);
-            
+
             foreach (string line in abcObject.Notes)
             {
-                string[] notes = line.Split(' ');
-                
-                foreach (string note in notes)
-                {
-                    char val, modifier = GetModifier(abcObject.Key, note.ToUpper());
+                char[] noteBits = line.ToCharArray();
+                string number = "";
+                bool isModifier = false;
+                bool isBreak = false;
+                char curNote = '\0';
 
-                    if (noteToVirtualDictionary.TryGetValue(note, out val))
+
+                foreach (char bit in noteBits)
+                {
+                    if (isModifier)
                     {
-                        if (modifier != '\0')
+                        if (char.IsNumber(bit))
                         {
-                            sb.Append(GetUpper(val));
+                            int num;
+                            if (int.TryParse(bit.ToString(), out num))
+                            {
+                                number += num;
+                            }
                         }
                         else
                         {
-                            sb.Append(val);
+                            sb = AddNote(virtualObject, sb, number, curNote, true);
+                            number = "";
+                            isModifier = false;
+                            isBreak = false;
+                            curNote = '\0';
                         }
+                    }
+
+
+
+                    if (curNote != '\0' || isBreak)
+                    {
+                        int num;
+                        if (int.TryParse(bit.ToString(), out num))
+                        {
+                            number += num;
+                            continue;
+                        }
+                        else if (bit == '/')
+                        {
+                            isModifier = true;
+                            continue;
+                        }
+
+                        if (isBreak)
+                        {
+                            sb = AddBreak(virtualObject, sb, number);
+                        }
+                        else
+                        {
+                            sb = AddNote(virtualObject, sb, number, curNote, false);
+                        }
+
+                        number = "";
+                        isModifier = false;
+                        isBreak = false;
+                        curNote = '\0';
+                    }
+                    else if (bit == 'z')
+                    {
+                        isBreak = true;
                     }
                     else
                     {
-                        char[] noteBits = note.ToCharArray();
-                        string number = "";
-                        bool isModifier = false;
-                        bool isBreak = false;
-
-                        char curNote = '\0';
-                        foreach (char bit in noteBits)
-                        {
-                            if (curNote != '\0')
-                            {
-                                int num;
-                                if (int.TryParse(bit.ToString(), out num))
-                                {
-                                    number += num;
-                                }
-                                else if (bit == '/')
-                                {
-                                    isModifier = true;
-                                }
-                                else if (bit == 'z')
-                                {
-                                    isBreak = true;
-                                }
-                            }
-                            else
-                            {
-                                noteToVirtualDictionary.TryGetValue(bit.ToString(), out curNote);
-
-                                if (curNote != '\0')
-                                {
-                                    modifier = GetModifier(abcObject.Key, char.ToUpper(bit).ToString());
-                                    if (modifier != '\0')
-                                    {
-                                        curNote = GetUpper(curNote);
-                                    }
-                                }
-                            }
-                        }
-
-                        if (number == "")
-                        {
-                            if (isBreak)
-                            {
-                                number = "1";
-                            }
-                            else
-                            {
-                                number = "2";
-                            }
-                        }
+                        noteToVirtualDictionary.TryGetValue(bit.ToString(), out curNote);
 
                         if (curNote != '\0')
                         {
-                            int actualNumber;
-                            if (int.TryParse(number, out actualNumber))
+                            char modifier = GetModifier(abcObject.Key, char.ToUpper(bit).ToString());
+                            if (modifier != '\0')
                             {
-                                int speed = isModifier ? virtualObject.Speed / actualNumber : virtualObject.Speed * (actualNumber - 1);
-                                if (!virtualObject.NoteModifiers.ContainsKey(speed))
-                                {
-                                    foreach (char character in commonDelayCharacters)
-                                    {
-                                        if (!virtualObject.NoteModifiers.ContainsValue(character) && !virtualObject.Breaks.ContainsKey(character))
-                                        {
-                                            virtualObject.NoteModifiers.Add(speed, character);
-                                            sb.Append(curNote + character.ToString());
-                                            break;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    sb.Append(curNote + virtualObject.NoteModifiers[speed].ToString());
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (isBreak)
-                            {
-                                int actualNumber;
-                                if (int.TryParse(number, out actualNumber))
-                                {
-                                    actualNumber *= virtualObject.Speed;
-                                    if (!virtualObject.NoteModifiers.ContainsKey(actualNumber))
-                                    {
-                                        foreach (char character in commonDelayCharacters)
-                                        {
-                                            if (!virtualObject.NoteModifiers.ContainsValue(character) && !virtualObject.Breaks.ContainsKey(character))
-                                            {
-                                                virtualObject.Breaks.Add(actualNumber, character);
-                                                sb.Append(character.ToString());
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        sb.Append(virtualObject.Breaks[actualNumber].ToString());
-                                    }
-                                }
+                                curNote = GetUpper(curNote);
                             }
                         }
                     }
@@ -187,6 +141,75 @@ namespace Tower_Unite_Instrument_Autoplayer.ABC
             }
             virtualObject.Notes = sb.ToString();
             return virtualObject;
+        }
+
+        private static StringBuilder AddBreak(ConvertedObject obj, StringBuilder sb, string number)
+        {
+            if (number == "")
+            {
+                number = "1";
+            }
+
+            int actualNumber;
+            if (int.TryParse(number, out actualNumber))
+            {
+                actualNumber *= obj.Speed;
+                if (!obj.Breaks.ContainsKey(actualNumber))
+                {
+                    foreach (char character in commonDelayCharacters)
+                    {
+                        if (!obj.NoteModifiers.ContainsValue(character) && !obj.Breaks.ContainsValue(character))
+                        {
+                            obj.Breaks.Add(actualNumber, character);
+                            sb.Append(character.ToString());
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    sb.Append(obj.Breaks[actualNumber].ToString());
+                }
+            }
+            return sb;
+        }
+
+        private static StringBuilder AddNote(ConvertedObject obj, StringBuilder sb, string number, char note, bool modifier)
+        {
+            if (number == "")
+            {
+                if (modifier)
+                {
+                    number = "2";
+                }
+                else
+                {
+                    number = "1";
+                }
+            }
+
+            int actualNumber;
+            if (int.TryParse(number, out actualNumber))
+            {
+                int speed = modifier ? obj.Speed / actualNumber : obj.Speed * actualNumber;
+                if (!obj.NoteModifiers.ContainsKey(speed))
+                {
+                    foreach (char character in commonDelayCharacters)
+                    {
+                        if (!obj.NoteModifiers.ContainsValue(character) && !obj.Breaks.ContainsValue(character))
+                        {
+                            obj.NoteModifiers.Add(speed, character);
+                            sb.Append(note + character.ToString());
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    sb.Append(note + obj.NoteModifiers[speed].ToString());
+                }
+            }
+            return sb;
         }
 
         private static char GetModifier(string key, string note)

@@ -226,11 +226,11 @@ namespace Tower_Unite_Instrument_Autoplayer.Core
                 {
                     if (modifier < NormalSpeed)
                     {
-                        ((Note)Song[Song.Count-1]).NoteLength -= Math.Abs(modifier);
+                        ((Note)Song[Song.Count-1]).NoteLength = Math.Abs(modifier);
                     }
                     else
                     {
-                        ((Note)Song[Song.Count-1]).NoteLength += Math.Abs(modifier);
+                        ((Note)Song[Song.Count-1]).NoteLength = Math.Abs(modifier);
                     }
                 }
             }
