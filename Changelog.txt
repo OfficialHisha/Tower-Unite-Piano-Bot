@@ -47,8 +47,9 @@ Fixed space not working
 Fixed the remaining black keys
 Fixed multi notes for the new system
 
-2.2c (Unreleased)
+2.2c
 Fixed note spam when stopping playback with keybind
 
 3.0 (Development branch)
 Added support for importing ABC files
+Migrated to .NET Core

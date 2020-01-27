@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Tower_Unite_Instrument_Player_Old_GUI</RootNamespace>
+    <UseWindowsForms>true</UseWindowsForms>
+    <StartupObject>Tower_Unite_Instrument_Autoplayer.Program</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Dependencies.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Dependencies.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Documentation\Speeds.txt" />
+    <None Include="Documentation\Test File.txt" />
+    <None Include="Documentation\_include" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tower Unite Instrument Player\Tower Unite Instrument Player.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ABCUtility">
+      <HintPath>dll\ABCUtility.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="GUI\DocumentationViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="GUI\DocumentationViewer.Designer.cs">
+      <DependentUpon>DocumentationViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Update="GUI\GraphicalUserInterface.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="GUI\GraphicalUserInterface.Designer.cs">
+      <DependentUpon>GraphicalUserInterface.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="GUI\DocumentationViewer.resx">
+      <DependentUpon>DocumentationViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="GUI\GraphicalUserInterface.resx">
+      <DependentUpon>GraphicalUserInterface.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
