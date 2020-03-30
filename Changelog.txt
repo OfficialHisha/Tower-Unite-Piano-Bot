@@ -1,14 +1,14 @@
 ﻿1.0
 Initial Release.
 
-1.1
+1.1.0
 GUI: Redesign.
 Added save and load features.
 
 1.1.1
 Fixed a bug where special characters would make your in-game character leave the piano.
 
-1.2
+1.2.0
 Added looping.
 Possibly added GMT support.
 
@@ -19,37 +19,39 @@ GUI: Moved delay settings to settings tab.
 
 1.2.2 (Final version of legacy, source code on Legacy branch on github)
 Fixed playback for drums (Whoops)
-Added custom delay options. For ultimate costumization!
+Added custom delay options. For ultimate customization!
 New save format, backwards compatible.
 
-2.0
+2.0.0
 Started over with a much better code design backend as well as a nicer GUI
 
 2.0.1
 Fixed speed change notes
 Removed delay time lower limit
 
-2.1
+2.1.0
 Initial version of the custom notes functionality
 Fixed a problem that could cause the program to make your computer press keys continously even when closing the program (As a side effect, this also allows users to play multiple songs should that be wanted)
 Errors will now appear in red text under the note field rather than the annoying popup!
-A major oversight in the save system has been fixed (Of cause with backwards compatibility)
+A major oversight in the save system has been fixed (Of course with backwards compatibility)
 
-2.2
+2.2.0
 Fixed gmod compatibility
 Finally got black notes to work!
 
-2.2a
+2.2.1 (2.2a)
 Fixed save and load
 
-2.2b
+2.2.2 (2.2b)
 Fixed space not working
 Fixed the remaining black keys
 Fixed multi notes for the new system
 
-2.2c
+2.2.3 (2.2c)
 Fixed note spam when stopping playback with keybind
 
-3.0 (Development branch)
+3.0.0 (Development branch)
 Added support for importing ABC files
 Migrated to .NET Core
+Redesigned the GUI
+New save format (old saves will be converted on load)

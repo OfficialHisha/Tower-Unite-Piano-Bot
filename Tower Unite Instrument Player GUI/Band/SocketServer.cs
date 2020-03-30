@@ -7,9 +7,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Tower_Unite_Instrument_Player.Exceptions;
+using Tower_Unite_Instrument_Player_GUI.Exceptions;
 
-namespace Tower_Unite_Instrument_Player.Band
+namespace Tower_Unite_Instrument_Player_GUI.Band
 {
     static class BandServer
     {
@@ -17,12 +17,12 @@ namespace Tower_Unite_Instrument_Player.Band
         static bool _enabled = false;
 
         // Threat signal used for accepting connections
-        private static ManualResetEvent _allDone = new ManualResetEvent(false);
+        static ManualResetEvent _allDone = new ManualResetEvent(false);
 
         public static void Start(string ipAddress, int port)
         {
             if (IPAddress.TryParse(ipAddress, out IPAddress address))
-                throw new AutoplayerBandServerException("The provided IP Address is invalid");
+                throw new BandServerException("The provided IP Address is invalid");
 
             TcpListener listener = new TcpListener(address, port);
 

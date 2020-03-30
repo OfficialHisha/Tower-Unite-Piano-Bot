@@ -10,5 +10,6 @@
         /// This method is invoked when the note is reached in the song
         /// </summary>
         void Play();
+        void Stop();
     }
 }

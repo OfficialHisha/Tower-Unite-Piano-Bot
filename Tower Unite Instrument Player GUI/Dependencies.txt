@@ -1,2 +1,3 @@
 ﻿Nuget:
 MaterialDesignThemes
+NHotkey.Wpf

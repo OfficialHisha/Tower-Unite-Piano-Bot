@@ -24,5 +24,10 @@ namespace Tower_Unite_Instrument_Player.Notes
         {
             Thread.Sleep(Time);
         }
+
+        public void Stop()
+        {
+
+        }
     }
 }

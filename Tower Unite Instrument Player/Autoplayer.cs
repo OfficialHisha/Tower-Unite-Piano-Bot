@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Tower_Unite_Instrument_Player.Exceptions;
 using Tower_Unite_Instrument_Player.Notes;
 
@@ -23,7 +22,7 @@ namespace Tower_Unite_Instrument_Player
 
         #region Field and property declarations
         //This can be accessed to get the version text
-        public static string Version { get; private set; } = "Version: 3.0";
+        public static string Version { get; private set; } = "3.0.0";
         //This will be used to define compatibility of save files between versions
         public static List<string> SupportedVersionsSave { get; } = new List<string>() { "Version: 2.1", "Version: 2.2a", "Version: 2.2b", "Version: 2.2c", "Version: 3.0"};
         
@@ -311,8 +310,9 @@ namespace Tower_Unite_Instrument_Player
         /// </summary>
         public static bool CheckBreakExists(char character)
         {
-            return (Breaks.ContainsKey(character));
+            return Breaks.ContainsKey(character);
         }
+
         /// <summary>
         /// This method will add a break to the list of breaks
         /// </summary>
@@ -327,6 +327,18 @@ namespace Tower_Unite_Instrument_Player
                 throw new AutoplayerCustomException("Trying to add already existing break");
             }
         }
+
+        /// <summary>
+        /// This method will add a list of breaks to the list of breaks
+        /// </summary>
+        public static void AddBreaks(Dictionary<char, int> breaks)
+        {
+            foreach (KeyValuePair<char, int> @break in breaks)
+            {
+                AddBreak(@break.Key, @break.Value);
+            }
+        }
+
         /// <summary>
         /// This method will remove a break from the list of breaks
         /// </summary>
@@ -372,7 +384,7 @@ namespace Tower_Unite_Instrument_Player
         /// </summary>
         public static bool CheckModifierExists(char character)
         {
-            return (NoteModifiers.ContainsKey(character));
+            return NoteModifiers.ContainsKey(character);
         }
         /// <summary>
         /// This method will add a modifier to the list of modifiers
@@ -547,14 +559,7 @@ namespace Tower_Unite_Instrument_Player
                     //The foreach loop here is to avoid any keys getting stuck when the song is stopped by the stop keybinding
                     foreach (INote n in Song)
                     {
-                        if (n is Note)
-                        {
-                            ((Note)n).Stop();
-                        }
-                        if (n is MultiNote)
-                        {
-                            ((MultiNote)n).Stop();
-                        }
+                        n.Stop();
                     }
                     SongWasStopped?.Invoke();
                 }
@@ -573,279 +578,5 @@ namespace Tower_Unite_Instrument_Player
         {
             Stop = true;
         }
-
-        #region Save & Load
-        /// <summary>
-        /// This method will save the song and its settings to a file at the "path" variable's destination
-        /// </summary>
-        public static void SaveSong(string path)
-        {
-            StreamWriter sw = new StreamWriter(path);
-            sw.WriteLine(Version);
-            sw.WriteLine("DELAYS");
-            sw.WriteLine(Breaks.Count);
-            if (Breaks.Count != 0)
-            {
-                foreach (KeyValuePair<char, int> SongBreak in Breaks)
-                {
-                    sw.WriteLine(SongBreak.Key);
-                    sw.WriteLine(SongBreak.Value);
-                }
-            }
-            sw.WriteLine("CUSTOM NOTES");
-            sw.WriteLine(CustomNotes.Count);
-            if (CustomNotes.Count != 0)
-            {
-                foreach (KeyValuePair<Note, Note> note in CustomNotes)
-                {
-                    sw.WriteLine(note.Value.Character);
-                    sw.WriteLine(note.Key.Character);
-                }
-            }
-            sw.WriteLine("SPEEDS");
-            sw.WriteLine(NormalSpeed);
-            sw.WriteLine(FastSpeed);
-            sw.WriteLine("NOTES");
-            sw.WriteLine(Song.Count);
-            if (Song.Count != 0)
-            {
-                bool isFastSpeedOn = false;
-                foreach (INote note in Song)
-                {
-                    if(note is BreakNote)
-                    {
-                        sw.Write(((BreakNote)note).Character);
-                    }
-                    else if (note is Note)
-                    {
-                        if (((Note)note).NoteLength == FastSpeed && !isFastSpeedOn)
-                        {
-                            sw.Write("{");
-                            isFastSpeedOn = true;
-                        }
-                        else if (((Note)note).NoteLength == NormalSpeed && isFastSpeedOn)
-                        {
-                            sw.Write("}");
-                            isFastSpeedOn = false;
-                        }
-                        sw.Write(((Note)note).Character);
-                    }
-                    else if (note is MultiNote)
-                    {
-                        sw.Write("[");
-                        foreach (Note multiNote in ((MultiNote)note).Notes)
-                        {
-                            sw.Write(multiNote.Character);
-                        }
-                        sw.Write("]");
-                    }
-                }
-            }
-            sw.Dispose();
-            sw.Close();
-            SaveCompleted?.Invoke();
-        }
-        /// <summary>
-        /// This method will load a song and its settings from a file at the "path" variable's destination
-        /// This loading method handles all previous save formats for backwards compatibility
-        /// </summary>
-        public static void LoadSong(string path)
-        {
-            Song.Clear();
-            bool errorWhileLoading = true;
-            StreamReader sr = new StreamReader(path);
-            string firstLine = sr.ReadLine();
-
-            #region 2.1+ save format
-            if (SupportedVersionsSave.Contains(firstLine))
-            {
-                if(sr.ReadLine() == "DELAYS")
-                {
-                    int delayCount = 0;
-                    if (int.TryParse(sr.ReadLine(), out delayCount) && delayCount > 0)
-                    {
-                        for (int i = 0; i < delayCount; i++)
-                        {
-                            char delayChar;
-                            int delayTime = 0;
-                            if (char.TryParse(sr.ReadLine(), out delayChar))
-                            {
-                                if (int.TryParse(sr.ReadLine(), out delayTime))
-                                {
-                                    Breaks.Add(delayChar, delayTime);
-                                }
-                            }
-                        }
-                    }
-                }
-                if(sr.ReadLine() == "CUSTOM NOTES")
-                {
-                    int noteCount = 0;
-                    if (int.TryParse(sr.ReadLine(), out noteCount) && noteCount > 0)
-                    {
-                        for (int i = 0; i < noteCount; i++)
-                        {
-                            char origNoteChar;
-                            char replaceNoteChar;
-                            if (char.TryParse(sr.ReadLine(), out origNoteChar))
-                            {
-                                if (char.TryParse(sr.ReadLine(), out replaceNoteChar))
-                                {
-                                    WindowsInput.Native.VirtualKeyCode vkOld;
-                                    WindowsInput.Native.VirtualKeyCode vkNew;
-                                    try
-                                    {
-                                        VirtualDictionary.TryGetValue(origNoteChar, out vkOld);
-                                        VirtualDictionary.TryGetValue(replaceNoteChar, out vkNew);
-
-                                        if (vkOld == 0 || vkNew == 0)
-                                        {
-                                            return;
-                                        }
-                                    }
-                                    catch (ArgumentNullException)
-                                    {
-                                        return;
-                                    }
-
-                                    CustomNotes.Add(new Note(origNoteChar, vkOld, char.IsUpper(origNoteChar)), new Note(replaceNoteChar, vkNew, char.IsUpper(replaceNoteChar)));
-                                }
-                            }
-                        }
-                    }
-                }
-                if(sr.ReadLine() == "SPEEDS")
-                {
-                    int normalSpeed, fastSpeed;
-                    int.TryParse(sr.ReadLine(), out normalSpeed);
-                    int.TryParse(sr.ReadLine(), out fastSpeed);
-                    NormalSpeed = normalSpeed;
-                    FastSpeed = fastSpeed;
-                }
-                if (sr.ReadLine() == "NOTES")
-                {
-                    int noteCount = 0;
-                    if (int.TryParse(sr.ReadLine(), out noteCount) && noteCount > 0)
-                    {
-                        AddNotesFromString(sr.ReadToEnd());
-                    }
-                    errorWhileLoading = false;
-                }
-            }
-            #endregion
-            #region 2.0 save format (for backwards compatibility)
-            if (firstLine == "DELAYS")
-            {
-                int delayCount = 0;
-                if (int.TryParse(sr.ReadLine(), out delayCount) && delayCount > 0)
-                {
-                    for (int i = 0; i < delayCount; i++)
-                    {
-                        char delayChar;
-                        int delayTime = 0;
-                        if (char.TryParse(sr.ReadLine(), out delayChar))
-                        {
-                            if (int.TryParse(sr.ReadLine(), out delayTime))
-                            {
-                                Breaks.Add(delayChar, delayTime);
-                            }
-                        }
-                    }
-                }
-                if (sr.ReadLine() == "NOTES")
-                {
-                    int noteCount = 0;
-                    if (int.TryParse(sr.ReadLine(), out noteCount) && noteCount > 0)
-                    {
-                        AddNotesFromString(sr.ReadToEnd());
-                    }
-                    errorWhileLoading = false;
-                }
-            }
-            #endregion
-            #region 1.2.2 save format (For backwards compatibility)
-            else if (firstLine == "CUSTOM DELAYS")
-            {
-                int delayCount = 0;
-                if (int.TryParse(sr.ReadLine(), out delayCount))
-                {
-                    if (sr.ReadLine() == "NORMAL DELAY")
-                    {
-                        if (int.TryParse(sr.ReadLine(), out delayAtNormalSpeed))
-                        {
-                            Breaks.Add(' ', NormalSpeed);
-                            if (sr.ReadLine() == "FAST DELAY")
-                            {
-                                if (int.TryParse(sr.ReadLine(), out delayAtFastSpeed))
-                                {
-                                    if (delayCount != 0)
-                                    {
-                                        for (int i = 0; i < delayCount; i++)
-                                        {
-                                            int customDelayIndex = 0;
-                                            int customDelayTime = 0;
-                                            char customDelayChar;
-
-                                            if (sr.ReadLine() == "CUSTOM DELAY INDEX")
-                                            {
-                                                if (int.TryParse(sr.ReadLine(), out customDelayIndex))
-                                                {
-                                                    if (sr.ReadLine() == "CUSTOM DELAY CHARACTER")
-                                                    {
-                                                        if (char.TryParse(sr.ReadLine(), out customDelayChar))
-                                                        {
-                                                            if (sr.ReadLine() == "CUSTOM DELAY TIME")
-                                                            {
-                                                                if (int.TryParse(sr.ReadLine(), out customDelayTime))
-                                                                {
-                                                                    Breaks.Add(customDelayChar, customDelayTime);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (sr.ReadLine() == "NOTES")
-                                    {
-                                        AddNotesFromString(sr.ReadToEnd());
-                                        errorWhileLoading = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            #endregion
-            #region 1.0 save format (For backwards compatibility)
-            else if (firstLine == "NORMAL DELAY")
-            {
-                if (int.TryParse(sr.ReadLine(), out delayAtNormalSpeed))
-                {
-                    if (sr.ReadLine() == "FAST DELAY")
-                    {
-                        if (int.TryParse(sr.ReadLine(), out delayAtFastSpeed))
-                        {
-                            if (sr.ReadLine() == "NOTES")
-                            {
-                                AddNotesFromString(sr.ReadToEnd());
-                                errorWhileLoading = false;
-                            }
-                        }
-                    }
-                }
-            }
-            #endregion
-            sr.Close();
-            if (errorWhileLoading)
-            {
-                LoadFailed?.Invoke();
-                throw new AutoplayerLoadFailedException("No compatible save format was found!");
-            }
-            LoadCompleted?.Invoke();
-        }
-        #endregion
     }
 }
