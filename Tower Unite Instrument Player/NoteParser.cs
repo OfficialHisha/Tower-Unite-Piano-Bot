@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Tower_Unite_Instrument_Player.Exceptions;
 using Tower_Unite_Instrument_Player.Notes;
 using WindowsInput.Native;
@@ -87,12 +88,14 @@ namespace Tower_Unite_Instrument_Player
             ')',
         };
 
-        public INote[] ParseNotes(string noteString, Dictionary<char, int> breaks)
+        public INote[] ParseNotes(string noteString, Dictionary<char, int> breaks, Dictionary<string, INote[]> musicPieces)
         {
             List<INote> notes = new List<INote>();
             int cursor = -1;
             int multinoteStartPos = -1;
             int fastnoteStartPos = -1;
+            int musicPieceStartPos = -1;
+            string musicPieceCandidate = "";
             bool multinoteIsHighNote = false;
             List<Note> multinoteBuffer = new List<Note>();
 
@@ -111,9 +114,33 @@ namespace Tower_Unite_Instrument_Player
 
                 switch (note)
                 {
+                    case ':':// Music piece logic
+                        if (musicPieceStartPos != -1)
+                        {
+                            // End of music piece
+                            if (!musicPieces.ContainsKey(musicPieceCandidate))
+                                throw new AutoplayerException($"Error at position '{cursor}': Music piece '{musicPieceCandidate}' not defined");
+
+                            notes.AddRange(musicPieces[musicPieceCandidate]);
+
+                            musicPieceStartPos = -1;
+                        }
+                        else
+                        {
+                            // Start of music piece
+                            if (multinoteStartPos != -1)
+                                throw new AutoplayerException($"Error at position '{cursor}': A music piece call cannot be defined whithin a mutinote definition! Multinote starts at position '{multinoteStartPos}'");
+                            if (fastnoteStartPos != -1)
+                                throw new AutoplayerException($"Error at position '{cursor}': A music piece call cannot be defined whithin a fast speed section! Fast speed section starts at position '{fastnoteStartPos}'");
+
+                            musicPieceStartPos = cursor;
+                        }
+                        break;
                     case '[':// Multinote start
                         if (multinoteStartPos != -1)
                             throw new AutoplayerException($"Error at position '{cursor}': A multinote cannot be defined whithin a multinote definition! Outer multinote starts at position '{multinoteStartPos}'");
+                        if (musicPieceStartPos != -1)
+                            throw new AutoplayerException($"Error at position '{cursor}': A multinote cannot be defined whithin a music piece call! Music piece call starts at position '{musicPieceStartPos}'");
 
                         multinoteBuffer = new List<Note>();
                         multinoteStartPos = cursor;
@@ -134,7 +161,9 @@ namespace Tower_Unite_Instrument_Player
                         if (multinoteStartPos != -1)
                             throw new AutoplayerException($"Error at position '{cursor}': A fast speed section cannot be performed whithin a multinote definition! Multinote starts at position '{multinoteStartPos}'");
                         if (fastnoteStartPos != -1)
-                            throw new AutoplayerException($"Error at position '{cursor}': A fast speed section cannot be defined within a fast speed section! Outer section starts at position '{fastnoteStartPos}'");
+                            throw new AutoplayerException($"Error at position '{cursor}': A fast speed section cannot be defined within a fast speed section! Outer fast speed section starts at position '{fastnoteStartPos}'");
+                        if (musicPieceStartPos != -1)
+                            throw new AutoplayerException($"Error at position '{cursor}': A fast speed section cannot be defined within a music piece call! Music piece call starts at position '{musicPieceStartPos}'");
 
                         fastnoteStartPos = cursor;
                         break;
@@ -168,7 +197,17 @@ namespace Tower_Unite_Instrument_Player
                         //This will check if the note is an uppercase letter, or if the note is in the list of high notes
                         bool isHighNote = char.IsUpper(note) || r_alwaysHighNotes.Contains(note);
 
-                        if (multinoteStartPos != -1)
+                        if (musicPieceStartPos != -1)
+                        {
+                            musicPieceCandidate += note;
+
+                            if (new Regex("[^a-zA-Z0-9]+").IsMatch(musicPieceCandidate))
+                            {
+                                // Invalid music piece name
+                                throw new AutoplayerException($"Error at position '{cursor}': Invalid music piece name!");
+                            }
+                        }
+                        else if (multinoteStartPos != -1)
                         {
                             if (multinoteBuffer.Count == 0)
                                 multinoteIsHighNote = char.IsUpper(note) || r_alwaysHighNotes.Contains(note);
@@ -194,6 +233,13 @@ namespace Tower_Unite_Instrument_Player
                         break;
                 }
             }
+
+            if (musicPieceStartPos != -1)
+                throw new AutoplayerException($"Music piece call at {musicPieceStartPos} not complete");
+            if (multinoteStartPos != -1)
+                throw new AutoplayerException($"Multinote definition at {multinoteStartPos} not complete");
+            if (fastnoteStartPos != -1)
+                throw new AutoplayerException($"Fast speed section at {fastnoteStartPos} not complete");
 
             return notes.ToArray();
         }

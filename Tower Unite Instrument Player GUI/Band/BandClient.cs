@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using System.Timers;
 using Tower_Unite_Instrument_Player_GUI.Exceptions;
 
 namespace Tower_Unite_Instrument_Player_GUI.Band
@@ -12,6 +13,8 @@ namespace Tower_Unite_Instrument_Player_GUI.Band
 
         static BinaryReader _reader;
         static BinaryWriter _writer;
+
+        static readonly Timer r_timeoutTimer = new Timer(30000);
 
         public static event Action OnServerPlay;
         public static async Task Join(string ipAddress, int port)
@@ -29,6 +32,15 @@ namespace Tower_Unite_Instrument_Player_GUI.Band
 
             Console.WriteLine($"Connected to {ipAddress}:{port}");
 
+            r_timeoutTimer.Elapsed += (timer, args) =>
+            {
+                // It's more than 30 seconds since the server has sent a message or ping
+                // Server is assumed to be unresponsive
+                r_client.Close();
+                Console.WriteLine("Connection to server was lost");
+            };
+            r_timeoutTimer.Start();
+
             _reader = new BinaryReader(r_client.GetStream());
             _writer = new BinaryWriter(r_client.GetStream());
 
@@ -40,20 +52,21 @@ namespace Tower_Unite_Instrument_Player_GUI.Band
             while (r_client.Connected)
             {
                 string message = await Task.Run(() => _reader.ReadString());
-                Console.WriteLine(message);
+                Console.WriteLine($"Received message from server: {message}");
 
-                if (message == "play")
+                switch (message)
                 {
-                    OnServerPlay?.Invoke();
+                    case "ping":
+                        _writer.Write("pong");
+                        r_timeoutTimer.Interval = 30000;
+                        break;
+                    case "play":
+                        OnServerPlay?.Invoke();
+                        break;
+                    default:
+                        break;
                 }
             }
-            Console.WriteLine("Disconnected");
         }
-
-        static void Send(string message)
-        {
-            _writer.Write(message);
-        }
-
     }
 }

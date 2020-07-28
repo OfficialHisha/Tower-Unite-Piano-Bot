@@ -30,27 +30,41 @@ namespace Tower_Unite_Instrument_Player_GUI
         const int c_msPerMinute = 60000;
         const int c_compileTimerCooldown = 2000;
 
+        readonly Brush r_defaultButtonBrush;
+        readonly System.Timers.Timer r_compileTimer = new System.Timers.Timer();
+        readonly System.Timers.Timer r_musicPieceCompileTimer = new System.Timers.Timer();
+
         bool _loop = false;
-        Brush _defaultButtonBrush;
         INote[] song;
         CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         int p_normalDelay = 200;
         int p_fastDelay = 100;
-        int p_delayDuration;
         bool p_hasError = false;
         bool p_canPlay = false;
-        bool p_hasDelaySelected = false;
-        bool p_canAddDelay = false;
         string p_errorMessage = "";
         string p_noteViewText = "Load a song or input notes here..";
+
+        // Flow
+        int p_delayDuration;
+        bool p_hasDelaySelected = false;
+        bool p_canAddDelay = false;
         string p_delayCharacter;
         KeyValuePair<char, int> p_selectedDelay;
         ObservableDictionary<char, int> p_delays = new ObservableDictionary<char, int>();
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        readonly System.Timers.Timer r_compileTimer = new System.Timers.Timer();
+        // Music Pieces
+        bool p_musicPieceHasError = false;
+        bool p_hasMusicPieceSelected = false;
+        bool p_enableMusicPieceSettings = true;
+        string p_musicPieceName = "NewMusicPiece";
+        string p_musicPieceErrorMessage = "";
+        string p_musicPieceNotes = "Notes";
+        KeyValuePair<string, string> p_selectedMusicPiece;
+        ObservableDictionary<string, string> p_musicPieces = new ObservableDictionary<string, string>();
+        readonly Dictionary<string, INote[]> r_musicPiecesDictionary = new Dictionary<string, INote[]>();
 
         public bool HasError
         {
@@ -96,6 +110,315 @@ namespace Tower_Unite_Instrument_Player_GUI
                 OnPropertyChanged("FastDelay");
             }
         }
+
+        public string NoteViewText
+        {
+            get => p_noteViewText;
+            set
+            {
+                if (p_noteViewText == value) return;
+                p_noteViewText = value;
+
+                CompileSong();
+
+                OnPropertyChanged("NoteViewText");
+            }
+        }
+
+        public bool CanPlay
+        {
+            get => p_canPlay;
+            set
+            {
+                if (p_canPlay == value) return;
+                p_canPlay = value;
+                OnPropertyChanged("CanPlay");
+            }
+        }
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            VersionText.Text = $"Version: {Autoplayer.Version}";
+            Autoplayer.SongWasInteruptedByException += ExceptionHandler;
+            r_defaultButtonBrush = LoopButton.Background;
+
+            r_compileTimer.AutoReset = false;
+            r_compileTimer.Elapsed += (timer, args) =>
+            {
+                ResetError();
+
+                if (string.IsNullOrEmpty(NoteViewText)) return;
+
+                try
+                {
+                    NoteParser parser = new NoteParser();
+                    song = parser.ParseNotes(NoteViewText, new Dictionary<char, int>(Delays), r_musicPiecesDictionary);
+                    CanPlay = true;
+                }
+                catch (AutoplayerException ex)
+                {
+                    CanPlay = false;
+                    SetError(ex.Message);
+                }
+            };
+
+            r_musicPieceCompileTimer.AutoReset = false;
+            r_musicPieceCompileTimer.Elapsed += (timer, args) =>
+            {
+                ResetMusicPieceError();
+
+                if (string.IsNullOrEmpty(MusicPieceNotes)) return;
+
+                try
+                {
+                    NoteParser parser = new NoteParser();
+                    if (r_musicPiecesDictionary.ContainsKey(SelectedMusicPiece.Key))
+                        r_musicPiecesDictionary[SelectedMusicPiece.Key] = parser.ParseNotes(MusicPieceNotes, new Dictionary<char, int>(Delays), r_musicPiecesDictionary);
+                    else
+                        r_musicPiecesDictionary.Add(SelectedMusicPiece.Key, parser.ParseNotes(MusicPieceNotes, new Dictionary<char, int>(Delays), r_musicPiecesDictionary));
+                    EnableMusicPieceSettings = true;
+                }
+                catch (AutoplayerException ex)
+                {
+                    EnableMusicPieceSettings = false;
+                    SetMusicPieceError(ex.Message);
+                }
+            };
+
+            try
+            {
+                HotkeyManager.Current.AddOrReplace("Play", Key.F2, ModifierKeys.None, (sender, args) => PlaySong());
+                HotkeyManager.Current.AddOrReplace("Stop", Key.F3, ModifierKeys.None, (sender, args) => _cancellationTokenSource.Cancel());
+                HotkeyManager.Current.AddOrReplace("BandPlay", Key.F4, ModifierKeys.None, (sender, args) =>
+                {
+                    BandServer.Broadcast("play");
+                    PlaySong();
+                });
+            }
+            catch (HotkeyAlreadyRegisteredException)
+            {
+                // Hotkeys are already registered
+                //Application.Current.Shutdown();
+            }
+            
+
+            Application.Current.Exit += (sender, args) =>
+            {
+                // Ensure that we stop any song that may be playing when the application exits
+                _cancellationTokenSource.Cancel();
+            };
+
+            DataContext = this;
+        }
+
+        private void CompileSong()
+        {
+            CanPlay = false;
+
+            r_compileTimer.Interval = c_compileTimerCooldown;
+            r_compileTimer.Start();
+        }
+
+        private async Task PlaySong()
+        {
+            if (!CanPlay) return;
+
+            _cancellationTokenSource.Cancel();
+            await Task.Delay(1000);
+            _cancellationTokenSource = new CancellationTokenSource();
+            await Autoplayer.PlaySong(song, _cancellationTokenSource.Token);
+        }
+
+        private void ExceptionHandler(AutoplayerException exception)
+        {
+            SetError(exception.Message);
+        }
+
+        private void ResetError()
+        {
+            ErrorMessage = "";
+            HasError = false;
+        }
+
+        private void SetError(string errorMsg)
+        {
+            ErrorMessage = $"ERROR: {errorMsg}";
+            HasError = true;
+        }
+
+        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            PlaySong();
+        }
+
+        private void ClearNotesButton_Click(object sender, RoutedEventArgs e)
+        {
+            NoteViewText = "";
+        }
+
+        private void DisallowWhitespaceValidationTextBox(object sender, KeyEventArgs e)
+        {
+            e.Handled = e.Key == Key.Space;
+        }
+
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = string.IsNullOrEmpty(e.Text) || regex.IsMatch(e.Text);
+        }
+
+        private void SingleWordValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^a-zA-Z0-9]+");
+            e.Handled = string.IsNullOrEmpty(e.Text) || regex.IsMatch(e.Text);
+        }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        int BpmToMs(int bpm)
+        {
+            return c_msPerMinute / bpm;
+        }
+
+        #region Save and Load
+
+        private void SaveNotesButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog
+            {
+                //This sets the save dialog to filter on .json files
+                Filter = "JSON|*.json"
+            };
+
+            if (fileDialog.ShowDialog() == true)
+            {
+                JObject json = new JObject
+                {
+                    ["delays"] = JObject.FromObject(Delays),
+                    ["normal_speed"] = NormalDelay,
+                    ["fast_speed"] = FastDelay,
+                    ["notes"] = NoteViewText
+                };
+
+                File.WriteAllText(fileDialog.FileName, json.ToString());
+
+                MessageBox.Show($"Notes saved to '{fileDialog.FileName}'");
+            }
+        }
+
+        private void LoadNotesButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog
+            {
+                //This sets the load dialog to filter on .json and .txt files
+                //.txt files will be converted to .json files when loaded for backwards compatibility
+                Filter = "JSON|*.json|Text File|*.txt"
+            };
+
+            if (fileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    if (fileDialog.FileName.ToLower().EndsWith(".txt"))
+                        fileDialog.FileName = ConvertSaveFormat(fileDialog.FileName);
+
+                    dynamic json = JsonConvert.DeserializeObject(File.ReadAllText(fileDialog.FileName));
+
+                    Delays = JsonConvert.DeserializeObject<ObservableDictionary<char, int>>(json.delays.ToString());
+
+                    NormalDelay = int.Parse(json.normal_speed.ToString());
+                    FastDelay = int.Parse(json.fast_speed.ToString());
+
+                    NoteViewText = json.notes.ToString();
+
+                    MessageBox.Show("Loading completed");
+                }
+                catch (IOException error)
+                {
+                    MessageBox.Show($"Loading failed: {error.Message}");
+                }
+
+            }
+        }
+
+        private string ConvertSaveFormat(string filePath)
+        {
+            JObject json = new JObject();
+
+            using (StreamReader sr = new StreamReader(filePath))
+            {
+                if (sr.ReadLine() == "DELAYS")
+                {
+                    Dictionary<char, int> delayDict = new Dictionary<char, int>();
+
+                    if (int.TryParse(sr.ReadLine(), out int delayCount) && delayCount > 0)
+                    {
+                        for (int i = 0; i < delayCount; i++)
+                        {
+                            if (char.TryParse(sr.ReadLine(), out char delayChar))
+                            {
+                                if (int.TryParse(sr.ReadLine(), out int delayTime))
+                                {
+                                    delayDict.Add(delayChar, delayTime);
+                                }
+                            }
+                        }
+                    }
+
+                    json["delays"] = JObject.FromObject(delayDict);
+                }
+                if (sr.ReadLine() == "SPEEDS")
+                {
+                    int.TryParse(sr.ReadLine(), out int normalSpeed);
+                    int.TryParse(sr.ReadLine(), out int fastSpeed);
+                    json["normal_speed"] = normalSpeed;
+                    json["fast_speed"] = fastSpeed;
+                }
+                if (sr.ReadLine() == "NOTES")
+                {
+                    if (int.TryParse(sr.ReadLine(), out int noteCount) && noteCount > 0)
+                        json["notes"] = sr.ReadToEnd();
+                }
+            }
+
+            string jsonPath = filePath.Replace(".txt", ".json");
+
+            try
+            {
+                File.WriteAllText(jsonPath, json.ToString());
+                return jsonPath;
+            }
+            catch (IOException e)
+            {
+                MessageBox.Show($"Failed to write json file: {e.Message}");
+                return filePath;
+            }
+        }
+
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            _cancellationTokenSource.Cancel();
+        }
+
+        private void LoopButton_Click(object sender, RoutedEventArgs e)
+        {
+            _loop = !_loop;
+            LoopButton.Background = _loop ? Brushes.Green : r_defaultButtonBrush;
+            Autoplayer.Loop = _loop;
+        }
+
+        #endregion
+
+        #region Flow
 
         public KeyValuePair<char, int> SelectedDelay
         {
@@ -168,196 +491,6 @@ namespace Tower_Unite_Instrument_Player_GUI
             }
         }
 
-        private KeyValuePair<string, string> p_selectedMusicPiece;
-
-        public KeyValuePair<string, string> SelectedMusicPiece
-        {
-            get => p_selectedMusicPiece;
-            set
-            {
-                if (p_selectedMusicPiece.Equals(value)) return;
-                p_selectedMusicPiece = value;
-                HasMusicPieceSelected = !string.IsNullOrEmpty(p_selectedMusicPiece.Key);
-                OnPropertyChanged("SelectedMusicPiece");
-            }
-        }
-
-        private bool p_hasMusicPieceSelected;
-
-        public bool HasMusicPieceSelected
-        {
-            get => p_hasMusicPieceSelected;
-            set
-            {
-                if (p_hasMusicPieceSelected == value) return;
-                p_hasMusicPieceSelected = value;
-                OnPropertyChanged("HasMusicPieceSelected");
-         
-            }
-        }
-
-        private string p_musicPieceNotes = "Notes";
-
-        public string MusicPieceNotes
-        {
-            get => p_musicPieceNotes;
-            set
-            {
-                if (p_musicPieceNotes == value) return;
-                p_musicPieceNotes = value;
-                OnPropertyChanged("MusicPieceNotes");
-            }
-        }
-
-        private ObservableDictionary<string, string> p_musicPieces = new ObservableDictionary<string, string>();
-        public ObservableDictionary<string, string> MusicPieces
-        {
-            get => p_musicPieces;
-            set
-            {
-                if (p_musicPieces.Equals(value)) return;
-
-                p_musicPieces = value;
-                OnPropertyChanged("MusicPieces");
-            }
-        }
-
-        public string NoteViewText
-        {
-            get => p_noteViewText;
-            set
-            {
-                if (p_noteViewText == value) return;
-                p_noteViewText = value;
-
-                CompileSong();
-
-                OnPropertyChanged("NoteViewText");
-            }
-        }
-
-        public bool CanPlay
-        {
-            get => p_canPlay;
-            set
-            {
-                if (p_canPlay == value) return;
-                p_canPlay = value;
-                OnPropertyChanged("CanPlay");
-            }
-        }
-
-        public MainWindow()
-        {
-            InitializeComponent();
-            VersionText.Text = $"Version: {Autoplayer.Version}";
-            Autoplayer.SongWasInteruptedByException += ExceptionHandler;
-            _defaultButtonBrush = LoopButton.Background;
-
-            r_compileTimer.AutoReset = false;
-            r_compileTimer.Elapsed += (timer, args) =>
-            {
-                ResetError();
-
-                if (string.IsNullOrEmpty(NoteViewText))
-                    return;
-
-                try
-                {
-                    NoteParser parser = new NoteParser();
-                    song = parser.ParseNotes(NoteViewText, new Dictionary<char, int>(Delays));
-                    CanPlay = true;
-                }
-                catch (AutoplayerException ex)
-                {
-                    CanPlay = false;
-                    SetError(ex.Message);
-                }
-            };
-
-            try
-            {
-                HotkeyManager.Current.AddOrReplace("Play", Key.F2, ModifierKeys.None, (sender, args) => PlaySong());
-                HotkeyManager.Current.AddOrReplace("Stop", Key.F3, ModifierKeys.None, (sender, args) => _cancellationTokenSource.Cancel());
-                HotkeyManager.Current.AddOrReplace("BandPlay", Key.F4, ModifierKeys.None, (sender, args) =>
-                {
-                    BandServer.Broadcast("play");
-                    PlaySong();
-                });
-            }
-            catch (HotkeyAlreadyRegisteredException)
-            {
-                // Hotkeys are already registered
-                //Application.Current.Shutdown();
-            }
-            
-
-            Application.Current.Exit += (sender, args) =>
-            {
-                // Ensure that we stop any song that may be playing when the application exits
-                _cancellationTokenSource.Cancel();
-            };
-
-            DataContext = this;
-        }
-
-        private void CompileSong()
-        {
-            CanPlay = false;
-
-            r_compileTimer.Interval = c_compileTimerCooldown;
-            r_compileTimer.Start();
-        }
-
-        private async Task PlaySong()
-        {
-            if (!CanPlay) return;
-
-            _cancellationTokenSource.Cancel();
-            await Task.Delay(1000);
-            _cancellationTokenSource = new CancellationTokenSource();
-            await Autoplayer.PlaySong(song, _cancellationTokenSource.Token);
-        }
-
-        private void ExceptionHandler(AutoplayerException exception)
-        {
-            SetError(exception.Message);
-        }
-
-        private void ResetError()
-        {
-            ErrorMessage = "";
-            HasError = false;
-        }
-
-        private void SetError(string errorMsg)
-        {
-            ErrorMessage = $"ERROR: {errorMsg}";
-            HasError = true;
-        }
-
-        private void PlayButton_Click(object sender, RoutedEventArgs e)
-        {
-            PlaySong();
-        }
-
-        private void StopButton_Click(object sender, RoutedEventArgs e)
-        {
-            _cancellationTokenSource.Cancel();
-        }
-
-        private void LoopButton_Click(object sender, RoutedEventArgs e)
-        {
-            _loop = !_loop;
-            LoopButton.Background = _loop ? Brushes.Green : _defaultButtonBrush;
-            Autoplayer.Loop = _loop;
-        }
-
-        private void ClearNotesButton_Click(object sender, RoutedEventArgs e)
-        {
-            NoteViewText = "";
-        }
-
         private void AddDelayButton_Click(object sender, RoutedEventArgs e)
         {
             char delayChar = DelayCharacter[0];
@@ -378,14 +511,159 @@ namespace Tower_Unite_Instrument_Player_GUI
             CompileSong();
         }
 
+        #endregion
+
+        #region Music Pieces
+
+        public string MusicPieceName
+        {
+            get => p_musicPieceName;
+            set
+            {
+
+                if (p_musicPieceName == value) return;
+                p_musicPieceName = value;
+                OnPropertyChanged("MusicPieceName");
+            }
+        }
+
+        public bool EnableMusicPieceSettings
+        {
+            get => p_enableMusicPieceSettings;
+            set
+            {
+                if (p_enableMusicPieceSettings == value) return;
+                p_enableMusicPieceSettings = value;
+                OnPropertyChanged("EnableMusicPieceSettings");
+            }
+        }
+
+        public bool MusicPieceHasError
+        {
+            get => p_musicPieceHasError;
+            set
+            {
+                if (p_musicPieceHasError == value) return;
+                p_musicPieceHasError = value;
+                OnPropertyChanged("MusicPieceHasError");
+            }
+        }
+        public string MusicPieceErrorMessage
+        {
+            get => p_musicPieceErrorMessage;
+            set
+            {
+                if (p_musicPieceErrorMessage == value) return;
+                p_musicPieceErrorMessage = value;
+                OnPropertyChanged("MusicPieceErrorMessage");
+            }
+        }
+
+        public KeyValuePair<string, string> SelectedMusicPiece
+        {
+            get => p_selectedMusicPiece;
+            set
+            {
+                if (p_selectedMusicPiece.Equals(value)) return;
+                p_selectedMusicPiece = value;
+                HasMusicPieceSelected = !string.IsNullOrEmpty(p_selectedMusicPiece.Key);
+
+                if (value.Value == null)
+                {
+                    MusicPieceNotes = "Notes";
+                }
+                else
+                {
+                    MusicPieceNotes = value.Value;
+                }
+
+                OnPropertyChanged("SelectedMusicPiece");
+            }
+        }
+
+        public bool HasMusicPieceSelected
+        {
+            get => p_hasMusicPieceSelected;
+            set
+            {
+                if (p_hasMusicPieceSelected == value) return;
+
+                p_hasMusicPieceSelected = value;
+                OnPropertyChanged("HasMusicPieceSelected");
+
+            }
+        }
+
+        public string MusicPieceNotes
+        {
+            get => p_musicPieceNotes;
+            set
+            {
+                if (p_musicPieceNotes == value) return;
+                p_musicPieceNotes = value;
+
+                if (SelectedMusicPiece.Key != null && MusicPieces[SelectedMusicPiece.Key] != value)
+                {
+                    MusicPieces[SelectedMusicPiece.Key] = value;
+                    CompileMusicPiece();
+                }
+
+                OnPropertyChanged("MusicPieceNotes");
+            }
+        }
+
+        public ObservableDictionary<string, string> MusicPieces
+        {
+            get => p_musicPieces;
+            set
+            {
+                if (p_musicPieces.Equals(value)) return;
+
+                p_musicPieces = value;
+                OnPropertyChanged("MusicPieces");
+            }
+        }
+
+        private void CompileMusicPiece()
+        {
+            EnableMusicPieceSettings = false;
+
+            r_musicPieceCompileTimer.Interval = c_compileTimerCooldown;
+            r_musicPieceCompileTimer.Start();
+        }
+
+        private void ResetMusicPieceError()
+        {
+            MusicPieceErrorMessage = "";
+            MusicPieceHasError = false;
+        }
+
+        private void SetMusicPieceError(string errorMsg)
+        {
+            MusicPieceErrorMessage = $"ERROR: {errorMsg}";
+            MusicPieceHasError = true;
+        }
+
         private void AddMusicPieceButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            if (MusicPieces.Keys.Contains(MusicPieceName)) return;
+
+            MusicPieces.Add(MusicPieceName, MusicPieceNotes);
+
+            CompileSong();
         }
         private void RemoveMusicPieceButton_Click(object sender, RoutedEventArgs e)
         {
+            MusicPieces.Remove(SelectedMusicPiece.Key);
+            r_musicPiecesDictionary.Remove(SelectedMusicPiece.Key);
+            SelectedMusicPiece = default;
 
+            CompileSong();
         }
+
+        #endregion
+
+        #region Band
 
         private void StartServer_Click(object sender, RoutedEventArgs e)
         {
@@ -405,138 +683,6 @@ namespace Tower_Unite_Instrument_Player_GUI
             PlaySong();
         }
 
-        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = new Regex("[^0-9]+");
-            e.Handled = regex.IsMatch(e.Text);
-        }
-
-        private void SaveNotesButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog fileDialog = new SaveFileDialog
-            {
-                //This sets the save dialog to filter on .json files
-                Filter = "JSON|*.json"
-            };
-
-            if (fileDialog.ShowDialog() == true)
-            {
-                JObject json = new JObject
-                {
-                    ["delays"] = JObject.FromObject(Delays),
-                    ["normal_speed"] = NormalDelay,
-                    ["fast_speed"] = FastDelay,
-                    ["notes"] = NoteViewText
-                };
-
-                File.WriteAllText(fileDialog.FileName, json.ToString());
-
-                MessageBox.Show($"Notes saved to '{fileDialog.FileName}'");
-            }
-        }
-
-        private void LoadNotesButton_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog fileDialog = new OpenFileDialog
-            {
-                //This sets the load dialog to filter on .json and .txt files
-                //.txt files will be converted to .json files when loaded for backwards compatibility
-                Filter = "JSON|*.json|Text File|*.txt"
-            };
-
-            if (fileDialog.ShowDialog() == true)
-            {
-                try
-                {
-                    if (fileDialog.FileName.ToLower().EndsWith(".txt"))
-                        fileDialog.FileName = ConvertSaveFormat(fileDialog.FileName);
-
-                    dynamic json = JsonConvert.DeserializeObject(File.ReadAllText(fileDialog.FileName));
-
-                    Delays = JsonConvert.DeserializeObject<ObservableDictionary<char, int>>(json.delays.ToString());
-
-                    NormalDelay = int.Parse(json.normal_speed.ToString());
-                    FastDelay = int.Parse(json.fast_speed.ToString());
-
-                    NoteViewText = json.notes.ToString();
-
-                    MessageBox.Show("Loading completed");
-                }
-                catch (IOException error)
-                {
-                    MessageBox.Show($"Loading failed: {error.Message}");
-                }
-                
-            }
-        }
-
-        private string ConvertSaveFormat(string filePath)
-        {
-            JObject json = new JObject();
-
-            using (StreamReader sr = new StreamReader(filePath))
-            {
-                if (sr.ReadLine() == "DELAYS")
-                {
-                    Dictionary<char, int> delayDict = new Dictionary<char, int>();
-
-                    if (int.TryParse(sr.ReadLine(), out int delayCount) && delayCount > 0)
-                    {
-                        for (int i = 0; i < delayCount; i++)
-                        {
-                            if (char.TryParse(sr.ReadLine(), out char delayChar))
-                            {
-                                if (int.TryParse(sr.ReadLine(), out int delayTime))
-                                {
-                                    delayDict.Add(delayChar, delayTime);
-                                }
-                            }
-                        }
-                    }
-
-                    json["delays"] = JObject.FromObject(delayDict);
-                }
-                if (sr.ReadLine() == "SPEEDS")
-                {
-                    int.TryParse(sr.ReadLine(), out int normalSpeed);
-                    int.TryParse(sr.ReadLine(), out int fastSpeed);
-                    json["normal_speed"] = normalSpeed;
-                    json["fast_speed"] = fastSpeed;
-                }
-                if (sr.ReadLine() == "NOTES")
-                {
-                    if (int.TryParse(sr.ReadLine(), out int noteCount) && noteCount > 0)
-                        json["notes"] = sr.ReadToEnd();
-                }
-            }
-
-            string jsonPath = filePath.Replace(".txt", ".json");
-
-            try
-            {
-                File.WriteAllText(jsonPath, json.ToString());
-                return jsonPath;
-            }
-            catch (IOException e)
-            {
-                MessageBox.Show($"Failed to write json file: {e.Message}");
-                return filePath;
-            }
-        }
-
-        private void ExitButton_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
-        void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        int BpmToMs(int bpm)
-        {
-            return c_msPerMinute / bpm;
-        }
+        #endregion
     }
 }

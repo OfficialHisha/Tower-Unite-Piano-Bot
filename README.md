@@ -1,9 +1,10 @@
 # Tower Unite Instrument Player
 # This is a development branch, it might not be tested, might be buggy, might have unfinished features or might not compile. Use at your own risk!
 
-This program will play the pasted song in Tower Unite.
+This program will play the pasted song in Tower Unite. Become the musician you always wanted to be without putting in the work!
 
 You are free to download, modify and redistribute modified versions of the software under the GNU General Public License V3.
+
 Redistributed versions of the software must contain appropriate creadits to the original author of the software.
 
 # How to use
@@ -24,11 +25,18 @@ An example of invalid input is as such:
 
 as described in Known issues.
 
-# Planned features
+The software has most of the same limitations as a human player with very few exceptions.
 
+# Features
+* Supports all instrucments in the game
+* Built-in song editor
+* Easily editable save format to make edits without having the program open
+
+# Planned features
 * Faster reuse of notes through "music pieces".
 * Ability to use x2 or something similair to play a certain series of notes multiple times without copying and pasting them over and over again.
-* Some sooper secret features I am not ready to talk about yet ;)
+* Synchronisation between multiple players in a band
+* Creating songs from MIDI files
 
 # Known issues
 These issues may lead to the software crashing or the in game character leaving the instrument (See "Important").

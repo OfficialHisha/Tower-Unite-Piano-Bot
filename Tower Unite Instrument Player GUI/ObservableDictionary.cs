@@ -35,7 +35,6 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
 using System.Linq;
-using System.Security.Cryptography.Pkcs;
 
 namespace DrWPF.Windows.Data
 {

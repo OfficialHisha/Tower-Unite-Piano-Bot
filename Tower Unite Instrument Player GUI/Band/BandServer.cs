@@ -10,13 +10,16 @@ namespace Tower_Unite_Instrument_Player_GUI.Band
 {
     static class BandServer
     {
+
         // Only accept clients when the server is enabled
         static bool _enabled = false;
 
         // Thread signal used for accepting connections
         static readonly ManualResetEvent r_allDone = new ManualResetEvent(false);
 
-        public static Dictionary<TcpClient, BinaryWriter> Clients { get; } = new Dictionary<TcpClient, BinaryWriter>();
+        static readonly System.Timers.Timer r_pingTimer = new System.Timers.Timer(1000);
+
+        public static Dictionary<EndPoint, BandMember> Clients { get; } = new Dictionary<EndPoint, BandMember>();
 
         public static async Task Start(int port)
         {
@@ -29,6 +32,26 @@ namespace Tower_Unite_Instrument_Player_GUI.Band
             await Task.Run(() => listener.Start());
 
             Console.WriteLine($"Server started on {localAddr}:{port}");
+
+            r_pingTimer.AutoReset = true;
+            r_pingTimer.Elapsed += (timer, args) =>
+            {
+                foreach (BandMember client in Clients.Values)
+                {
+                    if ((client.LastMessage - DateTime.Now).TotalSeconds > 30)
+                    {
+                        // It's more than 30 seconds since the client sent a message or responded to pings
+                        // Client is assumed to be disconnected
+                        Clients.Remove(client.EndPoint);
+                        client.Client.Close();
+                        Console.WriteLine($"{client.EndPoint} lost connection");
+                        continue;
+                    }
+
+                    client.Ping();
+                }
+            };
+            r_pingTimer.Start();
 
             await Task.Run(() =>
             {
@@ -56,8 +79,10 @@ namespace Tower_Unite_Instrument_Player_GUI.Band
 
             Console.WriteLine($"Accepted connection from {client.Client.RemoteEndPoint}");
 
-            Clients.Add(client, new BinaryWriter(client.GetStream()));
-            await Receive(client.Client.RemoteEndPoint, new BinaryReader(client.GetStream()));
+            BandMember member = new BandMember(client, client.Client.RemoteEndPoint.ToString());
+
+            Clients.Add(client.Client.RemoteEndPoint, member);
+            await Receive(client.Client.RemoteEndPoint, member.Reader);
         }
 
         static async Task Receive(EndPoint clientEndPoint, BinaryReader clientReader)
@@ -66,12 +91,16 @@ namespace Tower_Unite_Instrument_Player_GUI.Band
             {
                 string message = await Task.Run(() => clientReader.ReadString());
                 Console.WriteLine($"Received message from {clientEndPoint}: {message}");
+                switch (message)
+                {
+                    case "pong":
+                        Clients[clientEndPoint].Pong();
+                        Console.WriteLine($"Received ping response from {clientEndPoint} ({Clients[clientEndPoint].Latency} ms)");
+                        break;
+                    default:
+                        break;
+                }
             }
-        }
-
-        static void Send(TcpClient client, string message)
-        {
-            Clients[client].Write(message);
         }
 
         public static async Task Broadcast(string message)
@@ -80,9 +109,9 @@ namespace Tower_Unite_Instrument_Player_GUI.Band
 
             await Task.Run(() =>
             {
-                foreach (BinaryWriter writer in Clients.Values)
+                foreach (BandMember client in Clients.Values)
                 {
-                    writer.Write(message);
+                    client.SendMessage(message);
                 }
             });
         }
