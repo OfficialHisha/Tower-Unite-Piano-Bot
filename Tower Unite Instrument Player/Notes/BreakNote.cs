@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Tower_Unite_Instrument_Player.Notes
 {
@@ -20,14 +21,11 @@ namespace Tower_Unite_Instrument_Player.Notes
             Time = breakTime;
         }
 
-        public void Play()
+        public async Task Play()
         {
-            Thread.Sleep(Time);
+            await Task.Delay(Time);
         }
 
-        public void Stop()
-        {
-
-        }
+        public void Stop(){}
     }
 }

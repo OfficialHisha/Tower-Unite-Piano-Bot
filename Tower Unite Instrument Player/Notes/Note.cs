@@ -1,4 +1,4 @@
-﻿using System.Threading;
+﻿using System.Threading.Tasks;
 using WindowsInput;
 using WindowsInput.Native;
 
@@ -12,7 +12,7 @@ namespace Tower_Unite_Instrument_Player.Notes
     /// </summary>
     public class Note : INote
     {
-        InputSimulator sim = new InputSimulator();
+        readonly InputSimulator r_sim = new InputSimulator();
 
         public VirtualKeyCode NoteToPlay { get; private set; }
         public char Character { get; private set; }
@@ -28,34 +28,37 @@ namespace Tower_Unite_Instrument_Player.Notes
             NoteLength = noteLength;
         }
 
-        public void Play()
+        public async Task Play()
         {
-            //This method is used until a better solution is found. This will NOT play black keys :(
-            //SendKeys.SendWait(Character.ToString());
-
-            //EXPERIMENTAL SOLUTION
-            //This method is a better solution as you can define a delay. However, this may result in unexpected behaviour should the program be terminated before KeyUp is run!
             if (IsHighNote)
             {
-                sim.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
-                Thread.Sleep(8);
-                sim.Keyboard.KeyDown(NoteToPlay);
-                Thread.Sleep(NoteLength-8);
-                sim.Keyboard.KeyUp(NoteToPlay);
-                sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
+                await Task.Run(() =>
+                {
+                    r_sim.Keyboard
+                    .KeyDown(VirtualKeyCode.LSHIFT)
+                    .KeyDown(NoteToPlay)
+                    .Sleep(NoteLength)
+                    .KeyUp(NoteToPlay)
+                    .KeyUp(VirtualKeyCode.LSHIFT);
+                });
             }
             else
             {
-                sim.Keyboard.KeyDown(NoteToPlay);
-                Thread.Sleep(NoteLength);
-                sim.Keyboard.KeyUp(NoteToPlay);
+                await Task.Run(() =>
+                {
+                    r_sim.Keyboard
+                    .KeyDown(NoteToPlay)
+                    .Sleep(NoteLength)
+                    .KeyUp(NoteToPlay);
+                });
             }
         }
 
         public void Stop()
         {
-            sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
-            sim.Keyboard.KeyUp(NoteToPlay);
+            r_sim.Keyboard
+            .KeyUp(VirtualKeyCode.LSHIFT)
+            .KeyUp(NoteToPlay);
         }
 
         public override string ToString()

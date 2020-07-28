@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Tower_Unite_Instrument_Player_GUI</RootNamespace>
     <UseWPF>true</UseWPF>
@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/OfficialHisha/Tower-Unite-Piano-Bot</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageId>Tower Unite Instrument Player</PackageId>
+    <PackageId>Tower Unite Instrument Player GUI</PackageId>
     <Authors>Matias Jensen</Authors>
     <Product>Tower Unite Instrument Player</Product>
     <Company />
@@ -20,13 +20,14 @@
 Developed for virtual instruments in the computer game "Tower Unite".
 May also work on virtual instruments on other platforms.</Description>
     <SignAssembly>false</SignAssembly>
-    <AssemblyName>Tower Unite Instrument Player</AssemblyName>
+    <AssemblyName>Tower Unite Instrument Player GUI</AssemblyName>
     <Version>3.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>true</Optimize>
     <DocumentationFile></DocumentationFile>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

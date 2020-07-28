@@ -1,4 +1,6 @@
-﻿namespace Tower_Unite_Instrument_Player.Notes
+﻿using System.Threading.Tasks;
+
+namespace Tower_Unite_Instrument_Player.Notes
 {
     /// <summary>
     /// This interface is a set of rules that all notes has to follow
@@ -9,7 +11,7 @@
         /// <summary>
         /// This method is invoked when the note is reached in the song
         /// </summary>
-        void Play();
+        Task Play();
         void Stop();
     }
 }

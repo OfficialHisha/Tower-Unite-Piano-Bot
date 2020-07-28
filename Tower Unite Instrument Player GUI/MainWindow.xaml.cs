@@ -4,27 +4,21 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Tower_Unite_Instrument_Player;
 using Tower_Unite_Instrument_Player.Exceptions;
+using Tower_Unite_Instrument_Player.Notes;
+using Tower_Unite_Instrument_Player_GUI.Band;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Runtime.InteropServices;
-using NHotkey.Wpf;
 using DrWPF.Windows.Data;
+using NHotkey;
+using NHotkey.Wpf;
 
 namespace Tower_Unite_Instrument_Player_GUI
 {
@@ -38,7 +32,8 @@ namespace Tower_Unite_Instrument_Player_GUI
 
         bool _loop = false;
         Brush _defaultButtonBrush;
-        Thread _songThread;
+        INote[] song;
+        CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         int p_normalDelay = 200;
         int p_fastDelay = 100;
@@ -51,7 +46,7 @@ namespace Tower_Unite_Instrument_Player_GUI
         string p_noteViewText = "Load a song or input notes here..";
         string p_delayCharacter;
         KeyValuePair<char, int> p_selectedDelay;
-        ObservableDictionary<char, int> p_Delays = new ObservableDictionary<char, int>();
+        ObservableDictionary<char, int> p_delays = new ObservableDictionary<char, int>();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -162,16 +157,70 @@ namespace Tower_Unite_Instrument_Player_GUI
 
         public ObservableDictionary<char, int> Delays
         {
-            get => p_Delays;
+            get => p_delays;
             set
             {
-                if (p_Delays.Equals(value)) return;
+                if (p_delays.Equals(value)) return;
 
-                p_Delays = value;
+                p_delays = value;
+
                 OnPropertyChanged("Delays");
             }
         }
 
+        private KeyValuePair<string, string> p_selectedMusicPiece;
+
+        public KeyValuePair<string, string> SelectedMusicPiece
+        {
+            get => p_selectedMusicPiece;
+            set
+            {
+                if (p_selectedMusicPiece.Equals(value)) return;
+                p_selectedMusicPiece = value;
+                HasMusicPieceSelected = !string.IsNullOrEmpty(p_selectedMusicPiece.Key);
+                OnPropertyChanged("SelectedMusicPiece");
+            }
+        }
+
+        private bool p_hasMusicPieceSelected;
+
+        public bool HasMusicPieceSelected
+        {
+            get => p_hasMusicPieceSelected;
+            set
+            {
+                if (p_hasMusicPieceSelected == value) return;
+                p_hasMusicPieceSelected = value;
+                OnPropertyChanged("HasMusicPieceSelected");
+         
+            }
+        }
+
+        private string p_musicPieceNotes = "Notes";
+
+        public string MusicPieceNotes
+        {
+            get => p_musicPieceNotes;
+            set
+            {
+                if (p_musicPieceNotes == value) return;
+                p_musicPieceNotes = value;
+                OnPropertyChanged("MusicPieceNotes");
+            }
+        }
+
+        private ObservableDictionary<string, string> p_musicPieces = new ObservableDictionary<string, string>();
+        public ObservableDictionary<string, string> MusicPieces
+        {
+            get => p_musicPieces;
+            set
+            {
+                if (p_musicPieces.Equals(value)) return;
+
+                p_musicPieces = value;
+                OnPropertyChanged("MusicPieces");
+            }
+        }
 
         public string NoteViewText
         {
@@ -179,11 +228,9 @@ namespace Tower_Unite_Instrument_Player_GUI
             set
             {
                 if (p_noteViewText == value) return;
-                CanPlay = false;
                 p_noteViewText = value;
 
-                r_compileTimer.Interval = c_compileTimerCooldown;
-                r_compileTimer.Start();
+                CompileSong();
 
                 OnPropertyChanged("NoteViewText");
             }
@@ -215,30 +262,61 @@ namespace Tower_Unite_Instrument_Player_GUI
                 if (string.IsNullOrEmpty(NoteViewText))
                     return;
 
-                Autoplayer.AddNotesFromString(NoteViewText);
-                CanPlay = !HasError;
+                try
+                {
+                    NoteParser parser = new NoteParser();
+                    song = parser.ParseNotes(NoteViewText, new Dictionary<char, int>(Delays));
+                    CanPlay = true;
+                }
+                catch (AutoplayerException ex)
+                {
+                    CanPlay = false;
+                    SetError(ex.Message);
+                }
             };
 
-            HotkeyManager.Current.AddOrReplace("Play", Key.F2, ModifierKeys.None, (sender, args) => PlaySong());
-            HotkeyManager.Current.AddOrReplace("Stop", Key.F3, ModifierKeys.None, (sender, args) => Autoplayer.StopSong());
+            try
+            {
+                HotkeyManager.Current.AddOrReplace("Play", Key.F2, ModifierKeys.None, (sender, args) => PlaySong());
+                HotkeyManager.Current.AddOrReplace("Stop", Key.F3, ModifierKeys.None, (sender, args) => _cancellationTokenSource.Cancel());
+                HotkeyManager.Current.AddOrReplace("BandPlay", Key.F4, ModifierKeys.None, (sender, args) =>
+                {
+                    BandServer.Broadcast("play");
+                    PlaySong();
+                });
+            }
+            catch (HotkeyAlreadyRegisteredException)
+            {
+                // Hotkeys are already registered
+                //Application.Current.Shutdown();
+            }
+            
 
             Application.Current.Exit += (sender, args) =>
             {
-                Autoplayer.StopSong();// Ensure that we stop any song that may be playing when the application exits
+                // Ensure that we stop any song that may be playing when the application exits
+                _cancellationTokenSource.Cancel();
             };
 
             DataContext = this;
         }
 
-        private void PlaySong()
+        private void CompileSong()
         {
-            if (CanPlay)
-            {
-                Autoplayer.StopSong();// Stop the song in case a song might still be playing
-                Thread.Sleep(1000);// wait a second to ensure it has finished execution
-                _songThread = new Thread(Autoplayer.PlaySong);// Start a new song in a new thread
-                _songThread.Start();
-            }
+            CanPlay = false;
+
+            r_compileTimer.Interval = c_compileTimerCooldown;
+            r_compileTimer.Start();
+        }
+
+        private async Task PlaySong()
+        {
+            if (!CanPlay) return;
+
+            _cancellationTokenSource.Cancel();
+            await Task.Delay(1000);
+            _cancellationTokenSource = new CancellationTokenSource();
+            await Autoplayer.PlaySong(song, _cancellationTokenSource.Token);
         }
 
         private void ExceptionHandler(AutoplayerException exception)
@@ -265,7 +343,7 @@ namespace Tower_Unite_Instrument_Player_GUI
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
-            Autoplayer.StopSong();
+            _cancellationTokenSource.Cancel();
         }
 
         private void LoopButton_Click(object sender, RoutedEventArgs e)
@@ -284,26 +362,47 @@ namespace Tower_Unite_Instrument_Player_GUI
         {
             char delayChar = DelayCharacter[0];
 
-            if (Autoplayer.Breaks.ContainsKey(delayChar))
-                Autoplayer.ChangeBreak(delayChar, DelayDuration);
+            if (Delays.Keys.Contains(delayChar))
+                Delays[delayChar] = DelayDuration;
             else
-                Autoplayer.AddBreak(delayChar, DelayDuration);
+                Delays.Add(delayChar, DelayDuration);
 
-            Delays = new ObservableDictionary<char, int>(Autoplayer.Breaks);
+            CompileSong();
         }
 
         private void RemoveDelayButton_Click(object sender, RoutedEventArgs e)
         {
-            Autoplayer.RemoveBreak(SelectedDelay.Key);
-
-            if (Autoplayer.Breaks.Count == 0)
-            {
-                Delays.Clear();
-                return;
-            }
-
-            Delays = new ObservableDictionary<char, int>(Autoplayer.Breaks);
+            Delays.Remove(SelectedDelay.Key);
             SelectedDelay = default;
+
+            CompileSong();
+        }
+
+        private void AddMusicPieceButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+        private void RemoveMusicPieceButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void StartServer_Click(object sender, RoutedEventArgs e)
+        {
+
+            BandServer.Start(6000);
+        }
+
+        private void JoinServer_Click(object sender, RoutedEventArgs e)
+        {
+            BandClient.OnServerPlay += () => PlaySong();
+            BandClient.Join("127.0.0.1", 6000);
+        }
+
+        private void ServerPlay_Click(object sender, RoutedEventArgs e)
+        {
+            BandServer.Broadcast("play");
+            PlaySong();
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
@@ -314,18 +413,21 @@ namespace Tower_Unite_Instrument_Player_GUI
 
         private void SaveNotesButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog fileDialog = new SaveFileDialog();
-
-            //This sets the save dialog to filter on .json files
-            fileDialog.Filter = "JSON|*.json";
+            SaveFileDialog fileDialog = new SaveFileDialog
+            {
+                //This sets the save dialog to filter on .json files
+                Filter = "JSON|*.json"
+            };
 
             if (fileDialog.ShowDialog() == true)
             {
-                JObject json = new JObject();
-                json["delays"] = JObject.FromObject(new object());
-                json["normal_speed"] = NormalDelay;
-                json["fast_speed"] = FastDelay;
-                json["notes"] = NoteViewText;
+                JObject json = new JObject
+                {
+                    ["delays"] = JObject.FromObject(Delays),
+                    ["normal_speed"] = NormalDelay,
+                    ["fast_speed"] = FastDelay,
+                    ["notes"] = NoteViewText
+                };
 
                 File.WriteAllText(fileDialog.FileName, json.ToString());
 
@@ -344,34 +446,24 @@ namespace Tower_Unite_Instrument_Player_GUI
 
             if (fileDialog.ShowDialog() == true)
             {
-                bool fallbackCanPlay = CanPlay;
                 try
                 {
-                    CanPlay = false;
-
                     if (fileDialog.FileName.ToLower().EndsWith(".txt"))
                         fileDialog.FileName = ConvertSaveFormat(fileDialog.FileName);
 
-                    Autoplayer.ResetBreaks();
-
                     dynamic json = JsonConvert.DeserializeObject(File.ReadAllText(fileDialog.FileName));
 
-                    foreach (JObject delay in json.delays)
-                    {
-                        Delays.Add(char.Parse(delay[0].ToString()), int.Parse(delay[1].ToString()));
-                    }
+                    Delays = JsonConvert.DeserializeObject<ObservableDictionary<char, int>>(json.delays.ToString());
 
                     NormalDelay = int.Parse(json.normal_speed.ToString());
                     FastDelay = int.Parse(json.fast_speed.ToString());
 
                     NoteViewText = json.notes.ToString();
-                    CanPlay = true;
 
                     MessageBox.Show("Loading completed");
                 }
                 catch (IOException error)
                 {
-                    CanPlay = fallbackCanPlay;
                     MessageBox.Show($"Loading failed: {error.Message}");
                 }
                 
@@ -445,15 +537,6 @@ namespace Tower_Unite_Instrument_Player_GUI
         int BpmToMs(int bpm)
         {
             return c_msPerMinute / bpm;
-        }
-
-        private void AddMusicPieceButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-        private void RemoveMusicPieceButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

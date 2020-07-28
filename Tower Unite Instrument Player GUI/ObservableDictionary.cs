@@ -34,6 +34,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
+using System.Linq;
+using System.Security.Cryptography.Pkcs;
 
 namespace DrWPF.Windows.Data
 {
@@ -42,7 +44,6 @@ namespace DrWPF.Windows.Data
         IDictionary<TKey, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IEnumerable<KeyValuePair<TKey, TValue>>,
-        IDictionary,
         ICollection,
         IEnumerable,
         ISerializable,
@@ -56,12 +57,12 @@ namespace DrWPF.Windows.Data
 
         public ObservableDictionary()
         {
-            _keyedEntryCollection = new KeyedDictionaryEntryCollection<TKey>();
+            _keyedEntryCollection = new Dictionary<TKey, TValue>();
         }
 
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
         {
-            _keyedEntryCollection = new KeyedDictionaryEntryCollection<TKey>();
+            _keyedEntryCollection = new Dictionary<TKey, TValue>();
 
             foreach (KeyValuePair<TKey, TValue> entry in dictionary)
                 DoAddEntry((TKey)entry.Key, (TValue)entry.Value);
@@ -69,15 +70,15 @@ namespace DrWPF.Windows.Data
 
         public ObservableDictionary(IEqualityComparer<TKey> comparer)
         {
-            _keyedEntryCollection = new KeyedDictionaryEntryCollection<TKey>(comparer);
+            _keyedEntryCollection = new Dictionary<TKey, TValue>(comparer);
         }
 
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
-            _keyedEntryCollection = new KeyedDictionaryEntryCollection<TKey>(comparer);
+            _keyedEntryCollection = new Dictionary<TKey, TValue>(comparer);
 
             foreach (KeyValuePair<TKey, TValue> entry in dictionary)
-                DoAddEntry((TKey)entry.Key, (TValue)entry.Value);
+                DoAddEntry(entry.Key, entry.Value);
         }
 
         #endregion public
@@ -114,7 +115,7 @@ namespace DrWPF.Windows.Data
 
         public TValue this[TKey key]
         {
-            get { return (TValue)_keyedEntryCollection[key].Value; }
+            get { return _keyedEntryCollection[key]; }
             set { DoSetEntry(key, value); }
         }
 
@@ -134,8 +135,8 @@ namespace DrWPF.Windows.Data
                 if (_dictionaryCacheVersion != _version)
                 {
                     _dictionaryCache.Clear();
-                    foreach (DictionaryEntry entry in _keyedEntryCollection)
-                        _dictionaryCache.Add((TKey)entry.Key, (TValue)entry.Value);
+                    foreach (KeyValuePair<TKey, TValue> entry in _keyedEntryCollection)
+                        _dictionaryCache.Add(entry.Key, entry.Value);
                     _dictionaryCacheVersion = _version;
                 }
                 return _dictionaryCache;
@@ -162,7 +163,7 @@ namespace DrWPF.Windows.Data
 
         public bool ContainsKey(TKey key)
         {
-            return _keyedEntryCollection.Contains(key);
+            return _keyedEntryCollection.ContainsKey(key);
         }
 
         public bool ContainsValue(TValue value)
@@ -182,8 +183,8 @@ namespace DrWPF.Windows.Data
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            bool result = _keyedEntryCollection.Contains(key);
-            value = result ? (TValue)_keyedEntryCollection[key].Value : default(TValue);
+            bool result = _keyedEntryCollection.ContainsKey(key);
+            value = result ? _keyedEntryCollection[key] : default;
             return result;
         }
 
@@ -193,7 +194,7 @@ namespace DrWPF.Windows.Data
 
         protected virtual bool AddEntry(TKey key, TValue value)
         {
-            _keyedEntryCollection.Add(new DictionaryEntry(key, value));
+            _keyedEntryCollection.Add(key, value);
             return true;
         }
 
@@ -209,28 +210,26 @@ namespace DrWPF.Windows.Data
             return result;
         }
 
-        protected int GetIndexAndEntryForKey(TKey key, out DictionaryEntry entry)
+        protected int GetIndexAndEntryForKey(TKey key, out KeyValuePair<TKey, TValue> entry)
         {
-            entry = new DictionaryEntry();
+            entry = new KeyValuePair<TKey, TValue>();
             int index = -1;
-            if (_keyedEntryCollection.Contains(key))
+            if (_keyedEntryCollection.ContainsKey(key))
             {
-                entry = _keyedEntryCollection[key];
-                index = _keyedEntryCollection.IndexOf(entry);
+                entry = new KeyValuePair<TKey, TValue>(key, _keyedEntryCollection[key]);
+                index = Array.IndexOf(_keyedEntryCollection.ToArray(), entry);
             }
             return index;
         }
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (CollectionChanged != null)
-                CollectionChanged(this, args);
+            CollectionChanged?.Invoke(this, args);
         }
 
         protected virtual void OnPropertyChanged(string name)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         protected virtual bool RemoveEntry(TKey key)
@@ -241,10 +240,10 @@ namespace DrWPF.Windows.Data
 
         protected virtual bool SetEntry(TKey key, TValue value)
         {
-            bool keyExists = _keyedEntryCollection.Contains(key);
+            bool keyExists = _keyedEntryCollection.ContainsKey(key);
 
             // if identical key/value pair already exists, nothing to do
-            if (keyExists && value.Equals((TValue)_keyedEntryCollection[key].Value))
+            if (keyExists && value.Equals(_keyedEntryCollection[key]))
                 return false;
 
             // otherwise, remove the existing entry
@@ -252,7 +251,7 @@ namespace DrWPF.Windows.Data
                 _keyedEntryCollection.Remove(key);
 
             // add the new entry
-            _keyedEntryCollection.Add(new DictionaryEntry(key, value));
+            _keyedEntryCollection.Add(key, value);
 
             return true;
         }
@@ -267,8 +266,7 @@ namespace DrWPF.Windows.Data
             {
                 _version++;
 
-                DictionaryEntry entry;
-                int index = GetIndexAndEntryForKey(key, out entry);
+                int index = GetIndexAndEntryForKey(key, out KeyValuePair<TKey, TValue> entry);
                 FireEntryAddedNotifications(entry, index);
             }
         }
@@ -284,8 +282,7 @@ namespace DrWPF.Windows.Data
 
         private bool DoRemoveEntry(TKey key)
         {
-            DictionaryEntry entry;
-            int index = GetIndexAndEntryForKey(key, out entry);
+            int index = GetIndexAndEntryForKey(key, out KeyValuePair<TKey, TValue> entry);
 
             bool result = RemoveEntry(key);
             if (result)
@@ -300,8 +297,7 @@ namespace DrWPF.Windows.Data
 
         private void DoSetEntry(TKey key, TValue value)
         {
-            DictionaryEntry entry;
-            int index = GetIndexAndEntryForKey(key, out entry);
+            int index = GetIndexAndEntryForKey(key, out KeyValuePair<TKey, TValue> entry);
 
             if (SetEntry(key, value))
             {
@@ -322,7 +318,7 @@ namespace DrWPF.Windows.Data
             }
         }
 
-        private void FireEntryAddedNotifications(DictionaryEntry entry, int index)
+        private void FireEntryAddedNotifications(KeyValuePair<TKey, TValue> entry, int index)
         {
             // fire the relevant PropertyChanged notifications
             FirePropertyChangedNotifications();
@@ -334,7 +330,7 @@ namespace DrWPF.Windows.Data
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        private void FireEntryRemovedNotifications(DictionaryEntry entry, int index)
+        private void FireEntryRemovedNotifications(KeyValuePair<TKey, TValue> entry, int index)
         {
             // fire the relevant PropertyChanged notifications
             FirePropertyChangedNotifications();
@@ -387,7 +383,7 @@ namespace DrWPF.Windows.Data
 
         bool IDictionary<TKey, TValue>.ContainsKey(TKey key)
         {
-            return _keyedEntryCollection.Contains(key);
+            return _keyedEntryCollection.ContainsKey(key);
         }
 
         bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)
@@ -407,66 +403,11 @@ namespace DrWPF.Windows.Data
 
         TValue IDictionary<TKey, TValue>.this[TKey key]
         {
-            get { return (TValue)_keyedEntryCollection[key].Value; }
+            get { return _keyedEntryCollection[key]; }
             set { DoSetEntry(key, value); }
         }
 
         #endregion IDictionary<TKey, TValue>
-
-        #region IDictionary
-
-        void IDictionary.Add(object key, object value)
-        {
-            DoAddEntry((TKey)key, (TValue)value);
-        }
-
-        void IDictionary.Clear()
-        {
-            DoClearEntries();
-        }
-
-        bool IDictionary.Contains(object key)
-        {
-            return _keyedEntryCollection.Contains((TKey)key);
-        }
-
-        IDictionaryEnumerator IDictionary.GetEnumerator()
-        {
-            return new Enumerator<TKey, TValue>(this, true);
-        }
-
-        bool IDictionary.IsFixedSize
-        {
-            get { return false; }
-        }
-
-        bool IDictionary.IsReadOnly
-        {
-            get { return false; }
-        }
-
-        object IDictionary.this[object key]
-        {
-            get { return _keyedEntryCollection[(TKey)key].Value; }
-            set { DoSetEntry((TKey)key, (TValue)value); }
-        }
-
-        ICollection IDictionary.Keys
-        {
-            get { return Keys; }
-        }
-
-        void IDictionary.Remove(object key)
-        {
-            DoRemoveEntry((TKey)key);
-        }
-
-        ICollection IDictionary.Values
-        {
-            get { return Values; }
-        }
-
-        #endregion IDictionary
 
         #region ICollection<KeyValuePair<TKey, TValue>>
 
@@ -482,7 +423,7 @@ namespace DrWPF.Windows.Data
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> kvp)
         {
-            return _keyedEntryCollection.Contains(kvp.Key);
+            return _keyedEntryCollection.ContainsKey(kvp.Key);
         }
 
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
@@ -500,7 +441,7 @@ namespace DrWPF.Windows.Data
                 throw new ArgumentException("CopyTo() failed:  supplied array was too small");
             }
 
-            foreach (DictionaryEntry entry in _keyedEntryCollection)
+            foreach (KeyValuePair<TKey, TValue> entry in _keyedEntryCollection)
                 array[index++] = new KeyValuePair<TKey, TValue>((TKey)entry.Key, (TValue)entry.Value);
         }
 
@@ -572,9 +513,9 @@ namespace DrWPF.Windows.Data
                 throw new ArgumentNullException("info");
             }
 
-            Collection<DictionaryEntry> entries = new Collection<DictionaryEntry>();
-            foreach (DictionaryEntry entry in _keyedEntryCollection)
-                entries.Add(entry);
+            Dictionary<TKey, TValue> entries = new Dictionary<TKey, TValue>();
+            foreach (KeyValuePair<TKey, TValue> entry in _keyedEntryCollection)
+                entries.Append(entry);
             info.AddValue("entries", entries);
         }
 
@@ -586,9 +527,9 @@ namespace DrWPF.Windows.Data
         {
             if (_siInfo != null)
             {
-                Collection<DictionaryEntry> entries = (Collection<DictionaryEntry>)
-                    _siInfo.GetValue("entries", typeof(Collection<DictionaryEntry>));
-                foreach (DictionaryEntry entry in entries)
+                Dictionary<TKey, TValue> entries = (Dictionary<TKey, TValue>)
+                    _siInfo.GetValue("entries", typeof(Dictionary<TKey, TValue>));
+                foreach (KeyValuePair<TKey, TValue> entry in entries)
                     AddEntry((TKey)entry.Key, (TValue)entry.Value);
             }
         }
@@ -625,7 +566,7 @@ namespace DrWPF.Windows.Data
 
         #region KeyedDictionaryEntryCollection<TKey>
 
-        protected class KeyedDictionaryEntryCollection<TKey> : KeyedCollection<TKey, DictionaryEntry>
+        protected class KeyedDictionaryEntryCollection<TKey> : KeyedCollection<TKey, KeyValuePair<TKey, TValue>>
         {
             #region constructors
 
@@ -643,9 +584,9 @@ namespace DrWPF.Windows.Data
 
             #region protected
 
-            protected override TKey GetKeyForItem(DictionaryEntry entry)
+            protected override TKey GetKeyForItem(KeyValuePair<TKey, TValue> entry)
             {
-                return (TKey)entry.Key;
+                return entry.Key;
             }
 
             #endregion protected
@@ -662,7 +603,7 @@ namespace DrWPF.Windows.Data
         #region Enumerator
 
         [Serializable, StructLayout(LayoutKind.Sequential)]
-        public struct Enumerator<TKey, TValue> : IEnumerator<KeyValuePair<TKey, TValue>>, IDisposable, IDictionaryEnumerator, IEnumerator
+        public struct Enumerator<TKey, TValue> : IEnumerator<KeyValuePair<TKey, TValue>>, IDisposable, IEnumerator
         {
             #region constructors
 
@@ -708,7 +649,7 @@ namespace DrWPF.Windows.Data
                 _index++;
                 if (_index < _dictionary._keyedEntryCollection.Count)
                 {
-                    _current = new KeyValuePair<TKey, TValue>((TKey)_dictionary._keyedEntryCollection[_index].Key, (TValue)_dictionary._keyedEntryCollection[_index].Value);
+                    _current = new KeyValuePair<TKey, TValue>(_dictionary._keyedEntryCollection.ElementAt(_index).Key, _dictionary._keyedEntryCollection.ElementAt(_index).Value);
                     return true;
                 }
                 _index = -2;
@@ -753,7 +694,7 @@ namespace DrWPF.Windows.Data
                     ValidateCurrent();
                     if (_isDictionaryEntryEnumerator)
                     {
-                        return new DictionaryEntry(_current.Key, _current.Value);
+                        return new KeyValuePair<TKey, TValue>(_current.Key, _current.Value);
                     }
                     return new KeyValuePair<TKey, TValue>(_current.Key, _current.Value);
                 }
@@ -767,35 +708,6 @@ namespace DrWPF.Windows.Data
             }
 
             #endregion IEnumerator implemenation
-
-            #region IDictionaryEnumerator implemenation
-
-            DictionaryEntry IDictionaryEnumerator.Entry
-            {
-                get
-                {
-                    ValidateCurrent();
-                    return new DictionaryEntry(_current.Key, _current.Value);
-                }
-            }
-            object IDictionaryEnumerator.Key
-            {
-                get
-                {
-                    ValidateCurrent();
-                    return _current.Key;
-                }
-            }
-            object IDictionaryEnumerator.Value
-            {
-                get
-                {
-                    ValidateCurrent();
-                    return _current.Value;
-                }
-            }
-
-            #endregion
 
             #region fields
 
@@ -814,7 +726,7 @@ namespace DrWPF.Windows.Data
 
         #region fields
 
-        protected KeyedDictionaryEntryCollection<TKey> _keyedEntryCollection;
+        protected Dictionary<TKey, TValue> _keyedEntryCollection;
 
         private int _countCache = 0;
         private Dictionary<TKey, TValue> _dictionaryCache = new Dictionary<TKey, TValue>();

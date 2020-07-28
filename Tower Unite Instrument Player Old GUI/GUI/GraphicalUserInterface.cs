@@ -43,7 +43,7 @@ namespace Tower_Unite_Instrument_Autoplayer.GUI
             ErrorTextBox.Hide();
             ErrorTextBox.Text = "";
             VersionLabel.Text = $"Version: {Autoplayer.Version}";
-            Autoplayer.AddingNoteFinished += EnablePlayButton;
+            Autoplayer.AddingNotesFinished += EnablePlayButton;
             Autoplayer.SongFinishedPlaying += EnableClearButton;
             Autoplayer.SongWasStopped += EnableClearButton;
             Autoplayer.SongWasStopped += SongStopped;

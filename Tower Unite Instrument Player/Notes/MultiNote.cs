@@ -1,4 +1,4 @@
-﻿using System.Threading;
+﻿using System.Threading.Tasks;
 using WindowsInput;
 using WindowsInput.Native;
 
@@ -11,7 +11,7 @@ namespace Tower_Unite_Instrument_Player.Notes
     /// </summary>
     public class MultiNote : INote
     {
-        InputSimulator sim = new InputSimulator();
+        readonly InputSimulator r_sim = new InputSimulator();
 
         public Note[] Notes { get; private set; }
         public bool IsHighNote { get; private set; }
@@ -22,42 +22,26 @@ namespace Tower_Unite_Instrument_Player.Notes
             IsHighNote = isHighNote;
         }
 
-        public void Play()
+        public async Task Play()
         {
-            //EXPERIMENTAL SOLUTION
-            //This method is a better solution as you can define a delay. However, this may result in unexpected behaviour should the program be terminated before KeyUp is run!
-            //if (IsHighNote)
-            //{
-            //    sim.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
-            //    Thread.Sleep(8);
-            //    foreach (Note note in Notes)
-            //    {
-            //        sim.Keyboard.KeyDown(note.NoteToPlay);
-            //    }
-            //    Thread.Sleep(8);
-            //    foreach (Note note in Notes)
-            //    {
-            //        sim.Keyboard.KeyUp(note.NoteToPlay);
-            //    }
-            //    sim.Keyboard.KeyPress(VirtualKeyCode.LSHIFT);
-            //}
-            //else
-            //{
-            //    foreach (Note note in Notes)
-            //    {
-            //        sim.Keyboard.KeyDown(note.NoteToPlay);
-            //    }
-            //    Thread.Sleep(8);
-            //    foreach (Note note in Notes)
-            //    {
-            //        sim.Keyboard.KeyUp(note.NoteToPlay);
-            //    }
-            //}
+            if (IsHighNote)
+                r_sim.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
 
-            foreach (Note note in Notes)
+            await Task.Run(() =>
             {
-                note.Play();
-            }
+                foreach (Note note in Notes)
+                    r_sim.Keyboard.KeyDown(note.NoteToPlay);
+            });
+                
+            r_sim.Keyboard.Sleep(Notes[0].NoteLength);
+
+            await Task.Run(() =>
+            {
+                foreach (Note note in Notes)
+                    r_sim.Keyboard.KeyUp(note.NoteToPlay);
+            });
+
+            r_sim.Keyboard.KeyUp(VirtualKeyCode.LSHIFT);
         }
 
         public void Stop()
